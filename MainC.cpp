@@ -132,9 +132,11 @@ int main(int argc, char** argv){
   Var df0 = 0, dfN = -0;
   Var CCi = 2*info.spacestep*(a - ak)*df0;
   Var CCe =- 2*info.spacestep*(c - ck)*dfN;
-  CranckSolver myIntegrator(mat,info.Nl,info.Nt,CCi,CCe);
+  cout << "Inizializzo il Solver" <<endl;
+  CranckSolver myIntegrator(mat,infoNl,info.Nt,CCi,CCe);
+  cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
-  
+  cout << "Inizio i calcoli" <<endl;
   while(myIntegrator.doStep());
 
   //preparo il file per root
