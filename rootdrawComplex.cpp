@@ -13,12 +13,12 @@ TApplication theApp("app",0,NULL);
 int main()
 #endif
 {
-  TCanvas c("c","Real",640,512);
+  /*  TCanvas c("c","Real",640,512);
   TGraph2D *grafo = new TGraph2D("out.txt");
   grafo->Draw("pcol");
   TCanvas c2("c2","Imaginary",640,512);
   TGraph2D *Cgrafo = new TGraph2D("iout.txt");
-  Cgrafo->Draw("pcol");
+  Cgrafo->Draw("pcol");*/
   TCanvas c3("c3","Norm",640,512);
   TGraph2D *Ngrafo = new TGraph2D("Nout.txt");
   Ngrafo->Draw("pcol");

@@ -1,6 +1,7 @@
 #eseguibili
 main
 drawer
+*out.txt
 
 #emacs
 *~
