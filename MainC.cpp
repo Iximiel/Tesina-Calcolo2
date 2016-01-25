@@ -7,12 +7,13 @@
 using namespace std;
 
 const double PI = 4*atan(1);
+const Var I(0,1);
 
 struct impostazioni{
   int Nl, spaceskip;
   double lenght, spacestep;
   double mid, stdev ,norm;
-  double Vpos, Vmod;
+  double Vpos, Vval;
   double vel;
   int Vnum;
   int Nt, timeskip;
@@ -27,7 +28,7 @@ struct impostazioni{
     file >> dummy >> norm >> stdev;
     file >> mid;
     //    mid = lenght/2.;
-    file >> dummy >> Vpos >> Vmod;
+    file >> dummy >> Vpos >> Vval;
     file >> dummy >> vel;
     bool Ndep;
     file >> dummy >> Ndep;
@@ -48,7 +49,7 @@ struct impostazioni{
       cout << "Passi spaziali: " << Nl <<endl;
       cout << "Passi temporali: " << Nt <<endl;
     }
-    if(Vmod == 0)
+    if(Vval == 0)
       Vnum = Nl;
     else{
       Vnum = Vpos/spacestep;
@@ -59,7 +60,7 @@ struct impostazioni{
   double eta(){return k* timestep/(spacestep*spacestep);}
   Var gauss(int i){//Condizione iniziale
     double x = i*spacestep;
-    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(Var(0,1)*vel*x);
+    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(I*vel*x);
   }
 };
 
@@ -89,7 +90,7 @@ int main(int argc, char** argv){
   int Nt = tmax / timestep;
   ***********************
   double k = 1;//diffusivita`*/
-  Var eta = info.eta() * Var(0,1);
+  Var eta = info.eta() * I;
   /*while(eta > 1){
     cout << "Per rendere eta <1 (eta = " << eta << "), cambio k: "<< k <<" -> ";
     k /= 10;//diffusivita`
@@ -111,8 +112,8 @@ int main(int argc, char** argv){
   mat.setKnown(0,0,dk,ak+ck,0);
   for(int j = 1;j< info.Nl-1;j++){
     if(j==info.Vnum){
-      d -= info.Vmod * info.timestep/eta ;
-      dk+= info.Vmod * info.timestep/eta;
+      d -= -I*info.Vval * info.timestep/eta ;
+      dk+= -I*info.Vval * info.timestep/eta;
     }
     /****
      *NB: se ho CI troppo strette,
