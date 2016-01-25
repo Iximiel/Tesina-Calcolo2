@@ -5,9 +5,11 @@
 #tmax
 3
 #impostazioni_gaussiana_norm_stdev_midpoint
-10 1 2.5
+0.04 0.1 2.5
 #impostazioniV_Pos_Val
 2.5 0.0
+#Velocità
+50
 #Ndipende_da_int=0
 0
 #Nl
