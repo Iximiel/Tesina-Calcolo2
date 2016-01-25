@@ -57,7 +57,7 @@ struct impostazioni{
   double eta(){return k* timestep/(spacestep*spacestep);}
   Var gauss(int i){//Condizione iniziale
     double x = i*spacestep;
-    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(.1*Var(0,1)*x);
+    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(1.*Var(0,1)*x);
   }
 };
 
