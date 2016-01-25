@@ -1,0 +1,354 @@
+\documentclass[]{article}
+\usepackage[cm]{fullpage}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{showlabels} % debug, togliere
+
+%\usepackage[italian]{babel}
+%\usepackage[latin1]{inputenc}
+%\usepackage[utf8x]{inputenc}
+\usepackage{dsfont}
+%\usepackage{amsthm}
+%\usepackage[cm]{fullpage}
+\usepackage{enumerate}
+%\usepackage{extarrows}
+%\usepackage{mathrsfs}
+%\usepackage{braket}
+%\usepackage{wrapfig}
+\usepackage{tikz}
+%\usepackage{verbatim}
+
+\usepackage{hyperref}%deve essere l'ultimo package
+%http://www.tug.org/applications/hyperref/manual.html
+\hypersetup{colorlinks=true,
+linkcolor=black}
+
+%derivate
+\newcommand{\de}[2]{\ensuremath{\frac{\mathrm{d} #1}{\mathrm{d} #2}}}
+\newcommand{\lde}[2]{\ensuremath{{\mathrm{d} #1}/{\mathrm{d} #2}}}
+\newcommand{\dt}[2]{\ensuremath{\frac{\mathrm{d} #1}{\mathrm{d} t}}}
+\newcommand{\Dt}[1]{\ensuremath{\frac{\mathrm{D} #1}{\mathrm{D} t}}}
+\newcommand{\pde}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}}
+\newcommand{\lpde}[2]{\ensuremath{{\partial #1}/{\partial #2}}}
+%lettere
+\newcommand{\df}{\ensuremath{\mathrm{d}}}
+\newcommand{\w}{\ensuremath{\omega}}
+\newcommand{\R}{\mathds{R}}
+\renewcommand{\O}{\mathcal{O}} %ordine di
+%parentesi
+\newcommand{\lr}[3]{\ensuremath{\left#1 #3 \right#2}}
+\newcommand{\lrt}[1]{\lr{(}{)}{#1}}
+\newcommand{\lrq}[1]{\lr{[}{]}{#1}}
+\newcommand{\lrg}[1]{\lr{\{}{\}}{#1}}
+\newcommand{\media}[1]{\lr{<}{>}{#1}}
+
+\newcommand{\infint}{\int\limits_{-\infty}^{+\infty}}
+\newcommand{\MB}{Maxwell-Boltzmann}
+
+%vettori
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+\numberwithin{equation}{subsection}
+
+%opening
+\title{}
+\author{Daniele Rapetti}
+\date{}
+
+%\makeindex
+
+\begin{document}
+Iniziamo con la formulazione delle derivate:
+
+Prima (in avanti):
+$$\pde{F}x(a) \simeq \frac{F(a+h)-F(a)}{h}$$
+Prima (centrale):
+$$\pde{F}x(a) \simeq \frac{F(a+h/2)-F(a-h/2)}{2*h/2}$$
+
+Seconda(in avanti):
+$$\pde{^2F}{x^2}(a) \simeq \frac{\pde{F}x(a+h)-\pde{F}x(a)}{h} = \frac{F(a+2h)+F(a)-2F(a+h)}{h^2}$$
+Seconda(centrale):
+$$\pde{^2F}{x^2}(a) \simeq  \frac{F(a+h)+F(a-h)-2F(a)}{h^2}$$
+
+Partiamo dall'equazione del calore:
+$$\pde Tt =K \pde{^2T}{x^2}$$
+saltiamo le varie definizioni in avanti e indietro e passiamo direttamente al Cranck Nicholson:
+
+Schematizziamo la temperatura come $I*J$ punti ($I$ spazio, $J$ tempo): $T^j_i$.
+
+Per il tempo calcoliamo la derivata centrale in $t+\Delta t/2$.:
+$$\pde{T}t(x,t+\Delta t/2) \simeq \frac{T(x,t+\Delta t/2+\Delta t/2)-T(x,t-\Delta t/2+\Delta t/2)}{2*\Delta t/2} = \frac{T(x,t+\Delta t)-T(x,t)}{\Delta t}$$
+
+Per lo spazio le derivate al secondo ordine sono:
+$$\pde{^2T}{x^2}(x,t) \simeq  \frac{T(x+\Delta x,t)+T(x-\Delta x,t)-2T(x,t)}{\Delta x^2}$$
+
+per l'equazione si fa la media $\pde{^2T}{x^2}(x,t)+\pde{^2T}{x^2}(x,t+\Delta t)$:
+$$\begin{aligned}
+\frac{T(x,t+\Delta t)-T(x,t)}{\Delta t} = \frac K2 &\lr(.{\frac{T(x+\Delta x,t)+T(x-\Delta x,t)-2T(x,t)}{\Delta x^2}}\\
+&\lr.){+\frac{T(x+\Delta x,t+\Delta t)+T(x-\Delta x,t+\Delta t)-2T(x,t+\Delta t)}{\Delta x^2}}
+\end{aligned}$$
+
+in pochi passaggi si arriva a separare le parti a tempo differente:, con $\eta = K\frac{\Delta t}{\Delta x^2}$:
+$$\lrt{\frac 2\eta +2}T(x,t+\Delta t) -T(x+\Delta x,t+\Delta t)-T(x-\Delta x,t+\Delta t) = \lrt{\frac 2\eta -2}T(x,t)+T(x+\Delta x,t)+T(x-\Delta x,t)$$
+
+a questo punto procedo con il metodo della matrice tridiagonale
+
+
+Lavoriamo con l'equazione di Schrodinger dipendente dal tempo:
+$$i\hbar\pde \psi t(x,t) =\lrq{-\frac{\hbar^2}{2m}\pde{^2}{x^2}+V(x,t)} \psi(x,t)$$
+
+Similmente si arriva  a:
+$$\begin{aligned}
+i\hbar\frac{\psi(x,t+\Delta t)-\psi(x,t)}{\Delta t} = -\frac{\hbar^2}{4m} &\lr(.{\frac{\psi(x+\Delta x,t)+\psi(x-\Delta x,t)-2\psi(x,t)}{\Delta x^2}}\\
+&\lr.){+\frac{\psi(x+\Delta x,t+\Delta t)+\psi(x-\Delta x,t+\Delta t)-2\psi(x,t+\Delta t)}{\Delta x^2}}\\
+&+ \frac 12\lrt{\psi(x,t)V(x,t)+ \psi(x,t+\Delta t)V(x,t+\Delta t)}
+\end{aligned}$$
+Come prima definisco un $\eta = i\frac{\hbar}{2m} \frac{\Delta t}{\Delta x^2} $ e riscrivo:
+$$\begin{aligned}
+2\frac{\psi(x,t+\Delta t)-\psi(x,t)}{\eta} = & \psi(x+\Delta x,t)+\psi(x-\Delta x,t)-2\psi(x,t)\\
+&+\psi(x+\Delta x,t+\Delta t)+\psi(x-\Delta x,t+\Delta t)-2\psi(x,t+\Delta t)\\
+&+ \frac {\Delta t}\eta\lrt{\psi(x,t)V(x,t)+ \psi(x,t+\Delta t)V(x,t+\Delta t)}
+\end{aligned}$$
+E similmente a  prima ottengo un'equazione in cui separo i termini a tempi differenti:
+$$\begin{aligned}
+\lrt{\frac{2-\Delta t V(x,t+\Delta t)}{\eta}+2}\psi(x,t+\Delta t) -&\psi(x+\Delta x,t+\Delta t)-\psi(x-\Delta x,t+\Delta t) =\\
+& \lrt{\frac{2+\Delta t V(x,t)}{\eta}-2}\psi(x,t) +\psi(x+\Delta x,t)+\psi(x-\Delta x,t)
+\end{aligned}$$
+per impostare la tabella tridiagonale discretizzo $\psi$ e $V$, $i$ indice spaziale $j$ indice temporale:
+$$
+-\psi_{i-1}^{j+1}+\lrt{\frac{2-\Delta t V_i^{j+1}}{\eta}+2}\psi_{i}^{j+1} -\psi_{i+1}^{j+1} = 
+\psi_{i-1}^{j}+\lrt{\frac{2+ \Delta t V_{i}^{j}}{\eta}-2}\psi_{i}^{j} +\psi_{i+1}^{j}
+$$
+\subsection{Generalizzando}
+Partendo da una generica equazione di secondo ordine:
+$$
+\partial_t F = D_2 \partial^2_x F + D_1 \partial_x F + V(x,t) F + U(x,t)
+$$
+Non metto coefficienti davanti alla derivata temporale perch\`e posso includerlo in $D_1$ e $D_2$, mentre per la funzione che moltiplica F o che si somma il coefficente e` compreso in essa.
+In poche parole:
+$$\begin{aligned}
+\frac{F_i^{j+1} - F_i^j}{\Delta t} = \frac 12&\lr(.{D_2\frac{F^j_{i+1}+F^{j}_{i-1}-2F_i^{j}}{\Delta x^2} + D_1\frac{F^j_{i+1}-F^{j}_{i-1}}{2\Delta x} + F_i^j V_i^j + U_i^j+}\\
+&\lr.){D_2\frac{F^{j+1}_{i+1}+F^{j+1}_{i-1}-2F_i^{j+1}}{\Delta x^2} + D_1\frac{F^{j+1}_{i+1}-F^{j+1}_{i-1}}{2\Delta x} + F_i^{j+1} V_i^{j+1} + U_i^{j+1}}
+\end{aligned}
+$$
+Se indico con $\eta = \frac {D_2 \Delta t}{\Delta x^2}$ posso scrivere:
+$$
+-\lrt{1+\frac{D_1}{D_2}\frac{\Delta x}2}F_{i+1}^{j+1} + \lrt{\frac2\eta +2- \frac{\Delta x^2}{D_2}V_i^{j+1}} F^{j+1}_i - \lrt{1-\frac{D_1}{D_2}\frac{\Delta x}2}F_{i-1}^{j+1}  - \frac{\Delta x^2}{D_2} U_i^{j+1} = 
+$$
+
+$$
+\lrt{1+\frac{D_1}{D_2}\frac{\Delta x}2}F_{i+1}^{j} + \lrt{\frac2\eta -2+ \frac{\Delta x^2}{D_2}V_i^{j}} F^{j}_i + \lrt{1-\frac{D_1}{D_2}\frac{\Delta x}2}F_{i-1}^{j} + \frac{\Delta x^2}{D_2} U_i^{j}
+$$
+Ai fini del prossimo capitolo indico:
+$$
+\begin{array}{ll}
+a_i^j = -1-\frac{D_1}{D_2}\frac{\Delta x}2             & ak_i^j =1+\frac{D_1}{D_2}\frac{\Delta x}2\\
+d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1}} +2 & dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j}} -2 \\
+c_i^j = -1+\frac{D_1}{D_2}\frac{\Delta x}2             & ck_i^j =1-\frac{D_1}{D_2}\frac{\Delta x}2\\
+e_i^j = -\frac{\Delta x^2}{D_2} U_i^{j+1}              & ek_i^j =\frac{\Delta x^2}{D_2} U_i^{j}
+\end{array}
+$$
+\subsection{La matrice Tridiagonale: soluzione}
+A questo punto mi trovo con la forma dell'equazione (calcolata per il tempo $j$):
+$$
+a_{i} F_{i-1}^{j+1}+d_i F_{i}^{j+1} +c_{i}F_{i+1}^{j+1}  + e_i= 
+ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i
+$$
+
+che equivale al sistema(con $i=0->N-1$, ovvero un sistema con N punti rispettando le convenzioni del C, in cui a destra ci sono le variabili ci cui conosco i valori e a sinistra quelli ignoti:
+$$\lrt{\begin{array}{cccccc}
+d_0&c_0&&&\\
+a_1&d_1&c_1&\\
+&&...&&&\\
+&&&a_{N-2}&d_{N-2}&c_{N-2}\\
+&&&&a_{N-1}&d_{N-1}\\
+\end{array}} F^{j+1} = 
+\lrt{\begin{array}{cccccc}
+dk_0&ck_0&&&&\\
+ak_1&dk_1&ck_1&&&\\
+&&...&&&\\
+&&&ak_{N-2}&dk_{N-2}&ck_{N-2}\\
+&&&&ak_{N-1}&dk_{N-1}\\
+\end{array}} F^{j} + 
+\lrt{\begin{array}{c}
+ek_0 - e_0\\
+ek_1 - e_1\\
+...\\
+ek_{N-2} - e_{N-2}\\
+ek_{N-1} - e_{N-1}\\
+\end{array}}
+$$
+La trattazione attuale non tiene conto delle condizioni al contorno, ne parler\`o in seguito
+
+Per comodita` compatto il lato conosciuto in un vettore $B^j$:
+$$b_i^j = ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i-e_i$$
+
+$$\lrt{\begin{array}{cccccc}
+d_0&c_0&&&\\
+a_1&d_1&c_1&\\
+&&...&&&\\
+&&&...&&\\
+&&&a_{N-2}&d_{N-2}&c_{N-2}\\
+&&&&a_{N-1}&d_{N-1}\\
+\end{array}} F^{j+1} = 
+B^j
+$$
+
+a questo punto procedo con il trasformare la prima matrice in una matrice identita` + una matrice con valori non nulli solo nelle celle sopra alla diagonale:
+
+$$\lrt{\begin{array}{cccccc}
+d_0&c_0&0&...&0\\
+a_1&d_1&c_1&...&0\\
+&.&.&.&&\\
+\end{array}} F^{j+1} = \lrt{\begin{array}{c}
+b_0\\b_1\\...
+\end{array}}\to
+\lrt{\begin{array}{cccccc}
+1&\frac{c_0}{d_0}&0&...&0\\
+a_1&d_1&c_1&...&0\\
+&.&.&.&&\\
+\end{array}} F^{j+1} = \lrt{\begin{array}{c}
+\frac{b_0}{d_0}\\b_1\\...
+\end{array}}
+$$
+Proseguendo, chiamando $h_0 = \frac{c_0}{d_0}$ e $p_0 = \frac{b_0}{d_0}$
+$$
+\lrt{\begin{array}{cccccc}
+1&h_0&0&...&0\\
+a_1-a_1 &d_1 -a_1 h_0&c_1&...&0\\
+&.&.&.&&\\
+\end{array}} F^{j+1} = \lrt{\begin{array}{c}
+p_0\\b_1-a_1p_0\\...
+\end{array}}\to
+\lrt{\begin{array}{cccccc}
+1&h_0&0&...&0\\
+0 &1&\frac{c_1}{d_1 -a_1 h_0}&...&0\\
+&.&.&.&&\\
+\end{array}} F^{j+1} = \lrt{\begin{array}{c}
+p_0\\\frac{b_1-a_1p_0}{d_1 -a_1 h_0}\\...
+\end{array}}
+$$
+A questo punto chiamo $h_1 = \frac{c_1}{d_1 -a_1 h_0}$ e $p_1=\frac{b_1-a_1p_0}{d_1 -a_1 h_0}$: 
+$$
+\lrt{\begin{array}{cccccc}
+1&h_0&0&...&0\\
+0 &1&h_1&...&0\\
+0&a_3-a_3&d_3-a_3 h_1&c_3&...\\
+&.&.&.&&\\
+\end{array}} F^{j+1} = \lrt{\begin{array}{c}
+p_0\\p_1\\b_3 -a_3 p_1\\...
+\end{array}} \to
+\lrt{\begin{array}{cccccc}
+1&h_0&0&...&0\\
+0 &1&h_1&...&0\\
+0&0&1&\frac{c_3}{d_3-a_3 h_1}&...\\
+&.&.&.&&\\
+\end{array}} F^{j+1} = \lrt{\begin{array}{c}
+p_0\\p_1\\\frac{b_3 -a_3 p_1}{d_3-a_3 h_1}\\...
+\end{array}}
+$$
+A questo punto chiamo $h_3 = \frac{c_3}{d_3 -a_3 h_1}$ e $p_3=\frac{b_3-a_3p_1}{d_3 -a_3 h_1}$ e proseguo, ottengo cos\`i le regole:
+$$h_i = \frac{c_i}{d_i -a_i h_{i-1}}$$ e $$p_i=\frac{b_i-a_ip_{i-1}}{d_i -a_i h_{i-1}}$$
+
+da cui ottengo il sistema:
+$$\lrt{\begin{array}{cccccc}
+1&h_0&&&\\
+&1&h_1&\\
+&&...&&&\\
+&&&...&&\\
+&&&&1&h_{N-2}\\
+&&&&&1
+\end{array}}F^{j+1} = P$$
+
+ottengo i valori di $F_i^{j+1}$ a partire dall'ultimo $F_{N-1}^{j+1} = p_{N-1}$ con la formula (nell'algoritmo ho impostato $h_{N-1}=0$)
+$$F_{i}^{j+1} = p_{i}+h_i F_{i+1}^{j+1}$$ 
+
+A questo punto ho bisogno di conoscere le condizioni al contorno
+\section{Condizioni al contorno}
+In seguito espongo come \`e possibile adattare alcune condizioni al contorno:
+\begin{itemize}
+\item Dirichlet: Conosco i valori della funzione negli estremi del dominio
+\item Neumann: Conosco i valori della derivata della funzione negli estremi del dominio
+\item Robin: Conosco una combinazione lineare tra il valore della funzione e la sua derivata negli estremi del dominio
+%\item Cauchy: Conosco il valore della funzione \textbf{E} il valore della derivata negli estremi del dominio
+\item Miste: Negli estremi ho tipi differenti di condizioni al contorno
+\end{itemize}
+\subsection{Dirichlet}
+Conosco il valore della funzione negli estremi del dominio.
+$$F(x,t) = f(x,t) \forall x \in \partial D$$
+
+Assegno a $F_0^{j+1}$ e $F_{N-1}^{j+1}$ il valore noto, e` quindi inutile calcolare la prima e l'ultima riga della matrice $N\times N$ e posso trattare tutto come se la matrice fosse $N-2\times N-2$, con indici da $1$ a $N-2$ con la differenza che devo usare i seguenti valori:
+$$b_1^j = ak_1 F_{0}^{j}+ dk_1 F_{1}^{j} + ck_1 F_{2}^{j} - a_1 F_0^{j+1} $$
+$$b_{N-2}^j = ak_1 F_{N-3}^{j}+ dk_1 F_{N-2}^{j} + ck_1 F_{N-1}^{j} - c_1 F_{N-1}^{j+1} $$
+\subsection{Neumann}
+Conosco il valore della derivata negli estremi del dominio.
+$$\pde Fx(x,t) = f(x,t) \forall x \in \partial D$$
+
+La spiegazione e l'esempio per questa risoluzione lo fornisco nel paragrafo dedicato a Robin.
+
+\subsection{Robin}
+Conosco una combinazione lineare tra la derivata e il valore della funzione negli estremi del dominio.
+$$s(x,t)\pde Fx(x,t) +r(x,t) F(x,t) = f(x,t) \forall x \in \partial D$$
+
+Un esempio \`e necessario per poter affrontare queste Condizioni. Prima per\`o una piccola precisazione sulla derivata che devo utilizzare.
+
+Per mantenere la precisione del metodo ($\Delta x^2$) non posso usare la definizione della derivata ''in avanti'', perch\`e ha una precisione minore ($\Delta x$), ma quella centrale,  ho quindi bisogno di inventarmi un ''nodo fantasma'' $F_{-1}^{j+1}$ :
+$$\pde Fx(x(i=0),t(j=j+1)) = \frac{F_{1}^{j+1}-F_{-1}^{j+1}}{2\Delta x}$$
+
+La condizione \`e:
+$$s(x,t)\pde Fx(x,t) +r(x,t) F(x,t) = f(x,t) \forall x \in \partial D$$
+
+E svolgo il calcolo per $i=0$:
+
+$$S_0^n\frac{F_{1}^{n}-F_{-1}^{n}}{2\Delta x} + R_0^nF_{0}^{n} = f_0^n  \to 
+F_{-1}^{n} = F_{1}^{n} + \frac 2{S_0^n}\Delta x \lrt{R_0^nF_{0}^{n}-f^n_0}$$
+
+Parto dalla forma matriciale del problema generico:
+
+$$
+a_0  F_{-1}^{j+1} + d_0 F_{0}^{j+1} + c_{0}F_{1}^{j+1} = 
+ak_0 F_{-1}^{j}   + dk_0 F_{0}^{j}  + ck_0 F_{1}^{j}
+$$
+
+e sostituisco $F_{-1}^{n}$:
+$$
+a_0 \lrt{ F_{1}^{j+1} + \frac {2 \Delta x}{S_0^{j+1}} \lrt{R_0^{j+1}F_{0}^{j+1}-f^{j+1}_0}} +d_0 F_{0}^{j+1} +c_{0}F_{1}^{j+1} = 
+ak_0 \lrt{F_{1}^{j} + \frac {2 \Delta x}{S_0^{j}} \lrt{R_0^jF_{0}^{j}-f^{j}_0}} + dk_0 F_{0}^{j} + ck_0 F_{1}^{j}
+$$
+
+$$
+\lrt{d_0 + 2 a_0 \frac{R_0^{j+1}}{S_0^{j+1}}\Delta x} F_0^{j+1} + \lrt{c_0+a_0}F^{j+1}_1 = 
+\lrt{dk_0 + 2 ak_0 \frac{R_0^{j}}{S_0^{j}}\Delta x} F_0^{j} + \lrt{ck_0+ak_0}F^{j}_1 + 
+2 \Delta x \lrt{a_0 \frac{f^{j+1}_0}{S^{j+1}_0}-ak_0\frac{f^j_0}{S^{j}_0}}
+$$
+per il calcolo di $b_0$ andranno usati i seguenti parametri, quelli senza apice sono quelli originali:
+$$
+\begin{array}{ll}
+a'_0 = 0 & ak'_0= 0\\
+d_0' = d_0 + 2 a_0 \frac{R_0^{j+1}}{S_0^{j+1}}\Delta x& dk'_0 = dk_0 + 2 ak_0 \frac{R_0^{j}}{S_0^{j}}\Delta x\\
+c_0' = a_0+c_0 & ck_0' = ak_0+ck_0
+\end{array}
+$$
+
+$$b_0 = dk'_0 F_0^j  + ck_0' F_1^j + 2 \Delta x \lrt{a_0 \frac{f^{j+1}_0}{S^{j+1}_0}-ak_0\frac{f^j_0}{S^{j}_0}}$$
+
+Mentre se la condizione si presenta come ultimo punto del dominio:
+$$S_{N-1}^n\frac{F_{N}^{n}-F_{N-2}^{n}}{2\Delta x} + R_{N-1}^nF_{N-1}^{n} = f_{N-1}^n  \to 
+F_{N}^{n} = F_{N-2}^{n} - \frac 2{S_{N-1}^n}\Delta x \lrt{R_{N-1}^nF_{N-1}^{n}-f^n_{N-1}}$$
+
+per il calcolo di $b_{N-1}$ andranno usati i seguenti parametri, quelli senza apice sono quelli originali:
+$$
+\begin{array}{ll}
+a_{N-1}' = a_{N-1}+c_{N-1} & ak_{N-1}' = ak_{N-1}+ck_{N-1}\\
+d_{N-1}' = d_{N-1} - 2 c_{N-1} \frac{R_{N-1}^{j+1}}{S_{N-1}^{j+1}}\Delta x& dk'_{N-1} = dk_{N-1} - 2 ck_{N-1} \frac{R_{N-1}^{j}}{S_{N-1}^{j}}\Delta x\\
+c'_{N-1} = 0 & ck'_{N-1}= 0
+\end{array}
+$$
+
+$$b_{N-1} = ak_{N-1}' F_{N-2}^j + dk'_{N-1} F_{N-1}^j - 2 \Delta x \lrt{c_0 \frac{f^{j+1}_0}{S^{j+1}_0}-ck_0\frac{f^j_0}{S^{j}_0}}$$
+
+Con $r=0$ ottengo le CC di Neumann.
+
+\end{document}

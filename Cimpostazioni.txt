@@ -1,0 +1,24 @@
+#k
+0.01
+#lunghezza
+10
+#tmax
+3
+#impostazioni_gaussiana_norm_stdev_midpoint
+10 0.1 2.5
+#impostazioniV_Pos_Val
+2.5 0.0
+#Ndipende_da_int=0
+0
+#Nl
+10000
+#spacestep
+0.001
+#Nt
+1000
+#timestep
+0.001
+#timespan
+10
+#spacespan
+10
