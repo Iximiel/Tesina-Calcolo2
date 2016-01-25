@@ -17,4 +17,5 @@ HEADERS += \
 
 
 DISTFILES += \
-    Cimpostazioni.txt
+    Cimpostazioni.txt \
+#    ../build-Tesina-Calcolo2-Desktop/Cimpostazioni.txt

@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const double PI = 4*atan(1);
+
 struct impostazioni{
   int Nl, spaceskip;
   double lenght, spacestep;
@@ -55,7 +57,7 @@ struct impostazioni{
   double eta(){return k* timestep/(spacestep*spacestep);}
   Var gauss(int i){//Condizione iniziale
     double x = i*spacestep;
-    return norm * exp(-(x-mid)*(x-mid)/(stdev*stdev))*exp(.1*Var(0,1)*x);
+    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(.1*Var(0,1)*x);
   }
 };
 
@@ -133,7 +135,7 @@ int main(int argc, char** argv){
   Var CCi = 2*info.spacestep*(a - ak)*df0;
   Var CCe =- 2*info.spacestep*(c - ck)*dfN;
   cout << "Inizializzo il Solver" <<endl;
-  CranckSolver myIntegrator(mat,infoNl,info.Nt,CCi,CCe);
+  CranckSolver myIntegrator(mat,info.Nl,info.Nt,CCi,CCe);
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
   cout << "Inizio i calcoli" <<endl;
