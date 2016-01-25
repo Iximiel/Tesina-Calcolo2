@@ -13,6 +13,7 @@ struct impostazioni{
   double lenght, spacestep;
   double mid, stdev ,norm;
   double Vpos, Vmod;
+  double vel;
   int Vnum;
   int Nt, timeskip;
   double tmax, timestep;
@@ -25,8 +26,9 @@ struct impostazioni{
     file >> dummy >> tmax;
     file >> dummy >> norm >> stdev;
     file >> mid;
-    file >> dummy >> Vpos >> Vmod;
     //    mid = lenght/2.;
+    file >> dummy >> Vpos >> Vmod;
+    file >> dummy >> vel;
     bool Ndep;
     file >> dummy >> Ndep;
     file >> dummy >> Nl;
@@ -57,7 +59,7 @@ struct impostazioni{
   double eta(){return k* timestep/(spacestep*spacestep);}
   Var gauss(int i){//Condizione iniziale
     double x = i*spacestep;
-    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(1.*Var(0,1)*x);
+    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(Var(0,1)*vel*x);
   }
 };
 
