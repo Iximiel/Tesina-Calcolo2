@@ -10,6 +10,8 @@ public:
   // void doCalc();
 private:
   void SetConditions();
+  TGNumberEntry *numNorm;
+  TGComboBox *comboPotentials;
   /* void SetCanvas();//spazio superiore
   void SetData();//spazio centrale
   void SetStatus();//spazio inferiore e pulsanti
