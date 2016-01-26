@@ -9,7 +9,9 @@ public:
  void exit();
   // void doCalc();
 private:
-  void SetConditions();
+  TGFrame* SetConditions(const TGWindow *p);
+  TGFrame* SetLeftFrame(const TGWindow *p);
+  TGFrame* setAlgorithm(const TGWindow *p);
   TGNumberEntry *numNorm;
   TGComboBox *comboPotentials;
   /* void SetCanvas();//spazio superiore

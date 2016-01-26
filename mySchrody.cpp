@@ -8,7 +8,10 @@ void mySchrody(){//prootipo per vecoceutilizzo con root
 Schrody::Schrody(const TGWindow *p,int w,int h)
   :TGMainFrame(p,w,h,kMainFrame | kHorizontalFrame){
   SetName("Risoluzione equazione di Schrodinger");
-  SetConditions();
+  
+  AddFrame(SetConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  AddFrame(SetLeftFrame(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  
   SetMWMHints(kMWMDecorAll,
 	      kMWMFuncAll,
 	      kMWMInputModeless);
@@ -19,8 +22,8 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   Resize(800,600);
 }
 
-void Schrody::SetConditions(){
-  TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(this);
+TGFrame* Schrody::SetConditions(const TGWindow *p){
+  TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(p);
   //  TGButtonGroup  GroupMetodo = new TGButtonGroup(tHMainFrame,"Metodo");
   //dichiaro due dummy per comodita`
   TGHorizontalFrame *tHFrame; 
@@ -63,10 +66,30 @@ void Schrody::SetConditions(){
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
   tHFrame->AddFrame(/*numEne = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Energia"),LabelLayout);
+  //massa
+  gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
+  tHFrame->AddFrame(/*numEne = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Massa"),LabelLayout);
   
   tVMainFrame -> AddFrame(gfPotenziale, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
   tVMainFrame -> AddFrame(gfPacchetto, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
-  AddFrame(tVMainFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  return tVMainFrame;
+}
+
+TGFrame * Schrody::SetLeftFrame(const TGWindow *p){
+  TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(p);
+  TRootEmbeddedCanvas* ECanvas = new TRootEmbeddedCanvas(0,tVMainFrame,456,192);
+  ECanvas->SetName("Canvas");
+  int CanvasID = ECanvas->GetCanvasWindowId();
+  TCanvas *childCanvas = new TCanvas("childCanvas", 10, 10, CanvasID);
+  ECanvas->AdoptCanvas(childCanvas);
+  tVMainFrame->AddFrame(ECanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  tVMainFrame->AddFrame(setAlgorithm(tVMainFrame), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));
+  return tVMainFrame;
+}
+TGFrame *Schrody::setAlgorithm(const TGWindow *p){
+  TGHorizontalFrame *tHMainFrame =  new TGHorizontalFrame(p);
+  return tHMainFrame;
 }
 
 void Schrody::exit(){
