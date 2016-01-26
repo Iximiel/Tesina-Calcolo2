@@ -6,11 +6,10 @@ class Schrody : public TGMainFrame{
 public:
   Schrody(const TGWindow *p,int w,int h);
   //slots
-  /*
  void exit();
- void doCalc();
-*/
+  // void doCalc();
 private:
+  void SetConditions();
   /* void SetCanvas();//spazio superiore
   void SetData();//spazio centrale
   void SetStatus();//spazio inferiore e pulsanti
