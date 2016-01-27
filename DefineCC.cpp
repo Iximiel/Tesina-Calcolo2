@@ -1,7 +1,7 @@
 #include "DefineCC.hpp"
 
 DefineCC::DefineCC(const TGWindow *p, const char* title/*,*/)
-  : TGTransientFrame(p){
+  : TGTransientFrame(gClient->GetRoot(),p){
   SetName("CC");//title);
   AddFrame(buttons(this),new TGLayoutHints(kLHintsBottom | kLHintsRight,2,2,5,1));
   AddFrame(tabs(this,300,300),new TGLayoutHints(kLHintsBottom | kLHintsExpandX | kLHintsExpandY,2,2,5,1));
@@ -86,11 +86,12 @@ TGCompositeFrame DefineCC::*tabRobin(const TGWindow *p){
 //slots
 void DefineCC::doUndo(){
   didUndo();
-  SendCloseMessage();
+  CloseWindow();
 }
 
 void DefineCC::doOK(){
   int tabsel =  mainTab -> GetCurrent();
+  cout << tabsel<< endl;
   switch(tabsel){
   case 0:{
     double Dval = numDiFunc->GetNumber();
@@ -99,17 +100,18 @@ void DefineCC::doOK(){
     break;
   case 1:{
     double Nval = numDiFunc->GetNumber();
-    Neumann(Nval);    
+    Neumann(Nval);
   }
     break;
   case 2:{
     double f = numRobWeigh->GetNumber();
     double Rval = numRobVal->GetNumber();
-    Robin(f,Rval);    
+    RobinW(f);
+    RobinV(Rval);
   }
     break;
   }
-  SendCloseMessage();
+  CloseWindow();
 }
 //signals
 void DefineCC::Dirichlet(double val){
@@ -118,9 +120,11 @@ void DefineCC::Dirichlet(double val){
 void DefineCC::Neumann(double val){
   Emit("Neumann(double)",val);
 }
-void DefineCC::Robin(double f,double val){
-  long arg[2] = {f,val};
-  Emit("Dirichlet(double)",arg);
+void DefineCC::RobinW(double f){
+  Emit("RobinW(double)",f);
+}
+void DefineCC::RobinV(double val){
+  Emit("RobinV(double)",val);
 }
 void DefineCC::didUndo(){
   Emit("didUndo()");

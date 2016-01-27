@@ -74,7 +74,10 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   TGButtonGroup *bgCC = new TGButtonGroup(tVMainFrame,"Condizioni al contorno");//decidere se buttogroup o groupframe
   TGTextButton *CCin = new TGTextButton(bgCC,"In 0");
   TGTextButton *CCfin = new TGTextButton(bgCC,"In N");
-    bgCC->SetLayoutHints(frameHints);
+  CCin->Connect("Clicked()","Schrody",this,"launchCC0()");
+  CCfin->Connect("Clicked()","Schrody",this,"launchCCN()");
+  
+  bgCC->SetLayoutHints(frameHints);
   
   tVMainFrame -> AddFrame(gfPotenziale, frameHints);
   tVMainFrame -> AddFrame(gfPacchetto, frameHints);
@@ -136,6 +139,33 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   return tHMainFrame;
 }
 
+//slots
 void Schrody::exit(){
   gApplication->Terminate(0);
 }
+#include "DefineCC.hpp"
+void Schrody::launchCC0(){
+  DefineCC *CC0 = new DefineCC(this, "Condizioni in 0");
+  CC0->Connect("Dirichlet(double)", "Schrody", this, "Dirichlet0(double)");
+  CC0->Connect("Neumann(double)", "Schrody", this, "Neumann0(double)");
+  CC0->Connect("RobinV(double)", "Schrody", this, "RobinV0(double)");
+    CC0->Connect("RobinW(double)", "Schrody", this, "RobinW0(double)");
+}
+
+void Schrody::Dirichlet0(double val){
+  cout << "Devo assegnare le condizioni di D "<< val <<endl;
+}
+void Schrody::Neumann0(double val){
+  cout << "Devo assegnare le condizioni di N "<< val <<endl;
+}
+void Schrody::RobinV0(double val){
+  cout << "Devo assegnare le condizioni di Rv "<< val <<endl;
+}
+void Schrody::RobinW0(double f){
+  cout << "Devo assegnare le condizioni di Rw "<< f<<endl;
+}
+
+void Schrody::launchCCN(){}
+void Schrody::DirichletN(double val){}
+void Schrody::NeumannN(double val){}
+void Schrody::RobinN(double f,double val){}

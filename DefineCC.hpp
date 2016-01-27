@@ -1,6 +1,7 @@
 #ifndef _DefineCC
 #define _DefineCC
 class DefineCC : public TGTransientFrame{
+  RQ_OBJECT("DefineCC")
   ClassDef(DefineCC,1)
   public:
   DefineCC(const TGWindow *p, const char* title/*,*/);
@@ -9,9 +10,10 @@ class DefineCC : public TGTransientFrame{
   void doUndo();
   void doOK();
   //signals
-  void Dirichlet(double val);//*SIGNAL*
-  void Neumann(double val);//*SIGNAL*
-  void Robin(double f,double val);//*SIGNAL*
+  void Dirichlet(double);//*SIGNAL*
+  void Neumann(double);//*SIGNAL*
+  void RobinW(double);//*SIGNAL*
+  void RobinV(double);//*SIGNAL*
   void didUndo();//*SIGNAL*
   private:
   //componenti
