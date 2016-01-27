@@ -9,8 +9,9 @@ public:
  void exit();
   // void doCalc();
 private:
-  TGFrame* SetConditions(const TGWindow *p);
-  TGFrame* SetLeftFrame(const TGWindow *p);
+  //se il layout non mi piace spostare questi tre blocchi si rivlea estremamente veloce
+  TGFrame* setConditions(const TGWindow *p);
+  TGFrame* setCanvas(const TGWindow *p);
   TGFrame* setAlgorithm(const TGWindow *p);
   TGNumberEntry *numNorm;
   TGComboBox *comboPotentials;

@@ -9,9 +9,11 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   :TGMainFrame(p,w,h,kMainFrame | kHorizontalFrame){
   SetName("Risoluzione equazione di Schrodinger");
   
-  AddFrame(SetConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
-  AddFrame(SetLeftFrame(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
-  
+  AddFrame(setConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|/*kLHintsExpandX|*/kLHintsExpandY,2,2,2,2));
+  TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(this);
+  AddFrame(tVMainFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  tVMainFrame->AddFrame(setCanvas(tVMainFrame), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  tVMainFrame->AddFrame(setAlgorithm(tVMainFrame), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));
   SetMWMHints(kMWMDecorAll,
 	      kMWMFuncAll,
 	      kMWMInputModeless);
@@ -22,7 +24,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   Resize(800,600);
 }
 
-TGFrame* Schrody::SetConditions(const TGWindow *p){
+TGFrame* Schrody::setConditions(const TGWindow *p){
   TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(p);
   //  TGButtonGroup  GroupMetodo = new TGButtonGroup(tHMainFrame,"Metodo");
   //dichiaro due dummy per comodita`
@@ -30,18 +32,21 @@ TGFrame* Schrody::SetConditions(const TGWindow *p){
   TGLabel *tLabel;
   //hints per le labels:
   TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
-  
+  //hits per le frame
+  TGLayoutHints *frameHints = new TGLayoutHints(kLHintsCenterX | kLHintsTop,2,2,2,2);
   //Impostazioni potenziale (magari aggiorno realtime la canvas)
   TGGroupFrame *gfPotenziale = new TGGroupFrame(tVMainFrame,"Potenziale");
   //forma potenziale
   gfPotenziale->AddFrame(comboPotentials = new TGComboBox (gfPotenziale),
-			 new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));//da aggiustare
-  //roba moooolto temporanei
+			 new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
+			 //			 new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));//da aggiustare
+  //roba moooolto temporanea
   comboPotentials->NewEntry("[0]+x*[1]");
   comboPotentials->NewEntry("[0]*H(x-[1])");
   comboPotentials->NewEntry("[0]*H(x-[1])*H([2]-x)");
   comboPotentials->NewEntry("gauss(x,[0],[1])");
-  
+  comboPotentials->Select(3,false);
+  comboPotentials->Resize(150,20);
   //parametri
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
   tHFrame->AddFrame(/*numpar[0] = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
@@ -70,25 +75,69 @@ TGFrame* Schrody::SetConditions(const TGWindow *p){
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
   tHFrame->AddFrame(/*numEne = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Massa"),LabelLayout);
+  //condizioni al contorno
+  TGButtonGroup *bgCC = new TGButtonGroup(tVMainFrame,"Condizioni al contorno");//decidere se buttogroup o groupframe
+  TGTextButton *CCin = new TGTextButton(bgCC,"In 0");
+  TGTextButton *CCfin = new TGTextButton(bgCC,"In N");
+    bgCC->SetLayoutHints(frameHints);
   
-  tVMainFrame -> AddFrame(gfPotenziale, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
-  tVMainFrame -> AddFrame(gfPacchetto, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
+  tVMainFrame -> AddFrame(gfPotenziale, frameHints);
+  tVMainFrame -> AddFrame(gfPacchetto, frameHints);
+  tVMainFrame -> AddFrame(bgCC, frameHints);
   return tVMainFrame;
 }
 
-TGFrame * Schrody::SetLeftFrame(const TGWindow *p){
-  TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(p);
-  TRootEmbeddedCanvas* ECanvas = new TRootEmbeddedCanvas(0,tVMainFrame,456,192);
+TGFrame * Schrody::setCanvas(const TGWindow *p){
+  TRootEmbeddedCanvas* ECanvas = new TRootEmbeddedCanvas(0,p,456,192);
   ECanvas->SetName("Canvas");
   int CanvasID = ECanvas->GetCanvasWindowId();
   TCanvas *childCanvas = new TCanvas("childCanvas", 10, 10, CanvasID);
   ECanvas->AdoptCanvas(childCanvas);
-  tVMainFrame->AddFrame(ECanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
-  tVMainFrame->AddFrame(setAlgorithm(tVMainFrame), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));
-  return tVMainFrame;
+  return ECanvas;
 }
 TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   TGHorizontalFrame *tHMainFrame =  new TGHorizontalFrame(p);
+  //dichiaro due dummy per comodita`
+  TGHorizontalFrame *tHFrame; 
+  TGLabel *tLabel;
+  //hints per le labels:
+  TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
+  //Limiti superiori
+  TGGroupFrame *gfLimits = new TGGroupFrame(tHMainFrame,"Limiti Superiori");
+  //Spazio
+  gfLimits->AddFrame(tHFrame = new TGHorizontalFrame(gfLimits));
+  tHFrame->AddFrame(/*numSpaceLim = */new TGNumberEntry (tHFrame,10,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina, ma puo` andare su un mezzo un po' piu` potente
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Spazio"),LabelLayout);
+  //Tempo
+  gfLimits->AddFrame(tHFrame = new TGHorizontalFrame(gfLimits));
+  tHFrame->AddFrame(/*numTimeLim = */new TGNumberEntry (tHFrame,3.5,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Tempo"),LabelLayout);
+  //scelta su come calcolare i passi
+  TGButtonGroup*  bgSetSteps = new TGButtonGroup(tHMainFrame,"Calcolo passi");//,kVerticalFrame);//,uGC->GetGC());
+  TGRadioButton** StepMethods = new TGRadioButton*[3];
+  StepMethods[0] = new TGRadioButton(bgSetSteps,"Da passo a N");
+  StepMethods[1] = new TGRadioButton(bgSetSteps,"Da N a Passo");
+
+  StepMethods[0]->SetState(kButtonDown);
+
+  //quantifico i Passi
+  TGGroupFrame *gfSteps = new TGGroupFrame(tHMainFrame,"Impostazioni Passi");
+  gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
+  //passi
+  tHFrame->AddFrame(/*numSpaceStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta S"),LabelLayout);
+  gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
+  tHFrame->AddFrame(/*numTimeStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta T"),LabelLayout);
+  //numero
+  tHFrame->AddFrame(/*numSpaceStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi S"),LabelLayout);
+  gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
+  tHFrame->AddFrame(/*numTimeStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi T"),LabelLayout);
+  tHMainFrame -> AddFrame(gfLimits, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
+  tHMainFrame -> AddFrame(bgSetSteps, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
+  tHMainFrame -> AddFrame(gfSteps, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
   return tHMainFrame;
 }
 
