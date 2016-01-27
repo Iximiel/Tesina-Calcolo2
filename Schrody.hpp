@@ -7,6 +7,7 @@ public:
   Schrody(const TGWindow *p,int w,int h);
   //slots
  void exit();
+  void
   // void doCalc();
 private:
   //se il layout non mi piace spostare questi tre blocchi si rivlea estremamente veloce

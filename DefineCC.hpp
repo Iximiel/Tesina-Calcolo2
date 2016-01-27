@@ -12,6 +12,7 @@ class DefineCC : public TGTransientFrame{
   void Dirichlet(double val);//*SIGNAL*
   void Neumann(double val);//*SIGNAL*
   void Robin(double f,double val);//*SIGNAL*
+  void didUndo();//*SIGNAL*
   private:
   //componenti
   TGTab *mainTab;
