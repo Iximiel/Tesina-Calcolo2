@@ -6,7 +6,7 @@
 #include "TGFrame.h"
 #include "TGComboBox.h"
 #include "TGButton.h"
-
+#include "TGButtonGroup.h"
 
 class Schrody : public TGMainFrame{
   ClassDef(Schrody,1)
@@ -19,6 +19,7 @@ class Schrody : public TGMainFrame{
   void launchCCN();
   void CCset(bool);
   void controlReady();
+  void HandleNumbers(int);
 private:
   //dati
   guiInfo* info;
@@ -35,6 +36,7 @@ private:
   TGNumberEntry **numpar;
   TGComboBox *comboPotentials;
   TGTextButton *tbStart;
+  TGButtonGroup *bgSetSteps;
 
   /*
   //

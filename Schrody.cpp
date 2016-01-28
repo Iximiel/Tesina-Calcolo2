@@ -1,6 +1,5 @@
 #include "Schrody.hpp"
 #include "TGLabel.h"
-#include "TGButtonGroup.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 #include "TApplication.h"
@@ -24,11 +23,19 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   AddFrame(tVMainFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
   tVMainFrame->AddFrame(setCanvas(tVMainFrame), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
   tVMainFrame->AddFrame(setAlgorithm(tVMainFrame), new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));
+
   SetMWMHints(kMWMDecorAll,
 	      kMWMFuncAll,
 	      kMWMInputModeless);
   MapSubwindows();
-  
+
+  //connessione controllo passi valori
+  numSpaceStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
+  numTimeStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
+  numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
+  numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
+  HandleNumbers(0);
+    
   Resize(GetDefaultSize());
   MapWindow();
   Resize(800,600);
@@ -135,10 +142,10 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   tHFrame->AddFrame(numTimeLim = new TGNumberEntry (tHFrame,3.5,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Tempo"),LabelLayout);
   //scelta su come calcolare i passi
-  TGButtonGroup*  bgSetSteps = new TGButtonGroup(tHMainFrame,"Calcolo passi");//,kVerticalFrame);//,uGC->GetGC());
-  TGRadioButton** StepMethods = new TGRadioButton*[3];
-  StepMethods[0] = new TGRadioButton(bgSetSteps,"Da passo a N");
-  StepMethods[1] = new TGRadioButton(bgSetSteps,"Da N a Passo");
+  bgSetSteps = new TGButtonGroup(tHMainFrame,"Calcolo passi");//,kVerticalFrame);//,uGC->GetGC());
+  TGRadioButton **StepMethods = new TGRadioButton*[2];
+  StepMethods[0] = new TGRadioButton(bgSetSteps,"Da passo a N",100);
+  StepMethods[1] = new TGRadioButton(bgSetSteps,"Da N a Passo",101);
 
   StepMethods[0]->SetState(kButtonDown);
 
@@ -146,18 +153,18 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   TGGroupFrame *gfStep = new TGGroupFrame(tHMainFrame,"Impostazioni Passi");
   gfStep->AddFrame(tHFrame = new TGHorizontalFrame(gfStep));
   //passi
-  tHFrame->AddFrame(numSpaceStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
+  tHFrame->AddFrame(numSpaceStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMinMax, 0,1));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta S"),LabelLayout);
   gfStep->AddFrame(tHFrame = new TGHorizontalFrame(gfStep));
-  tHFrame->AddFrame(numTimeStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
+  tHFrame->AddFrame(numTimeStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMinMax, 0.000000,1));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta T"),LabelLayout);
   //numero
   TGGroupFrame *gfSteps = new TGGroupFrame(tHMainFrame,"Numero Passi");
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
-  tHFrame->AddFrame(numSpaceSteps = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMin, 0));
+  tHFrame->AddFrame(numSpaceSteps = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMin, 0));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi S"),LabelLayout);
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
-  tHFrame->AddFrame(numTimeSteps = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0));
+  tHFrame->AddFrame(numTimeSteps = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMinMax, 0));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi T"),LabelLayout);
 
   tHMainFrame -> AddFrame(gfLimits, elementsHints);
@@ -192,7 +199,26 @@ void Schrody::controlReady(){
   if(CC)
     tbStart->SetEnabled(true);
 }
+#include <iostream>
+void Schrody::HandleNumbers(int /*dummy*/){
+  std::cout << "HandleNumbers" <<"\n";
+  if(bgSetSteps->GetButton(100)->IsOn()){
+    double Sstep = numSpaceStep -> GetNumber();
+    double Tstep = numTimeStep -> GetNumber();
+    double Slim = numSpaceLim -> GetNumber();
+    double Tlim = numTimeLim -> GetNumber();
+    int NS = Slim/Sstep;
+    int NT = Tlim/Tstep;
+    numSpaceSteps -> SetIntNumber(NS);
+    numTimeSteps -> SetIntNumber(NT);
+  }else{
+    numSpaceSteps -> GetIntNumber();
+    numTimeSteps -> GetIntNumber();
+  }
+}
+
 
 void Schrody::doTheThing(){
 
 }
+
