@@ -5,6 +5,9 @@
 #include "TCanvas.h"
 #include "TApplication.h"
 
+#define USECOMPLEX//cosi` includo complex e la variabile Var e` un "Complex<double>" -std=c++11 e` raccomandato
+#include "CrankSolver.hpp"
+
 #include <iostream>
 using namespace std;
 
@@ -12,10 +15,10 @@ using namespace std;
 Schrody::Schrody(const TGWindow *p,int w,int h)
   :TGMainFrame(p,w,h,kMainFrame | kHorizontalFrame){
   SetName("Risoluzione equazione di Schrodinger");
-
   info = new guiInfo();
   CC = false;
-  //  DontCallClose();
+  Connect("CloseWindow()","Schrody",this,"exit()");//con questo schiacciando la x chiudo il programma e non solo la finestra
+  DontCallClose();
   AddFrame(setConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|/*kLHintsExpandX|*/kLHintsExpandY,2,2,2,2));
   TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(this);
   AddFrame(tVMainFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
@@ -62,12 +65,13 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   comboPotentials->Select(3,false);
   comboPotentials->Resize(150,20);
   //parametri
+  numpar = new TGNumberEntry*[2];
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(/*numpar[0] = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[0] = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[0]"),LabelLayout);
   //Distanza Piastre
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(/*numpar[1] = */new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[1]"),LabelLayout);
   
   //Impostazioni pacchetto d'onda (magari aggiorno realtime la canvas)
@@ -79,15 +83,15 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"\"Norma\""),LabelLayout);
   //larghezza
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(/*numLarg = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numLarg = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Larghezza"),LabelLayout);
   //energia
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(/*numEne = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numEne = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Energia"),LabelLayout);
   //massa
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(/*numEne = */new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numMass = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Massa"),LabelLayout);
   //condizioni al contorno
   TGButtonGroup *bgCC = new TGButtonGroup(tVMainFrame,"Condizioni al contorno");//decidere se buttogroup o groupframe
@@ -124,11 +128,11 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   TGGroupFrame *gfLimits = new TGGroupFrame(tHMainFrame,"Limiti Superiori");
   //Spazio
   gfLimits->AddFrame(tHFrame = new TGHorizontalFrame(gfLimits));
-  tHFrame->AddFrame(/*numSpaceLim = */new TGNumberEntry (tHFrame,10,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina, ma puo` andare su un mezzo un po' piu` potente
+  tHFrame->AddFrame(numSpaceLim = new TGNumberEntry (tHFrame,10,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina, ma puo` andare su un mezzo un po' piu` potente
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Spazio"),LabelLayout);
   //Tempo
   gfLimits->AddFrame(tHFrame = new TGHorizontalFrame(gfLimits));
-  tHFrame->AddFrame(/*numTimeLim = */new TGNumberEntry (tHFrame,3.5,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina
+  tHFrame->AddFrame(numTimeLim = new TGNumberEntry (tHFrame,3.5,5,-1,TGNumberFormat::kNESRealOne, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));//40 come max e` troppo per la mia macchina
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Tempo"),LabelLayout);
   //scelta su come calcolare i passi
   TGButtonGroup*  bgSetSteps = new TGButtonGroup(tHMainFrame,"Calcolo passi");//,kVerticalFrame);//,uGC->GetGC());
@@ -139,23 +143,26 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   StepMethods[0]->SetState(kButtonDown);
 
   //quantifico i Passi
-  TGGroupFrame *gfSteps = new TGGroupFrame(tHMainFrame,"Impostazioni Passi");
-  gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
+  TGGroupFrame *gfStep = new TGGroupFrame(tHMainFrame,"Impostazioni Passi");
+  gfStep->AddFrame(tHFrame = new TGHorizontalFrame(gfStep));
   //passi
   tHFrame->AddFrame(numSpaceStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta S"),LabelLayout);
-  gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
+  gfStep->AddFrame(tHFrame = new TGHorizontalFrame(gfStep));
   tHFrame->AddFrame(numTimeStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta T"),LabelLayout);
   //numero
-  tHFrame->AddFrame(numSpaceStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
+  TGGroupFrame *gfSteps = new TGGroupFrame(tHMainFrame,"Numero Passi");
+  gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
+  tHFrame->AddFrame(numSpaceSteps = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMin, 0));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi S"),LabelLayout);
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
-  tHFrame->AddFrame(numTimeStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
+  tHFrame->AddFrame(numTimeSteps = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi T"),LabelLayout);
 
   tHMainFrame -> AddFrame(gfLimits, elementsHints);
   tHMainFrame -> AddFrame(bgSetSteps, elementsHints);
+  tHMainFrame -> AddFrame(gfStep, elementsHints);
   tHMainFrame -> AddFrame(gfSteps, elementsHints);
   return tHMainFrame;
 }
@@ -184,4 +191,8 @@ void Schrody::CCset(bool CCok){
 void Schrody::controlReady(){
   if(CC)
     tbStart->SetEnabled(true);
+}
+
+void Schrody::doTheThing(){
+
 }
