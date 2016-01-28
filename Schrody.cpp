@@ -30,10 +30,10 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   MapSubwindows();
 
   //connessione controllo passi valori
-  numSpaceStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
-  numTimeStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
-  numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
-  numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers(int)");
+  numSpaceStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  numTimeStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   HandleNumbers(0);
     
   Resize(GetDefaultSize());
@@ -200,7 +200,7 @@ void Schrody::controlReady(){
     tbStart->SetEnabled(true);
 }
 #include <iostream>
-void Schrody::HandleNumbers(int /*dummy*/){
+void Schrody::HandleNumbers(){
   std::cout << "HandleNumbers" <<"\n";
   if(bgSetSteps->GetButton(100)->IsOn()){
     double Sstep = numSpaceStep -> GetNumber();
