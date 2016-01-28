@@ -3,6 +3,8 @@
 Schrody::Schrody(const TGWindow *p,int w,int h)
   :TGMainFrame(p,w,h,kMainFrame | kHorizontalFrame){
   SetName("Risoluzione equazione di Schrodinger");
+
+  info = new guiInfo();
   
   AddFrame(setConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|/*kLHintsExpandX|*/kLHintsExpandY,2,2,2,2));
   TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(this);
@@ -143,29 +145,18 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
 void Schrody::exit(){
   gApplication->Terminate(0);
 }
-#include "DefineCC.hpp"
+
 void Schrody::launchCC0(){
-  DefineCC *CC0 = new DefineCC(this, "Condizioni in 0");
-  CC0->Connect("Dirichlet(double)", "Schrody", this, "Dirichlet0(double)");
-  CC0->Connect("Neumann(double)", "Schrody", this, "Neumann0(double)");
-  CC0->Connect("RobinV(double)", "Schrody", this, "RobinV0(double)");
-    CC0->Connect("RobinW(double)", "Schrody", this, "RobinW0(double)");
+  DefineCC *CC0 = new DefineCC(this, "Condizioni in 0", info, true);
+  CC0->Connect("CCsets(bool)","Schrody",this,"CCset(bool)");
 }
 
-void Schrody::Dirichlet0(double val){
-  cout << "Devo assegnare le condizioni di D "<< val <<endl;
-}
-void Schrody::Neumann0(double val){
-  cout << "Devo assegnare le condizioni di N "<< val <<endl;
-}
-void Schrody::RobinV0(double val){
-  cout << "Devo assegnare le condizioni di Rv "<< val <<endl;
-}
-void Schrody::RobinW0(double f){
-  cout << "Devo assegnare le condizioni di Rw "<< f<<endl;
+void Schrody::launchCCN(){
+  DefineCC *CCN = new DefineCC(this, "Condizioni in N", info, false);
+  CCN->Connect("CCsets(bool)","Schrody",this,"CCset(bool)");
 }
 
-void Schrody::launchCCN(){}
-void Schrody::DirichletN(double val){}
-void Schrody::NeumannN(double val){}
-void Schrody::RobinN(double f,double val){}
+void Schrody::CCset(bool CCok){
+  //impostare la possibilita` di partire
+  cout << CCok<<endl;
+}

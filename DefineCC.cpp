@@ -1,8 +1,11 @@
 #include "DefineCC.hpp"
 
-DefineCC::DefineCC(const TGWindow *p, const char* title/*,*/)
+DefineCC::DefineCC(const TGWindow *p, const char* title, guiInfo *holder, bool isFirst)
   : TGTransientFrame(gClient->GetRoot(),p){
   SetName("CC");//title);
+  info = holder;
+  first = isFirst;
+  
   AddFrame(buttons(this),new TGLayoutHints(kLHintsBottom | kLHintsRight,2,2,5,1));
   AddFrame(tabs(this,300,300),new TGLayoutHints(kLHintsBottom | kLHintsExpandX | kLHintsExpandY,2,2,5,1));
   SetMWMHints(kMWMDecorAll,
@@ -16,9 +19,9 @@ DefineCC::DefineCC(const TGWindow *p, const char* title/*,*/)
   //  Resize(800,600);
 }
 /*
-DefineCC::~DefineCC(){
+  DefineCC::~DefineCC(){
 
-}
+  }
 */
 TGFrame DefineCC::*buttons(const TGWindow *p){
   TGHorizontalFrame *tHMainFrame =  new TGHorizontalFrame(p,150,20,kFixedWidth);
@@ -85,48 +88,50 @@ TGCompositeFrame DefineCC::*tabRobin(const TGWindow *p){
 
 //slots
 void DefineCC::doUndo(){
-  didUndo();
-  CloseWindow();
-}
-
-void DefineCC::doOK(){
-  int tabsel =  mainTab -> GetCurrent();
-  cout << tabsel<< endl;
-  switch(tabsel){
-  case 0:{
-    double Dval = numDiFunc->GetNumber();
-    Dirichlet(Dval);
-  }
-    break;
-  case 1:{
-    double Nval = numDiFunc->GetNumber();
-    Neumann(Nval);
-  }
-    break;
-  case 2:{
-    double f = numRobWeigh->GetNumber();
-    double Rval = numRobVal->GetNumber();
-    RobinW(f);
-    RobinV(Rval);
-  }
-    break;
-  }
-  CloseWindow();
-}
-//signals
-void DefineCC::Dirichlet(double val){
-  Emit("Dirichlet(double)",val);
-}
-void DefineCC::Neumann(double val){
-  Emit("Neumann(double)",val);
-}
-void DefineCC::RobinW(double f){
-  Emit("RobinW(double)",f);
-}
-void DefineCC::RobinV(double val){
-  Emit("RobinV(double)",val);
-}
-void DefineCC::didUndo(){
   Emit("didUndo()");
+  CloseWindow();
 }
 
+void DefineCC::doOK(){  
+  if(first){
+    info->setCC0 = true;
+    info->CC0 = mainTab -> GetCurrent();
+    cout << info->CC0 << endl;
+    switch(info->CC0){
+    case 0:{
+      info->val0 = numDiFunc->GetNumber();
+    }
+      break;
+    case 1:{
+      info->val0 = numDiFunc->GetNumber();
+    }
+      break;
+    case 2:{
+      info->weight0 = numRobWeigh->GetNumber();
+      info->val0 = numRobVal->GetNumber();
+    }
+      break;
+    }
+  }else{
+    info->setCCN = true;
+    info->CCN = mainTab -> GetCurrent();
+    cout << info->CCN << endl;
+    switch(info->CCN){
+    case 0:{
+      info->valN = numDiFunc->GetNumber();
+    }
+      break;
+    case 1:{
+      info->valN = numDiFunc->GetNumber();
+    }
+      break;
+    case 2:{
+      info->weightN = numRobWeigh->GetNumber();
+      info->valN = numRobVal->GetNumber();
+    }
+      break;
+    }
+  }
+  Emit("CCsets(bool)",info->setCC0&&info->setCCN);
+  CloseWindow();
+}

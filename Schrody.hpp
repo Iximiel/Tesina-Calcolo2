@@ -11,16 +11,9 @@ class Schrody : public TGMainFrame{
   void exit();
   void launchCC0();
   void launchCCN();
-  void Dirichlet0(double);
-  void DirichletN(double);
-  void Neumann0(double val);
-  void NeumannN(double val);
-  void RobinV0(double val);
-  void RobinW0(double f);
-  void RobinVN(double val);
-  void RobinWN(double f);
-  // void doCalc();
 private:
+  //dati
+  guiInfo* info;
   //se il layout non mi piace spostare questi tre blocchi si rivlea estremamente veloce
   TGFrame* setConditions(const TGWindow *p);
   TGFrame* setCanvas(const TGWindow *p);

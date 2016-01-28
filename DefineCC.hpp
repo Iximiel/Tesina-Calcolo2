@@ -1,21 +1,22 @@
 #ifndef _DefineCC
 #define _DefineCC
+#include "guiInfo.hpp"
+
 class DefineCC : public TGTransientFrame{
   RQ_OBJECT("DefineCC")
   ClassDef(DefineCC,1)
   public:
-  DefineCC(const TGWindow *p, const char* title/*,*/);
+  DefineCC(const TGWindow *p, const char* title, guiInfo *holder, bool isFirst);
   //  ~DefineCC()
   //slots
   void doUndo();
   void doOK();
   //signals
-  void Dirichlet(double);//*SIGNAL*
-  void Neumann(double);//*SIGNAL*
-  void RobinW(double);//*SIGNAL*
-  void RobinV(double);//*SIGNAL*
-  void didUndo();//*SIGNAL*
+  void CCsets(bool);//*SIGNAL*
   private:
+  //dati
+  guiInfo* info;
+  bool first;
   //componenti
   TGTab *mainTab;
   TGNumberEntry *numRobWeigh, *numRobVal, *numDiFunc, *numNeuDer;
