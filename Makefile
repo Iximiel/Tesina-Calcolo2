@@ -23,19 +23,19 @@ DefineCC.o: DefineCC.cpp
 	@$(CC11) $(CFLAGS) -c $^ $(LIBROOT) $(CFLAGSROOT)
 
 SchrodyDict.cpp: Schrody.hpp SchrodyLinkDef.h
-	@echo Chiamo rootcint per compilare le librerie
+	@echo Chiamo rootcint per compilare la libreria $@
 	@rootcint -f $@ -c $^
 
 libSchrody.so: SchrodyDict.cpp
-	@echo Compilo le librerie
+	@echo Compilo la libreria $@
 	@$(CC) $(CFLAGS) -shared -o$@ `root-config --ldflags` $(CFLAGSROOT) $^
 
-CCDict.cpp: DefineCC.hpp SchrodyLinkDef.h
-	@echo Chiamo rootcint per compilare le librerie
+CCDict.cpp: DefineCC.hpp CCLinkDef.h
+	@echo Chiamo rootcint per compilare la libreria $@
 	@rootcint -f $@ -c $^
 
 libCC.so: CCDict.cpp
-	@echo Compilo le librerie
+	@echo Compilo la libreria $@
 	@$(CC) $(CFLAGS) -shared -o$@ `root-config --ldflags` $(CFLAGSROOT) $^
 
 #@echo elimino i file GuiPDEDict.*

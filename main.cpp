@@ -15,7 +15,7 @@ int main(int argc, char **argv)
    }
 
 
-   new Scrhody(gClient->GetRoot(),490,372);
+   new Schrody(gClient->GetRoot(),490,372);
 
    theApp.Run();
 

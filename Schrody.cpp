@@ -1,4 +1,13 @@
 #include "Schrody.hpp"
+#include "TGLabel.h"
+#include "TGButtonGroup.h"
+#include "TRootEmbeddedCanvas.h"
+#include "TCanvas.h"
+#include "TApplication.h"
+
+#include <iostream>
+using namespace std;
+
 
 Schrody::Schrody(const TGWindow *p,int w,int h)
   :TGMainFrame(p,w,h,kMainFrame | kHorizontalFrame){
@@ -6,7 +15,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
 
   info = new guiInfo();
   CC = false;
-  
+  //  DontCallClose();
   AddFrame(setConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|/*kLHintsExpandX|*/kLHintsExpandY,2,2,2,2));
   TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(this);
   AddFrame(tVMainFrame, new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX|kLHintsExpandY,2,2,2,2));
@@ -33,7 +42,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   //hits per le frame
   TGLayoutHints *frameHints = new TGLayoutHints(kLHintsExpandX | kLHintsTop,2,2,2,2);
   //Impostazioni potenziale (magari aggiorno realtime la canvas)
-  TGTextButton *tbStart;
+
   tVMainFrame->AddFrame(tHFrame = new TGHorizontalFrame(tVMainFrame),frameHints);
   tHFrame->AddFrame(tbStart  =  new TGTextButton(tVMainFrame,"Avvia"),
 			new TGLayoutHints(kLHintsExpandX|kLHintsExpandY,2,2,2,2));

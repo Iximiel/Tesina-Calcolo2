@@ -1,7 +1,12 @@
 #ifndef _CLASSSCHRODY
 #define _CLASSSCHRODY
-
+//#include "TGMainFrame.h"
 #include "DefineCC.hpp"
+
+#include "TGFrame.h"
+#include "TGComboBox.h"
+#include "TGButton.h"
+
 
 class Schrody : public TGMainFrame{
   ClassDef(Schrody,1)
@@ -23,8 +28,9 @@ private:
   TGFrame* setAlgorithm(const TGWindow *p);
   
   DefineCC *CC0, *CCN;
-  TGNumberEntry *numNorm, *numSpaceStep, *numTimeStep, *numSpaceStep, *numTimeStep;
+  TGNumberEntry *numNorm, *numSpaceStep, *numTimeStep;
   TGComboBox *comboPotentials;
+    TGTextButton *tbStart;
 
   /*
   //

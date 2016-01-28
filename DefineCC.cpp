@@ -1,4 +1,8 @@
 #include "DefineCC.hpp"
+#include "TGLabel.h"
+#include "TGButton.h"
+
+
 
 DefineCC::DefineCC(const TGWindow *p, const char* title, guiInfo *holder, bool isFirst)
   : TGTransientFrame(gClient->GetRoot(),p){
@@ -23,21 +27,21 @@ DefineCC::DefineCC(const TGWindow *p, const char* title, guiInfo *holder, bool i
 
   }
 */
-TGFrame DefineCC::*buttons(const TGWindow *p){
+TGFrame* DefineCC::buttons(const TGWindow *p){
   TGHorizontalFrame *tHMainFrame =  new TGHorizontalFrame(p,150,20,kFixedWidth);
   TGLayoutHints *ButtonsLayout = new TGLayoutHints(kLHintsTop/*CenterY*/ | kLHintsRight | kLHintsExpandX, 2, 2, 2, 2);
   TGTextButton *tbOK, *tbUndo;
-  tbOk = new TGTextButton(tHMainFrame,"Ok");
+  tbOK = new TGTextButton(tHMainFrame,"Ok");
   tbUndo = new TGTextButton(tHMainFrame,"Annulla");
-  tHMainFrame->AddFrame(tbOk,ButtonsLayout);
+  tHMainFrame->AddFrame(tbOK,ButtonsLayout);
   tHMainFrame->AddFrame(tbUndo,ButtonsLayout);
   tbUndo -> Connect("Clicked()","DefineCC",this,"doUndo()");
-  tbOk -> Connect("Clicked()","DefineCC",this,"doOK()");
-  Resize(150,tbOk -> GetDefaultHeight());
+  tbOK -> Connect("Clicked()","DefineCC",this,"doOK()");
+  tHMainFrame->Resize(150,tbOK -> GetDefaultHeight());
   return tHMainFrame;
 }
 
-TGFrame DefineCC::*tabs(const TGWindow *p, int w, int h){
+TGFrame* DefineCC::tabs(const TGWindow *p, int w, int h){
   mainTab = new TGTab(p,w,h);
   mainTab->AddTab("Dirichlet",tabDirichlet(mainTab));
   mainTab->AddTab("Neumann",tabNeumann(mainTab));
@@ -45,7 +49,7 @@ TGFrame DefineCC::*tabs(const TGWindow *p, int w, int h){
   return mainTab;
 }
 
-TGCompositeFrame DefineCC::*tabDirichlet(const TGWindow *p){
+TGCompositeFrame* DefineCC::tabDirichlet(const TGWindow *p){
   TGVerticalFrame* tVFrame = new TGVerticalFrame(p);
   TGHorizontalFrame *tHFrame;
   TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
@@ -57,7 +61,7 @@ TGCompositeFrame DefineCC::*tabDirichlet(const TGWindow *p){
   return tVFrame;
 }
 
-TGCompositeFrame DefineCC::*tabNeumann(const TGWindow *p){
+TGCompositeFrame* DefineCC::tabNeumann(const TGWindow *p){
   TGVerticalFrame* tVFrame = new TGVerticalFrame(p);
   TGHorizontalFrame *tHFrame;
   TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
@@ -66,12 +70,12 @@ TGCompositeFrame DefineCC::*tabNeumann(const TGWindow *p){
   tVFrame->AddFrame(tHFrame = new TGHorizontalFrame(tVFrame));
   tHFrame->AddFrame(numNeuDer = new TGNumberEntry (tHFrame,0,5,-1,TGNumberFormat::kNESRealTwo, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, -100,100));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Valore Derivata"),LabelLayout);
-  tVFrame;
+  return tVFrame;
 }
 
 
 
-TGCompositeFrame DefineCC::*tabRobin(const TGWindow *p){
+TGCompositeFrame* DefineCC::tabRobin(const TGWindow *p){
   TGVerticalFrame* tVFrame = new TGVerticalFrame(p);
   TGHorizontalFrame *tHFrame;
   TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
@@ -83,7 +87,7 @@ TGCompositeFrame DefineCC::*tabRobin(const TGWindow *p){
   tVFrame->AddFrame(tHFrame = new TGHorizontalFrame(tVFrame));
   tHFrame->AddFrame(numRobVal = new TGNumberEntry (tHFrame,0,5,-1,TGNumberFormat::kNESRealTwo, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,40));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Valore combinazione"),LabelLayout);
-  tVFrame;
+  return tVFrame;
 }
 
 //slots
@@ -96,7 +100,6 @@ void DefineCC::doOK(){
   if(first){
     info->setCC0 = true;
     info->CC0 = mainTab -> GetCurrent();
-    cout << info->CC0 << endl;
     switch(info->CC0){
     case 0:{
       info->val0 = numDiFunc->GetNumber();
@@ -115,7 +118,6 @@ void DefineCC::doOK(){
   }else{
     info->setCCN = true;
     info->CCN = mainTab -> GetCurrent();
-    cout << info->CCN << endl;
     switch(info->CCN){
     case 0:{
       info->valN = numDiFunc->GetNumber();
@@ -134,4 +136,7 @@ void DefineCC::doOK(){
   }
   Emit("CCsets(bool)",info->setCC0&&info->setCCN);
   CloseWindow();
+}
+void DefineCC::CCsets(bool t){  
+  Emit("CCsets(bool)",t);
 }

@@ -1,5 +1,8 @@
 #ifndef _DefineCC
 #define _DefineCC
+#include "RQ_OBJECT.h"
+#include "TGTab.h"
+#include "TGNumberEntry.h"
 #include "guiInfo.hpp"
 
 class DefineCC : public TGTransientFrame{
