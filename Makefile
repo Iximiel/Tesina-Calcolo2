@@ -10,23 +10,31 @@ all:maincrankC
 
 #https://root.cern.ch/interacting-shared-libraries-rootcint
 
-main: mainPDE.cpp GuiPDE.o PDE.o libPDE.so
+main: main.cpp Schrody.o DefineCC.o libSchrody.so libCC.so
 	@echo Compilo il main
-	@$(CC) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
+	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
 
-GuiPDE.o: GuiPDE.cpp
+Schrody.o: Schrody.cpp
 	@echo Compilo $@
-	@$(CC) $(CFLAGS) -c $^ $(LIBROOT) $(CFLAGSROOT)
+	@$(CC11) $(CFLAGS) -c $^ $(LIBROOT) $(CFLAGSROOT)
 
-PDE.o: PDE.cpp
+DefineCC.o: DefineCC.cpp
 	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -c $^
+	@$(CC11) $(CFLAGS) -c $^ $(LIBROOT) $(CFLAGSROOT)
 
-GuiPDEDict.cpp: GuiPDE.hpp GuiPDELinkDef.h
+SchrodyDict.cpp: Schrody.hpp SchrodyLinkDef.h
 	@echo Chiamo rootcint per compilare le librerie
 	@rootcint -f $@ -c $^
 
-libPDE.so: GuiPDEDict.cpp
+libSchrody.so: SchrodyDict.cpp
+	@echo Compilo le librerie
+	@$(CC) $(CFLAGS) -shared -o$@ `root-config --ldflags` $(CFLAGSROOT) $^
+
+CCDict.cpp: DefineCC.hpp SchrodyLinkDef.h
+	@echo Chiamo rootcint per compilare le librerie
+	@rootcint -f $@ -c $^
+
+libCC.so: CCDict.cpp
 	@echo Compilo le librerie
 	@$(CC) $(CFLAGS) -shared -o$@ `root-config --ldflags` $(CFLAGSROOT) $^
 

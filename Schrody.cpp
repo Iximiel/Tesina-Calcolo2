@@ -5,6 +5,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   SetName("Risoluzione equazione di Schrodinger");
 
   info = new guiInfo();
+  CC = false;
   
   AddFrame(setConditions(this), new TGLayoutHints(kLHintsLeft | kLHintsTop|/*kLHintsExpandX|*/kLHintsExpandY,2,2,2,2));
   TGVerticalFrame *tVMainFrame =  new TGVerticalFrame(this);
@@ -30,8 +31,15 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   //hints per le labels:
   TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
   //hits per le frame
-  TGLayoutHints *frameHints = new TGLayoutHints(kLHintsCenterX | kLHintsTop,2,2,2,2);
+  TGLayoutHints *frameHints = new TGLayoutHints(kLHintsExpandX | kLHintsTop,2,2,2,2);
   //Impostazioni potenziale (magari aggiorno realtime la canvas)
+  TGTextButton *tbStart;
+  tVMainFrame->AddFrame(tHFrame = new TGHorizontalFrame(tVMainFrame),frameHints);
+  tHFrame->AddFrame(tbStart  =  new TGTextButton(tVMainFrame,"Avvia"),
+			new TGLayoutHints(kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+  tbStart->SetEnabled(false);
+  tHFrame->Resize(200,200);
+  
   TGGroupFrame *gfPotenziale = new TGGroupFrame(tVMainFrame,"Potenziale");
   //forma potenziale
   gfPotenziale->AddFrame(comboPotentials = new TGComboBox (gfPotenziale),
@@ -102,6 +110,7 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   TGLabel *tLabel;
   //hints per le labels:
   TGLayoutHints *LabelLayout = new TGLayoutHints(kLHintsCenterY | kLHintsLeft, 2, 2, 2, 2);
+  TGLayoutHints *elementsHints =  new TGLayoutHints(kLHintsExpandY | kLHintsCenterX,2,2,2,2);
   //Limiti superiori
   TGGroupFrame *gfLimits = new TGGroupFrame(tHMainFrame,"Limiti Superiori");
   //Spazio
@@ -124,20 +133,21 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   TGGroupFrame *gfSteps = new TGGroupFrame(tHMainFrame,"Impostazioni Passi");
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
   //passi
-  tHFrame->AddFrame(/*numSpaceStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
+  tHFrame->AddFrame(numSpaceStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta S"),LabelLayout);
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
-  tHFrame->AddFrame(/*numTimeStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
+  tHFrame->AddFrame(numTimeStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESRealFour, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"#delta T"),LabelLayout);
   //numero
-  tHFrame->AddFrame(/*numSpaceStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
+  tHFrame->AddFrame(numSpaceStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi S"),LabelLayout);
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
-  tHFrame->AddFrame(/*numTimeStep = */new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
+  tHFrame->AddFrame(numTimeStep = new TGNumberEntry (tHFrame,0.0001,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,1000000000));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi T"),LabelLayout);
-  tHMainFrame -> AddFrame(gfLimits, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
-  tHMainFrame -> AddFrame(bgSetSteps, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
-  tHMainFrame -> AddFrame(gfSteps, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,2,2,2,2));
+
+  tHMainFrame -> AddFrame(gfLimits, elementsHints);
+  tHMainFrame -> AddFrame(bgSetSteps, elementsHints);
+  tHMainFrame -> AddFrame(gfSteps, elementsHints);
   return tHMainFrame;
 }
 
@@ -159,4 +169,10 @@ void Schrody::launchCCN(){
 void Schrody::CCset(bool CCok){
   //impostare la possibilita` di partire
   cout << CCok<<endl;
+  CC = CCok;
+  controlReady();
+}
+void Schrody::controlReady(){
+  if(CC)
+    tbStart->SetEnabled(true);
 }

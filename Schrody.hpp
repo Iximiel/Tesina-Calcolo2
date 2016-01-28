@@ -11,16 +11,19 @@ class Schrody : public TGMainFrame{
   void exit();
   void launchCC0();
   void launchCCN();
+  void CCset(bool);
+  void controlReady();
 private:
   //dati
   guiInfo* info;
+  bool CC;
   //se il layout non mi piace spostare questi tre blocchi si rivlea estremamente veloce
   TGFrame* setConditions(const TGWindow *p);
   TGFrame* setCanvas(const TGWindow *p);
   TGFrame* setAlgorithm(const TGWindow *p);
   
   DefineCC *CC0, *CCN;
-  TGNumberEntry *numNorm;
+  TGNumberEntry *numNorm, *numSpaceStep, *numTimeStep, *numSpaceStep, *numTimeStep;
   TGComboBox *comboPotentials;
 
   /*
