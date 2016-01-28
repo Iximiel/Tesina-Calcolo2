@@ -19,7 +19,7 @@ class Schrody : public TGMainFrame{
   void launchCCN();
   void CCset(bool);
   void controlReady();
-  void HandleNumbers(int);
+  void HandleNumbers();
 private:
   //dati
   guiInfo* info;

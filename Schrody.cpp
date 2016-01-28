@@ -34,7 +34,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   numTimeStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
-  HandleNumbers(0);
+  HandleNumbers();
     
   Resize(GetDefaultSize());
   MapWindow();
