@@ -30,10 +30,13 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   MapSubwindows();
 
   //connessione controllo passi valori
+  numSpaceLim -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  numTimeLim -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numSpaceStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numTimeStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  bgSetSteps -> Connect("Clicked(Int_t)","Schrody",this,"HandleNumbers()");
   HandleNumbers();
     
   Resize(GetDefaultSize());
@@ -55,7 +58,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
 
   tVMainFrame->AddFrame(tHFrame = new TGHorizontalFrame(tVMainFrame),frameHints);
   tHFrame->AddFrame(tbStart  =  new TGTextButton(tVMainFrame,"Avvia"),
-			new TGLayoutHints(kLHintsExpandX|kLHintsExpandY,2,2,2,2));
+		    new TGLayoutHints(kLHintsExpandX|kLHintsExpandY,2,2,2,2));
   tbStart->SetEnabled(false);
   tHFrame->Resize(200,200);
   
@@ -63,7 +66,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   //forma potenziale
   gfPotenziale->AddFrame(comboPotentials = new TGComboBox (gfPotenziale),
 			 new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
-			 //			 new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));//da aggiustare
+  //			 new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));//da aggiustare
   //roba moooolto temporanea
   comboPotentials->NewEntry("[0]+x*[1]");
   comboPotentials->NewEntry("[0]*H(x-[1])");
@@ -164,7 +167,7 @@ TGFrame *Schrody::setAlgorithm(const TGWindow *p){
   tHFrame->AddFrame(numSpaceSteps = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMin, 0));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi S"),LabelLayout);
   gfSteps->AddFrame(tHFrame = new TGHorizontalFrame(gfSteps));
-  tHFrame->AddFrame(numTimeSteps = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMinMax, 0));
+  tHFrame->AddFrame(numTimeSteps = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESInteger, TGNumberFormat::kNEAPositive, TGNumberFormat::kNELLimitMin, 0));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Passi T"),LabelLayout);
 
   tHMainFrame -> AddFrame(gfLimits, elementsHints);
@@ -201,6 +204,8 @@ void Schrody::controlReady(){
 }
 #include <iostream>
 void Schrody::HandleNumbers(){
+  //NB: al momento di calcolare l'algoritmo il passo verra` calcolato con la precisione dovuta, le entries servono solo come anteptrime
+  //potrei essere piu` fine nell'attivare/disattivare le enrty, ma non affligge la performance della simulazione
   std::cout << "HandleNumbers" <<"\n";
   if(bgSetSteps->GetButton(100)->IsOn()){
     double Sstep = numSpaceStep -> GetNumber();
@@ -211,9 +216,25 @@ void Schrody::HandleNumbers(){
     int NT = Tlim/Tstep;
     numSpaceSteps -> SetIntNumber(NS);
     numTimeSteps -> SetIntNumber(NT);
+    //imposta/conferma gli stati
+    numSpaceStep -> SetState(true);
+    numTimeStep -> SetState(true);    
+    numSpaceSteps -> SetState(false);
+    numTimeSteps -> SetState(false);
   }else{
-    numSpaceSteps -> GetIntNumber();
-    numTimeSteps -> GetIntNumber();
+    int NS = numSpaceSteps -> GetIntNumber();
+    int NT = numTimeSteps -> GetIntNumber();
+    double Slim = numSpaceLim -> GetNumber();
+    double Tlim = numTimeLim -> GetNumber();
+    double Sstep = Slim/NS;
+    double Tstep = Tlim/NT;
+    numSpaceStep -> SetNumber(Sstep);
+    numTimeStep -> SetNumber(Tstep);
+    //imposta/conferma gli stati
+    numSpaceSteps -> SetState(true);
+    numTimeSteps -> SetState(true);
+    numSpaceStep -> SetState(false);
+    numTimeStep -> SetState(false);
   }
 }
 
