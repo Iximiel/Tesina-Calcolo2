@@ -15,7 +15,6 @@ public:
   bool writeEverithing(std::string ,double ,double);
 private:
   void Stepper();
-  void processCC();
   int CCfstep, CCestep;//includo o no il primo/ultimo punto
   char CC0, CCN;
   Var* CS_data;//[Ns*Nt]

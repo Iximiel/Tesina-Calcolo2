@@ -24,7 +24,7 @@ CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *opti
   CS_cce =CCe;
   CS_data = new Var [CS_ns * CS_nt];
   CS_step = 0;
-  CS_mat.create_h();
+  CS_mat.create_h(CCN == 'D');
 }
 
 CranckSolver::~CranckSolver(){
@@ -48,7 +48,6 @@ bool CranckSolver::doStep(){
     cout << "Ho fatto tutti i passi previsti"<<endl;
     return false;
   }else{
-    processCC();
     Stepper();
     CS_step++;
     return true;
@@ -68,20 +67,20 @@ void CranckSolver::Stepper(){
   //preparo il vettore delle p[]
   int pstart = 1, pstop = 1;
   if(CC0 == 'D'){
-    p[0] = 0;
+    p[0] = CS_cci;
     pstart = 2;
-    CS_data[t+0] = CS_cci;
     Var b1 = CS_mat.bi(1,CS_data[tm1+0],
 		       CS_data[tm1+1],
 		       CS_data[tm1+2]);
-	b1 -= CS_mat.a(1)*CS_cci;
-	p[1] =  CS_mat.pi(1,p[0],b1);
+	b1 -= CS_mat.GetA(1)*CS_cci;
+	p[1] =  CS_mat.pi(1,0,b1);
+	//in questo caso mi aspetto che h[0]=0
   }else{
     p[0] = CS_mat.pi(0,0,
 		     CS_mat.bi(0,0,CS_data[tm1],CS_data[tm1+1])+CS_cci);
   }
   if(CCN == 'D')
-    psstop = 2;
+    pstop = 2;
   for(int i=pstart;i<CS_ns-pstop;i++){
     //calcolo il valore di b[i]
     Var bi = CS_mat.bi(i,CS_data[tm1+i-1],
@@ -98,11 +97,14 @@ void CranckSolver::Stepper(){
   //assegno l'ultimo punto
   if(CCN == 'D'){
     p[CS_ns-1] = CS_cce;
-    Var bNm2 = CS_mat.bi(t+CS_ns-2,CS_data[tm1+CS_ns-3],
+    //matematicamente e` sbagliato, ma preferisco avere meno ecezzioni possibili nell'algoritmo
+    Var bNm2 = CS_mat.bi(CS_ns-2,CS_data[tm1+CS_ns-3],
 		       CS_data[tm1+CS_ns-2],
 		       CS_data[tm1+CS_ns-1]);
-	bNm2 -= CS_mat.a(CS_ns-2)*CS_cce;
+	bNm2 -= CS_cce * CS_mat.GetC(CS_ns-2);
 	p[CS_ns-2] =  CS_mat.pi(CS_ns-2,p[CS_ns-3],bNm2);
+	//in questo caso mi aspetto che h[CS_ns-2]=0
+	CS_data[t+CS_ns-2] = p[CS_ns-2];
   }else{
     p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
 			   CS_mat.bi(CS_ns-1,
@@ -111,8 +113,8 @@ void CranckSolver::Stepper(){
 				     0)+CS_cce);
   }
   //ora procedo finalmente con l'assegnare i risultati
-  CS_data[t+CS_ns-pstop] = p[CS_ns-pstop];
-  for(int i=CS_ns-1;i>=psstart-1;i--){
+  CS_data[t+CS_ns-1] = p[CS_ns-1];
+  for(int i=CS_ns-pstop-1;i>=0;i--){//parte da n-2 o n-3 se uso dirichlet
     CS_data[t+i] = p[i] - CS_mat.H(i) * CS_data[t+i+1];
     //da pi = xi + hi x(i+1)
 #ifdef DEBUG
@@ -234,13 +236,4 @@ bool CranckSolver::writeEverithing(string filename, double timestep, double spac
       return true;
     }
   }
-}
-  
-void CranckSolver::processCC(){
-  //int t = CS_step*CS_ns; //dummy per comodita`
-  // int tm1 = (CS_step-1)*CS_ns; //dummy per comodita`
-  //  if(options == "DD"){
-  // CS_data[t+0] = CS_cci;
-  //  CS_data[t+CS_ns-1] = CS_cce;
-  //}
 }

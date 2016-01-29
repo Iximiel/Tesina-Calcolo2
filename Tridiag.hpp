@@ -13,7 +13,7 @@ public:
   tridiag(int N);
   tridiag(const tridiag& );
   tridiag& operator=(const tridiag& );
-  void create_h();
+  void create_h(bool lastPointDirichlet=false);
   virtual Var bi(int i, Var T_nm1,Var T_n,Var T_np1);
   Var pi(int i, Var bi, Var pim1);
   Var GetA(int i);

@@ -53,7 +53,7 @@ tridiag& tridiag::operator=(const tridiag& x){
   return *this;
 }
 
-void tridiag::create_h(){
+void tridiag::create_h(bool lastPointDirichlet){
   if(h!=nullptr)
     delete h;
   
@@ -69,11 +69,11 @@ void tridiag::create_h(){
   h[0] =  c[0]/(d[0]);//se uso Dirichlet devo far si` che sia 0
   h[dim-1] = 0;// non esiste h nell'ultima riga!
 
-  for(int i=1;i<dim-1;i++){
+  for(int i=1;i<dim-1;i++)
     h[i] = c[i]/(d[i]-a[i]*h[i-1]);
-  }
-  //  if(opt[1]=='d'||opt[1]=='D')//CC di Cauchy sul secondo estremo del dominio:
-	//  h[dim-2] = 0;
+  
+  if(lastPointDirichlet)
+    h[dim-2]=0;
 }
 
 Var tridiag::bi(int i, Var F_nm1,Var F_n,Var F_np1){
