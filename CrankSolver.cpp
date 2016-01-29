@@ -12,15 +12,11 @@ void wait(){
 
 using namespace std;
 
-CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt,/* std::string opt,*/ Var CCi, Var CCe)
+CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, char *options, Var CCi, Var CCe)
   :CS_mat(mat){
-  /*
-    options = opt;
-    if(options == "DD")
-    CCfstep= CCestep = 1;
-    else
-    CCfstep= CCestep = 0;
-  */
+  CC0 = options[0];
+  CCN = options[1];  
+
   //CS_mat = mat;   
   CS_ns = Ns;
   CS_nt = Nt;
@@ -71,7 +67,7 @@ void CranckSolver::Stepper(){
   //0 e` l'indice delle condizioni al contorno, se uso Dirichlet 0 serve a non aggiungere eccezioni all'algoritmo
   //la spiegazione e` in create_h() di Tridiag.cpp
   //preparo del vettore delle p[]
-  //if(options ==" DD")
+  //if(options == "DD")
   // p[0] = 0;
   //else{
   p[0] = CS_mat.pi(0,0,
