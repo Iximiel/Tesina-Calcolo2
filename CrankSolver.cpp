@@ -151,33 +151,82 @@ bool CranckSolver::prepareTGraph2D(string filename, double timestep, double spac
       	   << "i"+filename <<"\" e \""
       	   << "N"+filename <<"\"" << endl;
       return true;
+    }
 #else
-      ofstream outfile(filename.c_str());
-      if(!outfile.is_open()){
-	cout << "Non sono riuscito ad aprire il file \""
-	     << filename <<"\"" << endl;
-	return false;
-      }else{
-	for(int i= 0;i<CS_nt/1;i+=timespan){
-	  int t = CS_ns * i;
-	  for(int j = 0;j< CS_ns ;j+=spacespan){
-	    outfile << i*timestep  << "\t" << j*spacestep << "\t"
-		    << CS_data[t+j]<<endl;
-	  }
+    ofstream outfile(filename.c_str());
+    if(!outfile.is_open()){
+      cout << "Non sono riuscito ad aprire il file \""
+	   << filename <<"\"" << endl;
+      return false;
+    }else{
+      for(int i= 0;i<CS_nt/1;i+=timespan){
+	int t = CS_ns * i;
+	for(int j = 0;j< CS_ns ;j+=spacespan){
+	  outfile << i*timestep  << "\t" << j*spacestep << "\t"
+		  << CS_data[t+j]<<endl;
 	}
-	cout << "Ho salvato i dati sul file \""
-	     << filename <<"\"" << endl;
-	return true;
-#endif
       }
+      cout << "Ho salvato i dati sul file \""
+	   << filename <<"\"" << endl;
+      return true;
+    }
+#endif
+  }
+}
+
+bool CranckSolver::writeEverithing(string filename, double timestep, double spacestep){//timestep e spacestep non vengono salvati nel Solver
+  //l'idea e` salvare un file con tutti i dati in questo modo:
+  /*
+    real/complex
+    N_Passi_temporali passo_T
+    N_Passi_spaziali passo_S
+    riga per il passo T_0(CI)
+    riga per il passo T_1
+    ....
+    riga per il passo CS_step(in caso ci siamo fermati prima della fine)
+    in caso di complessi ogni riga avra real_0 img_0 norm_0 real_1 img_1 norm_1... e cosi` via sino alla fine
+  */
+  if(CS_step <= 1){
+    cout << "Non ho svolto alcun calcolo, non preparo il file \""
+	 << filename <<"\"" << endl;
+    return false;
+  }else{
+    ofstream outfile(filename.c_str());
+    if(!outfile.is_open()){
+      cout << "Non sono riuscito ad aprire il file \""
+	   << filename <<"\"" << endl;
+      return false;
+    }else{
+#ifdef USECOMPLEX
+      outfile << "complex"<<endl;
+#else
+      outfile << "real"<<endl;
+#endif
+      outfile << CS_step << timestep << endl
+	      << CS_ns << spacestep<< endl;
+      for(int i= 0;i<CS_step;i++){
+	int t = CS_ns * i;
+	for(int j = 0;j< CS_ns ;j++){
+#ifdef USECOMPLEX
+	  outfile << "\t" << CS_data[t+j].real() << CS_data[t+j].imag() << norm(CS_data[t+j])
+#else
+	  outfile << CS_data[t+j];
+#endif
+	}
+	outfile << endl;
+      }
+      cout << "Ho salvato i dati sul file \""
+	   << filename <<"\"" << endl;
+      return true;
     }
   }
-
-  void CranckSolver::processCC(){
-    //int t = CS_step*CS_ns; //dummy per comodita`
-    // int tm1 = (CS_step-1)*CS_ns; //dummy per comodita`
-    //  if(options == "DD"){
-    // CS_data[t+0] = CS_cci;
-    //  CS_data[t+CS_ns-1] = CS_cce;
-    //}
-  }
+}
+  
+void CranckSolver::processCC(){
+  //int t = CS_step*CS_ns; //dummy per comodita`
+  // int tm1 = (CS_step-1)*CS_ns; //dummy per comodita`
+  //  if(options == "DD"){
+  // CS_data[t+0] = CS_cci;
+  //  CS_data[t+CS_ns-1] = CS_cce;
+  //}
+}

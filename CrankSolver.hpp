@@ -12,6 +12,7 @@ public:
   void SetDerivativeCC(Var CCdi, Var CCde, Var xstep);
   Var getPoint(int t, int x);
   bool prepareTGraph2D(std::string ,double ,double, int=1, int=1);
+  bool writeEverithing(std::string ,double ,double);
 private:
   void Stepper();
   void processCC();
