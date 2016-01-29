@@ -12,16 +12,12 @@ void wait(){
 
 using namespace std;
 
-CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt,/* std::string opt,*/ Var CCi, Var CCe)
+CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe)
   :CS_mat(mat){
-  /*
-    options = opt;
-    if(options == "DD")
-    CCfstep= CCestep = 1;
-    else
-    CCfstep= CCestep = 0;
-  */
-  //CS_mat = mat;   
+  
+  CC0 = options[0];
+  CCN = options[1];  
+
   CS_ns = Ns;
   CS_nt = Nt;
   CS_cci = CCi;
@@ -32,7 +28,6 @@ CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt,/* std::string op
 }
 
 CranckSolver::~CranckSolver(){
-  //delete h;
   delete CS_data;
 }
 
@@ -70,20 +65,29 @@ void CranckSolver::Stepper(){
   Var *p = new Var [CS_ns];
   //0 e` l'indice delle condizioni al contorno, se uso Dirichlet 0 serve a non aggiungere eccezioni all'algoritmo
   //la spiegazione e` in create_h() di Tridiag.cpp
-  //preparo del vettore delle p[]
-  //if(options ==" DD")
-  // p[0] = 0;
-  //else{
-  p[0] = CS_mat.pi(0,0,
-		   CS_mat.bi(0,0,CS_data[tm1],CS_data[tm1+1])+CS_cci);
-  //  }
-  for(int i=1;i<CS_ns-1;i++){
+  //preparo il vettore delle p[]
+  int pstart = 1, pstop = 1;
+  if(CC0 == 'D'){
+    p[0] = 0;
+    pstart = 2;
+    CS_data[t+0] = CS_cci;
+    Var b1 = CS_mat.bi(1,CS_data[tm1+0],
+		       CS_data[tm1+1],
+		       CS_data[tm1+2]);
+	b1 -= CS_mat.a(1)*CS_cci;
+	p[1] =  CS_mat.pi(1,p[0],b1);
+  }else{
+    p[0] = CS_mat.pi(0,0,
+		     CS_mat.bi(0,0,CS_data[tm1],CS_data[tm1+1])+CS_cci);
+  }
+  if(CCN == 'D')
+    psstop = 2;
+  for(int i=pstart;i<CS_ns-pstop;i++){
     //calcolo il valore di b[i]
     Var bi = CS_mat.bi(i,CS_data[tm1+i-1],
 		       CS_data[tm1+i],
 		       CS_data[tm1+i+1]);
     p[i] = CS_mat.pi(i,p[i-1],bi);
-
 #ifdef DEBUG
     if(abs(CS_ns/2.-i)<=5){
       cout << i <<": b[i] = "<< bi <<" p[i]= "<<p[i];//<<endl;
@@ -91,14 +95,24 @@ void CranckSolver::Stepper(){
     }
 #endif //DEBUG
   }
-  p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
-			 CS_mat.bi(CS_ns-1,
-				   CS_data[tm1+CS_ns-2],
-				   CS_data[tm1+CS_ns-1],
-				   0)+CS_cce);
+  //assegno l'ultimo punto
+  if(CCN == 'D'){
+    p[CS_ns-1] = CS_cce;
+    Var bNm2 = CS_mat.bi(t+CS_ns-2,CS_data[tm1+CS_ns-3],
+		       CS_data[tm1+CS_ns-2],
+		       CS_data[tm1+CS_ns-1]);
+	bNm2 -= CS_mat.a(CS_ns-2)*CS_cce;
+	p[CS_ns-2] =  CS_mat.pi(CS_ns-2,p[CS_ns-3],bNm2);
+  }else{
+    p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
+			   CS_mat.bi(CS_ns-1,
+				     CS_data[tm1+CS_ns-2],
+				     CS_data[tm1+CS_ns-1],
+				     0)+CS_cce);
+  }
   //ora procedo finalmente con l'assegnare i risultati
-  CS_data[t+CS_ns-1] = p[CS_ns-1];
-  for(int i=CS_ns-2;i>=0;i--){
+  CS_data[t+CS_ns-pstop] = p[CS_ns-pstop];
+  for(int i=CS_ns-1;i>=psstart-1;i--){
     CS_data[t+i] = p[i] - CS_mat.H(i) * CS_data[t+i+1];
     //da pi = xi + hi x(i+1)
 #ifdef DEBUG
@@ -151,33 +165,82 @@ bool CranckSolver::prepareTGraph2D(string filename, double timestep, double spac
       	   << "i"+filename <<"\" e \""
       	   << "N"+filename <<"\"" << endl;
       return true;
+    }
 #else
-      ofstream outfile(filename.c_str());
-      if(!outfile.is_open()){
-	cout << "Non sono riuscito ad aprire il file \""
-	     << filename <<"\"" << endl;
-	return false;
-      }else{
-	for(int i= 0;i<CS_nt/1;i+=timespan){
-	  int t = CS_ns * i;
-	  for(int j = 0;j< CS_ns ;j+=spacespan){
-	    outfile << i*timestep  << "\t" << j*spacestep << "\t"
-		    << CS_data[t+j]<<endl;
-	  }
+    ofstream outfile(filename.c_str());
+    if(!outfile.is_open()){
+      cout << "Non sono riuscito ad aprire il file \""
+	   << filename <<"\"" << endl;
+      return false;
+    }else{
+      for(int i= 0;i<CS_nt/1;i+=timespan){
+	int t = CS_ns * i;
+	for(int j = 0;j< CS_ns ;j+=spacespan){
+	  outfile << i*timestep  << "\t" << j*spacestep << "\t"
+		  << CS_data[t+j]<<endl;
 	}
-	cout << "Ho salvato i dati sul file \""
-	     << filename <<"\"" << endl;
-	return true;
-#endif
       }
+      cout << "Ho salvato i dati sul file \""
+	   << filename <<"\"" << endl;
+      return true;
+    }
+#endif
+  }
+}
+
+bool CranckSolver::writeEverithing(string filename, double timestep, double spacestep){//timestep e spacestep non vengono salvati nel Solver
+  //l'idea e` salvare un file con tutti i dati in questo modo:
+  /*
+    real/complex
+    N_Passi_temporali passo_T
+    N_Passi_spaziali passo_S
+    riga per il passo T_0(CI)
+    riga per il passo T_1
+    ....
+    riga per il passo CS_step(in caso ci siamo fermati prima della fine)
+    in caso di complessi ogni riga avra real_0 img_0 norm_0 real_1 img_1 norm_1... e cosi` via sino alla fine
+  */
+  if(CS_step <= 1){
+    cout << "Non ho svolto alcun calcolo, non preparo il file \""
+	 << filename <<"\"" << endl;
+    return false;
+  }else{
+    ofstream outfile(filename.c_str());
+    if(!outfile.is_open()){
+      cout << "Non sono riuscito ad aprire il file \""
+	   << filename <<"\"" << endl;
+      return false;
+    }else{
+#ifdef USECOMPLEX
+      outfile << "complex"<<endl;
+#else
+      outfile << "real"<<endl;
+#endif
+      outfile << CS_step << timestep << endl
+	      << CS_ns << spacestep<< endl;
+      for(int i= 0;i<CS_step;i++){
+	int t = CS_ns * i;
+	for(int j = 0;j< CS_ns ;j++){
+#ifdef USECOMPLEX
+	  outfile << "\t" << CS_data[t+j].real() << CS_data[t+j].imag() << norm(CS_data[t+j]);
+#else
+	  outfile << CS_data[t+j];
+#endif
+	}
+	outfile << endl;
+      }
+      cout << "Ho salvato i dati sul file \""
+	   << filename <<"\"" << endl;
+      return true;
     }
   }
-
-  void CranckSolver::processCC(){
-    //int t = CS_step*CS_ns; //dummy per comodita`
-    // int tm1 = (CS_step-1)*CS_ns; //dummy per comodita`
-    //  if(options == "DD"){
-    // CS_data[t+0] = CS_cci;
-    //  CS_data[t+CS_ns-1] = CS_cce;
-    //}
-  }
+}
+  
+void CranckSolver::processCC(){
+  //int t = CS_step*CS_ns; //dummy per comodita`
+  // int tm1 = (CS_step-1)*CS_ns; //dummy per comodita`
+  //  if(options == "DD"){
+  // CS_data[t+0] = CS_cci;
+  //  CS_data[t+CS_ns-1] = CS_cce;
+  //}
+}

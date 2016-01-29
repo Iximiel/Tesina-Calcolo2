@@ -138,7 +138,7 @@ int main(int argc, char** argv){
   Var CCi = 2*info.spacestep*(a - ak)*df0;
   Var CCe =- 2*info.spacestep*(c - ck)*dfN;
   cout << "Inizializzo il Solver" <<endl;
-  CranckSolver myIntegrator(mat,info.Nl,info.Nt,CCi,CCe);
+  CranckSolver myIntegrator(mat,info.Nl,info.Nt,"RR",CCi,CCe);
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
   cout << "Inizio i calcoli" <<endl;
