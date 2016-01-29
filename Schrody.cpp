@@ -37,6 +37,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   bgSetSteps -> Connect("Clicked(Int_t)","Schrody",this,"HandleNumbers()");
+  tbStart -> Connect("Clicked()","Schrody",this,"doTheThing()");
   HandleNumbers();
     
   Resize(GetDefaultSize());
@@ -238,8 +239,30 @@ void Schrody::HandleNumbers(){
   }
 }
 
-
 void Schrody::doTheThing(){
-
+  double Sstep, Tstep, Slim, Tlim;
+  int NS, NT;
+  //per prima cosa imposto i passi
+  if(bgSetSteps->GetButton(100)->IsOn()){
+    Sstep = numSpaceStep -> GetNumber();
+    Tstep = numTimeStep -> GetNumber();
+    Slim = numSpaceLim -> GetNumber();
+    Tlim = numTimeLim -> GetNumber();
+    NS = Slim/Sstep;
+    NT = Tlim/Tstep;
+  }else{
+    NS = numSpaceSteps -> GetIntNumber();
+    NT = numTimeSteps -> GetIntNumber();
+    Slim = numSpaceLim -> GetNumber();
+    Tlim = numTimeLim -> GetNumber();
+    Sstep = Slim/NS;
+    Tstep = Tlim/NT;
+  }
+  //quindi imposto le condizioni iniziali
+  //imposto la trimatrice
+  //do in pasto le impostazioni al solver
+  //CrankSolver
+  //lancio una finestra con una progressbar e faccio le cose
+  //salvo tutto su un file, poi creo un visualize piu` comodo
 }
 
