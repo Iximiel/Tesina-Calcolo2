@@ -281,7 +281,7 @@ $$F(x,t) = f(x,t) \forall x \in \partial D$$
 
 Assegno a $F_0^{j+1}$ e $F_{N-1}^{j+1}$ il valore noto, e` quindi inutile calcolare la prima e l'ultima riga della matrice $N\times N$ e posso trattare tutto come se la matrice fosse $N-2\times N-2$, con indici da $1$ a $N-2$ con la differenza che devo usare i seguenti valori:
 $$b_1^j = ak_1 F_{0}^{j}+ dk_1 F_{1}^{j} + ck_1 F_{2}^{j} - a_1 F_0^{j+1} $$
-$$b_{N-2}^j = ak_1 F_{N-3}^{j}+ dk_1 F_{N-2}^{j} + ck_1 F_{N-1}^{j} - c_1 F_{N-1}^{j+1} $$
+$$b_{N-2}^j = ak_{N-2} F_{N-3}^{j}+ dk_{N-2} F_{N-2}^{j} + ck_{N-2} F_{N-1}^{j} - c_{N-2} F_{N-1}^{j+1} $$
 \subsection{Neumann}
 Conosco il valore della derivata negli estremi del dominio.
 $$\pde Fx(x,t) = f(x,t) \forall x \in \partial D$$
