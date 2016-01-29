@@ -5,7 +5,7 @@
 //NB: questo solver non e` generalizzato per CC e V variabili nel tempo
 class CranckSolver{
 public:
-  CranckSolver(const tridiagM &mat, int Ns, int Nt, char *options, Var CCi, Var CCe);
+  CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe);
   ~CranckSolver();
   bool doStep();
   void SetInitialState(Var* );

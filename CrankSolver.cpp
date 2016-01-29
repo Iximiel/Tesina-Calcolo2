@@ -12,12 +12,12 @@ void wait(){
 
 using namespace std;
 
-CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, char *options, Var CCi, Var CCe)
+CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe)
   :CS_mat(mat){
+  
   CC0 = options[0];
   CCN = options[1];  
 
-  //CS_mat = mat;   
   CS_ns = Ns;
   CS_nt = Nt;
   CS_cci = CCi;
@@ -28,7 +28,6 @@ CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, char *options, V
 }
 
 CranckSolver::~CranckSolver(){
-  //delete h;
   delete CS_data;
 }
 
@@ -66,20 +65,29 @@ void CranckSolver::Stepper(){
   Var *p = new Var [CS_ns];
   //0 e` l'indice delle condizioni al contorno, se uso Dirichlet 0 serve a non aggiungere eccezioni all'algoritmo
   //la spiegazione e` in create_h() di Tridiag.cpp
-  //preparo del vettore delle p[]
-  //if(options == "DD")
-  // p[0] = 0;
-  //else{
-  p[0] = CS_mat.pi(0,0,
-		   CS_mat.bi(0,0,CS_data[tm1],CS_data[tm1+1])+CS_cci);
-  //  }
-  for(int i=1;i<CS_ns-1;i++){
+  //preparo il vettore delle p[]
+  int pstart = 1, pstop = 1;
+  if(CC0 == 'D'){
+    p[0] = 0;
+    pstart = 2;
+    CS_data[t+0] = CS_cci;
+    Var b1 = CS_mat.bi(1,CS_data[tm1+0],
+		       CS_data[tm1+1],
+		       CS_data[tm1+2]);
+	b1 -= CS_mat.a(1)*CS_cci;
+	p[1] =  CS_mat.pi(1,p[0],b1);
+  }else{
+    p[0] = CS_mat.pi(0,0,
+		     CS_mat.bi(0,0,CS_data[tm1],CS_data[tm1+1])+CS_cci);
+  }
+  if(CCN == 'D')
+    psstop = 2;
+  for(int i=pstart;i<CS_ns-pstop;i++){
     //calcolo il valore di b[i]
     Var bi = CS_mat.bi(i,CS_data[tm1+i-1],
 		       CS_data[tm1+i],
 		       CS_data[tm1+i+1]);
     p[i] = CS_mat.pi(i,p[i-1],bi);
-
 #ifdef DEBUG
     if(abs(CS_ns/2.-i)<=5){
       cout << i <<": b[i] = "<< bi <<" p[i]= "<<p[i];//<<endl;
@@ -87,14 +95,24 @@ void CranckSolver::Stepper(){
     }
 #endif //DEBUG
   }
-  p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
-			 CS_mat.bi(CS_ns-1,
-				   CS_data[tm1+CS_ns-2],
-				   CS_data[tm1+CS_ns-1],
-				   0)+CS_cce);
+  //assegno l'ultimo punto
+  if(CCN == 'D'){
+    p[CS_ns-1] = CS_cce;
+    Var bNm2 = CS_mat.bi(t+CS_ns-2,CS_data[tm1+CS_ns-3],
+		       CS_data[tm1+CS_ns-2],
+		       CS_data[tm1+CS_ns-1]);
+	bNm2 -= CS_mat.a(CS_ns-2)*CS_cce;
+	p[CS_ns-2] =  CS_mat.pi(CS_ns-2,p[CS_ns-3],bNm2);
+  }else{
+    p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
+			   CS_mat.bi(CS_ns-1,
+				     CS_data[tm1+CS_ns-2],
+				     CS_data[tm1+CS_ns-1],
+				     0)+CS_cce);
+  }
   //ora procedo finalmente con l'assegnare i risultati
-  CS_data[t+CS_ns-1] = p[CS_ns-1];
-  for(int i=CS_ns-2;i>=0;i--){
+  CS_data[t+CS_ns-pstop] = p[CS_ns-pstop];
+  for(int i=CS_ns-1;i>=psstart-1;i--){
     CS_data[t+i] = p[i] - CS_mat.H(i) * CS_data[t+i+1];
     //da pi = xi + hi x(i+1)
 #ifdef DEBUG
@@ -204,7 +222,7 @@ bool CranckSolver::writeEverithing(string filename, double timestep, double spac
 	int t = CS_ns * i;
 	for(int j = 0;j< CS_ns ;j++){
 #ifdef USECOMPLEX
-	  outfile << "\t" << CS_data[t+j].real() << CS_data[t+j].imag() << norm(CS_data[t+j])
+	  outfile << "\t" << CS_data[t+j].real() << CS_data[t+j].imag() << norm(CS_data[t+j]);
 #else
 	  outfile << CS_data[t+j];
 #endif
