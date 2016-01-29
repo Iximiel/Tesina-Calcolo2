@@ -1,6 +1,8 @@
-#eseguibili
+#eseguibili e file generati
 main
 drawer
+CCDict.cpp
+SchrodyDict.cpp
 *out.txt
 
 #emacs
