@@ -7,11 +7,14 @@
 #include "TGComboBox.h"
 #include "TGButton.h"
 #include "TGButtonGroup.h"
+#include "TF1.h"
 
 class Schrody : public TGMainFrame{
   ClassDef(Schrody,1)
   public:
   Schrody(const TGWindow *p,int w,int h);
+  //  ~Schrody();
+  void SetPotenziale();
   //slots
   void exit();
   void doTheThing();
@@ -20,6 +23,7 @@ class Schrody : public TGMainFrame{
   void CCset(bool);
   void controlReady();
   void HandleNumbers();
+  void PreviewPotenziale();
 private:
   //dati
   guiInfo* info;
@@ -37,7 +41,7 @@ private:
   TGComboBox *comboPotentials;
   TGTextButton *tbStart;
   TGButtonGroup *bgSetSteps;
-
+  TF1 *Potenziale;
   /*
   //
   PDECond *myPDE;

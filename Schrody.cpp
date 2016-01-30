@@ -4,6 +4,7 @@
 #include "TCanvas.h"
 #include "TApplication.h"
 
+
 #define USECOMPLEX//cosi` includo complex e la variabile Var e` un "Complex<double>" -std=c++11 e` raccomandato
 #include "CrankSolver.hpp"
 
@@ -27,7 +28,6 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   SetMWMHints(kMWMDecorAll,
 	      kMWMFuncAll,
 	      kMWMInputModeless);
-  MapSubwindows();
 
   //connessione controllo passi valori
   numSpaceLim -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
@@ -38,8 +38,12 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   bgSetSteps -> Connect("Clicked(Int_t)","Schrody",this,"HandleNumbers()");
   tbStart -> Connect("Clicked()","Schrody",this,"doTheThing()");
+
   HandleNumbers();
-    
+  Potenziale = nullptr;
+  PreviewPotenziale();
+  
+  MapSubwindows();    
   Resize(GetDefaultSize());
   MapWindow();
   Resize(800,600);
@@ -238,10 +242,19 @@ void Schrody::HandleNumbers(){
     numTimeStep -> SetState(false);
   }
 }
+void Schrody::SetPotenziale(){
+}
+void Schrody::PreviewPotenziale(){
+  SetPotenziale();
+}
 
 void Schrody::doTheThing(){
   double Sstep, Tstep, Slim, Tlim;
   int NS, NT;
+  static const Var I(0,1);// mi serve solo qui
+  static const char lazyCC[3] = {'D','N','R'};
+  double hbar = 1, mass = 1;// valori temporanei
+  char infoCC[2] = {lazyCC[info->CC0],lazyCC[info->CCN]};
   //per prima cosa imposto i passi
   if(bgSetSteps->GetButton(100)->IsOn()){
     Sstep = numSpaceStep -> GetNumber();
@@ -258,8 +271,42 @@ void Schrody::doTheThing(){
     Sstep = Slim/NS;
     Tstep = Tlim/NT;
   }
+  //definisco il potenziale
   //quindi imposto le condizioni iniziali
-  //imposto la trimatrice
+  // e imposto la trimatrice
+  tridiagM mat(NS);
+  Var eta = I * (hbar/(2*mass))*(Tstep/(Sstep*Sstep));
+  Var *initial = new Var[NS];
+  //imposto gli a d c generici
+  Var a = -1., d = 2./eta+2., c = -1.;
+  Var ak = 1., dk = 2./eta-2., ck = 1.;
+  initial[0] = info.gauss(0);
+  if(infoCC[0]=='D'){
+  }else if(infoCC[0]=='N'){ 
+  }else{//Robin
+    mat.setUnknown(0,0,d+2*a*spacestep*info->weight0 + 0.,a+c,0);
+    mat.setKnown(0,0,dk+2*ak*spacestep*info->weight0 + 0.,ak+ck,0);
+  }
+  for(int j = 1;j < NS-1;j++){
+    /*    if(j==info.Vnum){
+      d -= -I*info.Vval * timestep/eta;
+      dk+= -I*info.Vval * timestep/eta;
+    }*/
+
+    /* if(j==3*info.Nl/4){
+      d = 2./(eta*5)+2;
+      dk = 2./(eta*5)-2;
+      }*/
+    //    initial[j] = info.gauss(j);//+j*5./info.Nl;
+    mat.setUnknown(j,a,d,c,0);
+    mat.setKnown(j,ak,dk,ck,0);
+  }
+  // int set =3*info.Nl/4;
+  //  mat.setKnown(set,ak,dk,ck,0.1);
+  //  initial[NS-1] = info.gauss(NS-1);
+  mat.setUnknown(NS-1,a+c,d,0.,0.);
+  mat.setKnown(NS-1,ak+ck,dk,0.,0.);
+
   //do in pasto le impostazioni al solver
   //CrankSolver
   //lancio una finestra con una progressbar e faccio le cose
