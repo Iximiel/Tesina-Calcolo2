@@ -67,6 +67,8 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(tbStart  =  new TGTextButton(tVMainFrame,"Avvia"),
 		    new TGLayoutHints(kLHintsExpandX|kLHintsExpandY,2,2,2,2));
   tbStart->SetEnabled(false);
+  //tHFrame->SetMinWidth (150);
+  //tHFrame->SetMinHeight (150);
   tHFrame->Resize(200,200);
   
   TGGroupFrame *gfPotenziale = new TGGroupFrame(tVMainFrame,"Potenziale");
@@ -75,11 +77,11 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
 			 new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
   //			 new TGLayoutHints(kLHintsLeft | kLHintsTop|kLHintsExpandX/*|kLHintsExpandY*/,2,2,2,2));//da aggiustare
   //roba moooolto temporanea
-  comboPotentials->NewEntry("[0]+x*[1]");
+  comboPotentials->NewEntry("[0]*gauss(x,[1],[2])");
   comboPotentials->NewEntry("[0]*H(x-[1])");
+  comboPotentials->NewEntry("[0]*H([1]-x)");
   comboPotentials->NewEntry("[0]*H(x-[1])*H([2]-x)");
-  comboPotentials->NewEntry("gauss(x,[0],[1])");
-  comboPotentials->Select(3,false);
+  comboPotentials->Select(0,false);
   comboPotentials->Resize(150,20);
   //parametri
   numpar = new TGNumberEntry*[2];
@@ -244,12 +246,25 @@ void Schrody::HandleNumbers(){
     numTimeStep -> SetState(false);
   }
 }
+
 void Schrody::SetPotenziale(){
   if(Potenziale != nullptr)
     delete Potenziale;
-  char* formula;
+  /*
+    comboPotentials->NewEntry("[0]*gauss(x,[1],[2])");
+    comboPotentials->NewEntry("[0]*H(x-[1])");
+    comboPotentials->NewEntry("[0]*H([1])");
+    comboPotentials->NewEntry("[0]*H(x-[1])*H([2]-x)");
+  */
+  //uso le funzioni lambda:
+  static string formula[4]={"[0] *TMath::Gaus(x,[1],[2],false)",
+			   "[&](double *x, double *p){if(x[0] > par[1]){return par[0];}else{return 0;}}",
+			   "[&](double *x, double *p){if(x[0] < par[1]){return par[0];}else{return 0;}}",
+			   "[&](double *x,double *p){double a,b;if(x[0]>par[1]){a=1;}else{a=0;} if(x[0]<par[2]){b=1;}else{b=0;} return a*b*par[0];}"
+  };
+  int funcNum = comboPotentials->GetSelected();
   double Slim = numSpaceLim -> GetNumber();
-  Potenziale = new TF1("V",formula,0.,Slim);
+  Potenziale = new TF1("V",formula[funcNum].c_str(),0.,Slim);
 }
 void Schrody::PreviewPotenziale(){
   SetPotenziale();
@@ -289,25 +304,30 @@ void Schrody::doTheThing(){
   Var ak = 1., dk = 2./eta-2., ck = 1.;
   //  initial[0] = info.gauss(0);
   if(infoCC[0]=='D'){
-  }else if(infoCC[0]=='N'){ 
+    mat.setUnknown(0,0,1,0,0);
+    mat.setKnown(0,0,1,0,0);
+  }else if(infoCC[0]=='N'){
+    mat.setUnknown(0,0,d + Potenziale->Eval(0) * perV,a+c,0);
+    mat.setKnown(0,0,dk - Potenziale->Eval(0) * perV,ak+ck,0);    
   }else{//Robin
     mat.setUnknown(0,0,d+2.*a*Sstep*info->weight0 + Potenziale->Eval(0) * perV,a+c,0);
     mat.setKnown(0,0,dk+2.*ak*Sstep*info->weight0 - Potenziale->Eval(0) * perV,ak+ck,0);
   }
   for(int j = 1;j < NS-1;j++){
-    /*    if(j==info.Vnum){
-      d -= -I*info.Vval * timestep/eta;
-      dk+= -I*info.Vval * timestep/eta;
-    }*/
-
-    /* if(j==3*info.Nl/4){
-      d = 2./(eta*5)+2;
-      dk = 2./(eta*5)-2;
-      }*/
-    //    initial[j] = info.gauss(j);//+j*5./info.Nl;
     mat.setUnknown(j,a,d + Potenziale->Eval(j/Sstep) * perV,c,0);
-    mat.setKnown(j,ak,dk - Potenziale->Eval(j/Stsep) * perV,ck,0);
+    mat.setKnown(j,ak,dk - Potenziale->Eval(j/Sstep) * perV,ck,0);
   }
+  if(infoCC[1]=='D'){
+    mat.setUnknown(NS-1,0,1,0,0);
+    mat.setKnown(NS-1,0,1,0,0);
+  }else if(infoCC[1]=='N'){
+    mat.setUnknown(NS-1,0,d + Potenziale->Eval((NS-1)*Sstep) * perV,a+c,0);
+    mat.setKnown(NS-1,0,dk - Potenziale->Eval((NS-1)*Sstep) * perV,ak+ck,0);    
+  }else{//Robin
+    mat.setUnknown(NS-1,a+c,d-2.*c*Sstep*info->weight0 + Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
+    mat.setKnown(NS-1,ak+ck,dk-2.*ck*Sstep*info->weight0 - Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
+  }
+  
   // int set =3*info.Nl/4;
   //  mat.setKnown(set,ak,dk,ck,0.1);
   //  initial[NS-1] = info.gauss(NS-1);
