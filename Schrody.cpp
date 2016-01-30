@@ -29,9 +29,11 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
 	      kMWMFuncAll,
 	      kMWMInputModeless);
 
-  //connessione controllo passi valori
+  //connessioni
   numSpaceLim -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  numSpaceLim -> Connect("ValueSet(Long_t)","Schrody",this,"PreviewPotenziale()");
   numTimeLim -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
+  numTimeLim -> Connect("ValueSet(Long_t)","Schrody",this,"PreviewPotenziale()");
   numSpaceStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numTimeStep -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
@@ -199,7 +201,7 @@ void Schrody::launchCCN(){
 
 void Schrody::CCset(bool CCok){
   //impostare la possibilita` di partire
-  cout << CCok<<endl;
+  //cout << CCok<<endl;
   CC = CCok;
   controlReady();
 }
@@ -243,14 +245,22 @@ void Schrody::HandleNumbers(){
   }
 }
 void Schrody::SetPotenziale(){
+  if(Potenziale != nullptr)
+    delete Potenziale;
+  char* formula;
+  double Slim = numSpaceLim -> GetNumber();
+  Potenziale = new TF1("V",formula,0.,Slim);
 }
 void Schrody::PreviewPotenziale(){
   SetPotenziale();
+  //aggiungere grafica
 }
 
 void Schrody::doTheThing(){
   double Sstep, Tstep, Slim, Tlim;
   int NS, NT;
+  Slim = numSpaceLim -> GetNumber();
+  Tlim = numTimeLim -> GetNumber();
   static const Var I(0,1);// mi serve solo qui
   static const char lazyCC[3] = {'D','N','R'};
   double hbar = 1, mass = 1;// valori temporanei
@@ -259,15 +269,11 @@ void Schrody::doTheThing(){
   if(bgSetSteps->GetButton(100)->IsOn()){
     Sstep = numSpaceStep -> GetNumber();
     Tstep = numTimeStep -> GetNumber();
-    Slim = numSpaceLim -> GetNumber();
-    Tlim = numTimeLim -> GetNumber();
     NS = Slim/Sstep;
     NT = Tlim/Tstep;
   }else{
     NS = numSpaceSteps -> GetIntNumber();
     NT = numTimeSteps -> GetIntNumber();
-    Slim = numSpaceLim -> GetNumber();
-    Tlim = numTimeLim -> GetNumber();
     Sstep = Slim/NS;
     Tstep = Tlim/NT;
   }
@@ -276,6 +282,7 @@ void Schrody::doTheThing(){
   // e imposto la trimatrice
   tridiagM mat(NS);
   Var eta = I * (hbar/(2*mass))*(Tstep/(Sstep*Sstep));
+  Var perV = Tstep/eta;//moltiplicatore del potenziale
   Var *initial = new Var[NS];
   //imposto gli a d c generici
   Var a = -1., d = 2./eta+2., c = -1.;
@@ -284,8 +291,8 @@ void Schrody::doTheThing(){
   if(infoCC[0]=='D'){
   }else if(infoCC[0]=='N'){ 
   }else{//Robin
-    mat.setUnknown(0,0,d+2.*a*Sstep*info->weight0 + 0.,a+c,0);
-    mat.setKnown(0,0,dk+2.*ak*Sstep*info->weight0 + 0.,ak+ck,0);
+    mat.setUnknown(0,0,d+2.*a*Sstep*info->weight0 + Potenziale->Eval(0) * perV,a+c,0);
+    mat.setKnown(0,0,dk+2.*ak*Sstep*info->weight0 - Potenziale->Eval(0) * perV,ak+ck,0);
   }
   for(int j = 1;j < NS-1;j++){
     /*    if(j==info.Vnum){
@@ -298,8 +305,8 @@ void Schrody::doTheThing(){
       dk = 2./(eta*5)-2;
       }*/
     //    initial[j] = info.gauss(j);//+j*5./info.Nl;
-    mat.setUnknown(j,a,d,c,0);
-    mat.setKnown(j,ak,dk,ck,0);
+    mat.setUnknown(j,a,d + Potenziale->Eval(j/Sstep) * perV,c,0);
+    mat.setKnown(j,ak,dk - Potenziale->Eval(j/Stsep) * perV,ck,0);
   }
   // int set =3*info.Nl/4;
   //  mat.setKnown(set,ak,dk,ck,0.1);
