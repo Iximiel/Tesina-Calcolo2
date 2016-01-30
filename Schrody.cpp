@@ -280,12 +280,12 @@ void Schrody::doTheThing(){
   //imposto gli a d c generici
   Var a = -1., d = 2./eta+2., c = -1.;
   Var ak = 1., dk = 2./eta-2., ck = 1.;
-  initial[0] = info.gauss(0);
+  //  initial[0] = info.gauss(0);
   if(infoCC[0]=='D'){
   }else if(infoCC[0]=='N'){ 
   }else{//Robin
-    mat.setUnknown(0,0,d+2*a*spacestep*info->weight0 + 0.,a+c,0);
-    mat.setKnown(0,0,dk+2*ak*spacestep*info->weight0 + 0.,ak+ck,0);
+    mat.setUnknown(0,0,d+2.*a*Sstep*info->weight0 + 0.,a+c,0);
+    mat.setKnown(0,0,dk+2.*ak*Sstep*info->weight0 + 0.,ak+ck,0);
   }
   for(int j = 1;j < NS-1;j++){
     /*    if(j==info.Vnum){
