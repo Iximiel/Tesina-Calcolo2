@@ -3,8 +3,6 @@
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 #include "TApplication.h"
-
-
 #define USECOMPLEX//cosi` includo complex e la variabile Var e` un "Complex<double>" -std=c++11 e` raccomandato
 #include "CrankSolver.hpp"
 
@@ -46,7 +44,9 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
 
   HandleNumbers();
   CI = Potenziale = nullptr;
-  PreviewPotenziale();
+  SetCI(true);
+  SetPotenziale();
+  Preview();
   
   MapSubwindows();    
   Resize(GetDefaultSize());
@@ -102,7 +102,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   //Altezza
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
   tHFrame->AddFrame(numNorm = new TGNumberEntry (tHFrame,1.,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
-  numNorm->GetNumberEntry()->SetToolTipText("\"Norma\" moltiplica la gaussiana, che e` gia` normalizzata, se messo  a 0 fa si` che l'altezza massiam sia 1");
+  numNorm->GetNumberEntry()->SetToolTipText("\"Norma\" moltiplica la gaussiana, che e` gia` normalizzata, se messo  a 0 fa si` che l'altezza massiam sia 1\nRiguarda solo la forma del pacchetto, non la sua energia. L'anteprima visualizza l'altezza del pacchetto come l'energia del pacchetto rispetto al potenziale");
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"\"Norma\""),LabelLayout);
     //larghezza
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
@@ -114,7 +114,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Larghezza"),LabelLayout);
   //energia
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(numEne = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numEne = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Energia"),LabelLayout);
   //massa
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
@@ -271,6 +271,7 @@ void Schrody::SetCI(bool preview){
 			numLarg->GetNumber());
 
   }
+  CI->SetLineColor(1);
 }
 
 /*setting potenziale*/
@@ -295,15 +296,26 @@ void Schrody::SetPotenziale(){
 			      numpar[1]->GetNumber(),
 			      numpar[2]->GetNumber());
 }
+
 void Schrody::PreviewPotenziale(){
   SetPotenziale();
-  showCanvas->cd();
-  Potenziale->Draw();
-  showCanvas->Modified();
-    showCanvas->Update();
-  //aggiungere grafica
+  Preview();
 }
-
+void Schrody::Preview(){
+  showCanvas->cd();
+  
+  Potenziale->SetNpx(1000);
+  CI->SetNpx(1000);
+  if(Potenziale->GetParameter(0)>CI->GetParameter(0)){
+    Potenziale->Draw();
+    CI->Draw("same");
+  }else{
+    CI->Draw();
+    Potenziale->Draw("same");
+  }
+  showCanvas->Modified();
+  showCanvas->Update();
+}
 void Schrody::doTheThing(){
   double Sstep, Tstep, Slim, Tlim;
   int NS, NT;

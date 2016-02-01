@@ -18,6 +18,7 @@ class Schrody : public TGMainFrame{
   //  ~Schrody();
   void SetPotenziale();
   void SetCI(bool);
+  void Preview();
   //slots
   void exit();
   void doTheThing();
