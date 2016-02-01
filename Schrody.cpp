@@ -45,7 +45,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   tbStart -> Connect("Clicked()","Schrody",this,"doTheThing()");
 
   HandleNumbers();
-  Potenziale = nullptr;
+  CI = Potenziale = nullptr;
   PreviewPotenziale();
   
   MapSubwindows();    
@@ -92,7 +92,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(numpar[0] = new TGNumberEntry (tHFrame,1.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[0]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,5.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,1.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[1]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
   tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
@@ -101,12 +101,16 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   TGGroupFrame *gfPacchetto = new TGGroupFrame(tVMainFrame,"Pacchetto Iniziale");
   //Altezza
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(numNorm = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numNorm = new TGNumberEntry (tHFrame,1.,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   numNorm->GetNumberEntry()->SetToolTipText("\"Norma\" moltiplica la gaussiana, che e` gia` normalizzata, se messo  a 0 fa si` che l'altezza massiam sia 1");
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"\"Norma\""),LabelLayout);
+    //larghezza
+  gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
+  tHFrame->AddFrame(numPos = new TGNumberEntry (tHFrame,2.,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Pos. iniziale"),LabelLayout);
   //larghezza
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(numLarg = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numLarg = new TGNumberEntry (tHFrame,0.1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Larghezza"),LabelLayout);
   //energia
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
@@ -114,7 +118,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Energia"),LabelLayout);
   //massa
   gfPacchetto->AddFrame(tHFrame = new TGHorizontalFrame(gfPacchetto));
-  tHFrame->AddFrame(numMass = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numMass = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"Massa"),LabelLayout);
   //condizioni al contorno
   TGButtonGroup *bgCC = new TGButtonGroup(tVMainFrame,"Condizioni al contorno");//decidere se buttogroup o groupframe
@@ -251,6 +255,25 @@ void Schrody::HandleNumbers(){
   }
 }
 
+void Schrody::SetCI(bool preview){
+  if(CI != nullptr)
+    delete CI;
+  double Slim = numSpaceLim -> GetNumber();
+  if(preview){//non e` un anteprima accurata rispetto a quella del potenziale
+    CI = new TF1("CI","[0] * TMath::Gaus(x,[1],[2],false)",0.,Slim);
+    CI -> SetParameters(numEne->GetNumber(),
+			numPos->GetNumber(),
+			numLarg->GetNumber());
+  }else{
+    CI = new TF1("CI","[0] * TMath::Gaus(x,[1],[2],true)",0.,Slim);
+    CI -> SetParameters(numNorm->GetNumber(),
+			numPos->GetNumber(),
+			numLarg->GetNumber());
+
+  }
+}
+
+/*setting potenziale*/
 void Schrody::SetPotenziale(){
   if(Potenziale != nullptr)
     delete Potenziale;

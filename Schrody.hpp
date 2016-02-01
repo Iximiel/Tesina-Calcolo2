@@ -17,6 +17,7 @@ class Schrody : public TGMainFrame{
   Schrody(const TGWindow *p,int w,int h);
   //  ~Schrody();
   void SetPotenziale();
+  void SetCI(bool);
   //slots
   void exit();
   void doTheThing();
@@ -36,14 +37,14 @@ private:
   TGFrame* setAlgorithm(const TGWindow *p);
   
   DefineCC *CC0, *CCN;
-  TGNumberEntry *numNorm, *numLarg, *numEne, *numMass,
+  TGNumberEntry *numNorm, *numPos, *numLarg, *numEne, *numMass,
     *numSpaceStep, *numTimeStep, *numSpaceSteps, *numTimeSteps,
     *numSpaceLim, *numTimeLim;
   TGNumberEntry **numpar;
   TGComboBox *comboPotentials;
   TGTextButton *tbStart;
   TGButtonGroup *bgSetSteps;
-  TF1 *Potenziale;
+  TF1 *Potenziale, *CI;
   TCanvas *showCanvas;
   /*
   //
