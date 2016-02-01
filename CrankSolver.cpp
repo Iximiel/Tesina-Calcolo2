@@ -12,7 +12,7 @@ void wait(){
 
 using namespace std;
 
-CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe)
+CrankSolver::CrankSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe)
   :CS_mat(mat){
   
   CC0 = options[0];
@@ -27,11 +27,11 @@ CranckSolver::CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *opti
   CS_mat.create_h(CCN == 'D');
 }
 
-CranckSolver::~CranckSolver(){
+CrankSolver::~CrankSolver(){
   delete CS_data;
 }
 
-void CranckSolver::SetInitialState(Var* initialVector){
+void CrankSolver::SetInitialState(Var* initialVector){
   for(int i=0;i<CS_ns;i++)
     CS_data[i] = initialVector[i];
   CS_step =1;
@@ -40,7 +40,7 @@ void CranckSolver::SetInitialState(Var* initialVector){
 #endif //DEBUG
 }
 
-bool CranckSolver::doStep(){
+bool CrankSolver::doStep(){
   if(CS_step ==0){
     cout << "Non ho acquisito le condizioni iniziali"<<endl;
     return false;
@@ -54,11 +54,11 @@ bool CranckSolver::doStep(){
   }
 }
 
-Var CranckSolver::getPoint(int t, int x){
+Var CrankSolver::getPoint(int t, int x){
   return CS_data[t*CS_ns+x];
 }
 //da fare: rendere lo stepper flessibile
-void CranckSolver::Stepper(){
+void CrankSolver::Stepper(){
   int t = CS_step*CS_ns; //dummy per comodita`
   int tm1 = (CS_step-1)*CS_ns; //dummy per comodita`
   Var *p = new Var [CS_ns];
@@ -128,7 +128,7 @@ void CranckSolver::Stepper(){
 #endif //DEBUG
 }
 
-bool CranckSolver::prepareTGraph2D(string filename, double timestep, double spacestep, int timespan, int spacespan){
+bool CrankSolver::prepareTGraph2D(string filename, double timestep, double spacestep, int timespan, int spacespan){
   if(CS_step <= 1){
     cout << "Non ho svolto alcun calcolo, non preparo il file \""
 	 << filename <<"\"" << endl;
@@ -190,7 +190,7 @@ bool CranckSolver::prepareTGraph2D(string filename, double timestep, double spac
   }
 }
 
-bool CranckSolver::writeEverithing(string filename, double timestep, double spacestep){//timestep e spacestep non vengono salvati nel Solver
+bool CrankSolver::writeEverithing(string filename, double timestep, double spacestep){//timestep e spacestep non vengono salvati nel Solver
   //l'idea e` salvare un file con tutti i dati in questo modo:
   /*
     real/complex

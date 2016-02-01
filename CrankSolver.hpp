@@ -1,18 +1,17 @@
-#ifndef _Cranck
-#define _Cranck
+#ifndef _Crank
+#define _Crank
 #include "TridiagMore.hpp"
 #include <string>
 //NB: questo solver non e` generalizzato per CC e V variabili nel tempo
-class CranckSolver{
+class CrankSolver{
 public:
-  CranckSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe);
-  ~CranckSolver();
+  CrankSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe);
+  ~CrankSolver();
   bool doStep();
   void SetInitialState(Var* );
-  void SetDerivativeCC(Var CCdi, Var CCde, Var xstep);
   Var getPoint(int t, int x);
-  bool prepareTGraph2D(std::string ,double ,double, int=1, int=1);
-  bool writeEverithing(std::string ,double ,double);
+  bool prepareTGraph2D(std::string filename, double timestep, double spacestep, int timespan=1, int spacespan=1);
+  bool writeEverithing(std::string filename, double timestep, double spacestep);
 private:
   void Stepper();
   int CCfstep, CCestep;//includo o no il primo/ultimo punto
