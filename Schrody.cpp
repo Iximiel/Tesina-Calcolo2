@@ -39,6 +39,9 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   numSpaceSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   numTimeSteps -> Connect("ValueSet(Long_t)","Schrody",this,"HandleNumbers()");
   bgSetSteps -> Connect("Clicked(Int_t)","Schrody",this,"HandleNumbers()");
+  comboPotentials -> Connect("Selected(Int_t)","Schrody",this,"PreviewPotenziale()");
+  for(int i=0;i<3;i++)
+    numpar[i] -> Connect("ValueSet(Long_t)","Schrody",this,"PreviewPotenziale()");
   tbStart -> Connect("Clicked()","Schrody",this,"doTheThing()");
 
   HandleNumbers();
@@ -81,18 +84,18 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   comboPotentials->NewEntry("[0]*H(x-[1])");
   comboPotentials->NewEntry("[0]*H([1]-x)");
   comboPotentials->NewEntry("[0]*H(x-[1])*H([2]-x)");
-  comboPotentials->Select(0,false);
+  comboPotentials->Select(1,false);
   comboPotentials->Resize(150,20);
   //parametri
   numpar = new TGNumberEntry*[3];
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[0] = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[0] = new TGNumberEntry (tHFrame,1.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[0]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,5.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[1]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[2]"),LabelLayout);  
   //Impostazioni pacchetto d'onda (magari aggiorno realtime la canvas)
   TGGroupFrame *gfPacchetto = new TGGroupFrame(tVMainFrame,"Pacchetto Iniziale");
@@ -132,8 +135,8 @@ TGFrame * Schrody::setCanvas(const TGWindow *p){
   TRootEmbeddedCanvas* ECanvas = new TRootEmbeddedCanvas(0,p,456,192);
   ECanvas->SetName("Canvas");
   int CanvasID = ECanvas->GetCanvasWindowId();
-  TCanvas *childCanvas = new TCanvas("childCanvas", 10, 10, CanvasID);
-  ECanvas->AdoptCanvas(childCanvas);
+  showCanvas = new TCanvas("childCanvas", 10, 10, CanvasID);
+  ECanvas->AdoptCanvas(showCanvas);
   return ECanvas;
 }
 TGFrame *Schrody::setAlgorithm(const TGWindow *p){
@@ -262,7 +265,7 @@ void Schrody::SetPotenziale(){
 			    "(x < [1]) ? [0] : 0",
 			    "[0] * ((x > [1]) ? 1 : 0) * ((x < [2]) ? 1 : 0)"
   };
-  int funcNum = comboPotentials->GetSelected();
+  int funcNum = comboPotentials->GetSelected()-1;
   double Slim = numSpaceLim -> GetNumber();
   Potenziale = new TF1("V",formula[funcNum].c_str(),0.,Slim);
   Potenziale -> SetParameters(numpar[0]->GetNumber(),
@@ -271,6 +274,10 @@ void Schrody::SetPotenziale(){
 }
 void Schrody::PreviewPotenziale(){
   SetPotenziale();
+  showCanvas->cd();
+  Potenziale->Draw();
+  showCanvas->Modified();
+    showCanvas->Update();
   //aggiungere grafica
 }
 

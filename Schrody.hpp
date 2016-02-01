@@ -2,12 +2,14 @@
 #define _CLASSSCHRODY
 //#include "TGMainFrame.h"
 #include "DefineCC.hpp"
-
+//rootgui
 #include "TGFrame.h"
 #include "TGComboBox.h"
 #include "TGButton.h"
 #include "TGButtonGroup.h"
+//root
 #include "TF1.h"
+#include "TCanvas.h"
 
 class Schrody : public TGMainFrame{
   ClassDef(Schrody,1)
@@ -42,6 +44,7 @@ private:
   TGTextButton *tbStart;
   TGButtonGroup *bgSetSteps;
   TF1 *Potenziale;
+  TCanvas *showCanvas;
   /*
   //
   PDECond *myPDE;
