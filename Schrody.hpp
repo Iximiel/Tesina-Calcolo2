@@ -28,6 +28,7 @@ class Schrody : public TGMainFrame{
   void controlReady();
   void HandleNumbers();
   void PreviewPotenziale();
+  void PreviewCI();
 private:
   //dati
   guiInfo* info;

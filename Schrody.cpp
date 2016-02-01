@@ -40,6 +40,7 @@ Schrody::Schrody(const TGWindow *p,int w,int h)
   comboPotentials -> Connect("Selected(Int_t)","Schrody",this,"PreviewPotenziale()");
   for(int i=0;i<3;i++)
     numpar[i] -> Connect("ValueSet(Long_t)","Schrody",this,"PreviewPotenziale()");
+  //  *numPos, *numLarg, *numEne,
   tbStart -> Connect("Clicked()","Schrody",this,"doTheThing()");
 
   HandleNumbers();
@@ -95,7 +96,7 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,1.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[1]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,5.1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[2]"),LabelLayout);  
   //Impostazioni pacchetto d'onda (magari aggiorno realtime la canvas)
   TGGroupFrame *gfPacchetto = new TGGroupFrame(tVMainFrame,"Pacchetto Iniziale");
@@ -301,6 +302,12 @@ void Schrody::PreviewPotenziale(){
   SetPotenziale();
   Preview();
 }
+
+void Schrody::PreviewCI(){
+  SetCI(true);
+  Preview();
+}
+
 void Schrody::Preview(){
   showCanvas->cd();
   
@@ -319,11 +326,13 @@ void Schrody::Preview(){
 void Schrody::doTheThing(){
   double Sstep, Tstep, Slim, Tlim;
   int NS, NT;
+  //blocca();
+  SetCI(false);
   Slim = numSpaceLim -> GetNumber();
   Tlim = numTimeLim -> GetNumber();
   static const Var I(0,1);// mi serve solo qui
   static const char lazyCC[3] = {'D','N','R'};
-  double hbar = 1, mass = 1;// valori temporanei
+  double hbar = 1, mass = 1, E= 1;// valori temporanei
   char infoCC[2] = {lazyCC[info->CC0],lazyCC[info->CCN]};
   //per prima cosa imposto i passi
   if(bgSetSteps->GetButton(100)->IsOn()){
@@ -342,12 +351,14 @@ void Schrody::doTheThing(){
   // e imposto la trimatrice
   tridiagM mat(NS);
   Var eta = I * (hbar/(2*mass))*(Tstep/(Sstep*Sstep));
+  Var Ik = I * sqrt(E*2*mass/(hbar*hbar));//ik di ikx (E = hbar^2*k^2/2m)
   Var perV = Tstep/eta;//moltiplicatore del potenziale
   Var *initial = new Var[NS];
+  
   //imposto gli a d c generici
   Var a = -1., d = 2./eta+2., c = -1.;
   Var ak = 1., dk = 2./eta-2., ck = 1.;
-  //  initial[0] = info.gauss(0);
+  //imposto a d c e le CI
   if(infoCC[0]=='D'){
     mat.setUnknown(0,0,1,0,0);
     mat.setKnown(0,0,1,0,0);
@@ -358,10 +369,18 @@ void Schrody::doTheThing(){
     mat.setUnknown(0,0,d+2.*a*Sstep*info->weight0 + Potenziale->Eval(0) * perV,a+c,0);
     mat.setKnown(0,0,dk+2.*ak*Sstep*info->weight0 - Potenziale->Eval(0) * perV,ak+ck,0);
   }
+  //primo punto di CI
+  initial[0] = CI->Eval(0) * 1.;
+  //CC in 0
   for(int j = 1;j < NS-1;j++){
-    mat.setUnknown(j,a,d + Potenziale->Eval(j/Sstep) * perV,c,0);
-    mat.setKnown(j,ak,dk - Potenziale->Eval(j/Sstep) * perV,ck,0);
+    double xpos = j*Sstep;
+      initial[j] = CI->Eval(xpos) * exp(Ik*xpos);
+    mat.setUnknown(j,a,d + Potenziale->Eval(xpos) * perV,c,0);
+    mat.setKnown(j,ak,dk - Potenziale->Eval(xpos) * perV,ck,0);
   }
+  //ultimo punto di CI
+  initial[NS-1] = CI->Eval((NS-1)*Sstep) * exp(Ik*((NS-1)*Sstep));
+  //CC in N
   if(infoCC[1]=='D'){
     mat.setUnknown(NS-1,0,1,0,0);
     mat.setKnown(NS-1,0,1,0,0);
@@ -372,15 +391,14 @@ void Schrody::doTheThing(){
     mat.setUnknown(NS-1,a+c,d-2.*c*Sstep*info->weight0 + Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
     mat.setKnown(NS-1,ak+ck,dk-2.*ck*Sstep*info->weight0 - Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
   }
-  
-  // int set =3*info.Nl/4;
-  //  mat.setKnown(set,ak,dk,ck,0.1);
-  //  initial[NS-1] = info.gauss(NS-1);
-  mat.setUnknown(NS-1,a+c,d,0.,0.);
-  mat.setKnown(NS-1,ak+ck,dk,0.,0.);
 
   //do in pasto le impostazioni al solver
-  //CrankSolver
+  CrankSolver Solver(mat,NS,NT,infoCC,info->val0,info->valN);
+  Solver.SetInitialState(initial);
+  while(Solver.doStep());
+  Solver. prepareTGraph2D("out.dat",Tstep , Sstep, 10, 10);
+  //in realta` volgio usare:
+  //  bool writeEverithing(std::string ,double ,double);
   //lancio una finestra con una progressbar e faccio le cose
   //salvo tutto su un file, poi creo un visualize piu` comodo
 }
