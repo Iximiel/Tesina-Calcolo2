@@ -84,15 +84,16 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   comboPotentials->Select(0,false);
   comboPotentials->Resize(150,20);
   //parametri
-  numpar = new TGNumberEntry*[2];
+  numpar = new TGNumberEntry*[3];
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
   tHFrame->AddFrame(numpar[0] = new TGNumberEntry (tHFrame,6,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[0]"),LabelLayout);
-  //Distanza Piastre
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
   tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,0.5,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[1]"),LabelLayout);
-  
+  gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
+  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[2]"),LabelLayout);  
   //Impostazioni pacchetto d'onda (magari aggiorno realtime la canvas)
   TGGroupFrame *gfPacchetto = new TGGroupFrame(tVMainFrame,"Pacchetto Iniziale");
   //Altezza
@@ -256,14 +257,17 @@ void Schrody::SetPotenziale(){
     comboPotentials->NewEntry("[0]*H([1])");
     comboPotentials->NewEntry("[0]*H(x-[1])*H([2]-x)");
   */
-  static string formula[4]={"[0] *TMath::Gaus(x,[1],[2],false)",
-			    "(x > [1])?[0]: 0",
-			    "(x < [1])?[0]: 0",
-			    "[0]*((x > [1])?1 : 0)*((x < [2])?1 : 0)"
+  static string formula[4]={"[0] * TMath::Gaus(x,[1],[2],false)",
+			    "(x > [1]) ? [0] : 0",
+			    "(x < [1]) ? [0] : 0",
+			    "[0] * ((x > [1]) ? 1 : 0) * ((x < [2]) ? 1 : 0)"
   };
   int funcNum = comboPotentials->GetSelected();
   double Slim = numSpaceLim -> GetNumber();
   Potenziale = new TF1("V",formula[funcNum].c_str(),0.,Slim);
+  Potenziale -> SetParameters(numpar[0]->GetNumber(),
+			      numpar[1]->GetNumber(),
+			      numpar[2]->GetNumber());
 }
 void Schrody::PreviewPotenziale(){
   SetPotenziale();

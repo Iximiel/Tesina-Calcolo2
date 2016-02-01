@@ -1,6 +1,7 @@
 BASE	=../esercitazione1/
 CC	= g++
 CC11	= g++ -std=c++11
+PIC	= -fPIC #(Position-Indipendent-Code) non e` detto che questa riga funzioni, su ububtu 15.10 32bit non serviva, su lubuntu 15.10 64bit non metterla non fa compilare le .so, potrebbe servire scrivere -fpic, oppure ometterla del tutto
 CFLAGS	= -g -Wall
 CFLAGSROOT= `root-config --cflags`
 LIBROOT	= `root-config --glibs`
@@ -28,7 +29,7 @@ SchrodyDict.cpp: Schrody.hpp SchrodyLinkDef.h
 
 libSchrody.so: SchrodyDict.cpp
 	@echo Compilo la libreria $@
-	@$(CC) $(CFLAGS) -shared -o$@ `root-config --ldflags` $(CFLAGSROOT) $^
+	@$(CC) $(CFLAGS) $(PIC) -shared -o $@ `root-config --ldflags` $(CFLAGSROOT) $^
 
 CCDict.cpp: DefineCC.hpp CCLinkDef.h
 	@echo Chiamo rootcint per compilare la libreria $@
@@ -36,7 +37,7 @@ CCDict.cpp: DefineCC.hpp CCLinkDef.h
 
 libCC.so: CCDict.cpp
 	@echo Compilo la libreria $@
-	@$(CC) $(CFLAGS) -shared -o$@ `root-config --ldflags` $(CFLAGSROOT) $^
+	@$(CC) $(CFLAGS) $(PIC) -shared -o $@ `root-config --ldflags` $(CFLAGSROOT) $^
 
 #@echo elimino i file GuiPDEDict.*
 #@rm GuiPDEDict.*
