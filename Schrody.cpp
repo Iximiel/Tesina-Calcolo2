@@ -256,11 +256,10 @@ void Schrody::SetPotenziale(){
     comboPotentials->NewEntry("[0]*H([1])");
     comboPotentials->NewEntry("[0]*H(x-[1])*H([2]-x)");
   */
-  //uso le funzioni lambda:
   static string formula[4]={"[0] *TMath::Gaus(x,[1],[2],false)",
-			   "[&](double *x, double *p){if(x[0] > par[1]){return par[0];}else{return 0;}}",
-			   "[&](double *x, double *p){if(x[0] < par[1]){return par[0];}else{return 0;}}",
-			   "[&](double *x,double *p){double a,b;if(x[0]>par[1]){a=1;}else{a=0;} if(x[0]<par[2]){b=1;}else{b=0;} return a*b*par[0];}"
+			    "(x > [1])?[0]: 0",
+			    "(x < [1])?[0]: 0",
+			    "[0]*((x > [1])?1 : 0)*((x < [2])?1 : 0)"
   };
   int funcNum = comboPotentials->GetSelected();
   double Slim = numSpaceLim -> GetNumber();
