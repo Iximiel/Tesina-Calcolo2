@@ -22,7 +22,7 @@ CrankSolver::CrankSolver(const tridiagM &mat, int Ns, const char *options, Var C
   CS_cce =CCe;
   CS_data = nullptr;
   CS_data_prec = nullptr;
-  CS_step = 0;
+  CS_step = -1;
   CS_mat.create_h(CCN == 'D');
 }
 
@@ -35,14 +35,14 @@ void CrankSolver::SetInitialState(Var* initialVector){
   CS_data = new Var[CS_ns];
   for(int i=0;i<CS_ns;i++)
     CS_data[i] = initialVector[i];
-  CS_step =1;
+  CS_step =0;
 #ifdef DEBUG
   cout << "Acquisite condizioni iniziali"<< endl;
 #endif //DEBUG
 }
 
 int CrankSolver::doStep(){
-  if(CS_step ==0){
+  if(CS_step <0){
     cout << "Non ho acquisito le condizioni iniziali"<<endl;
   }else{
     if(CS_data_prec!=nullptr)

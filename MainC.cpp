@@ -126,23 +126,22 @@ int main(int argc, char** argv){
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
   cout << "Inizio i calcoli" <<endl;
-  ofstream outfile("out.txt");
+  ofstream outfile("todraw.txt");
   int t = 0;
-  for(int i=0; i< info.Nl;i+=10){
+  for(int i=0; i< info.Nl;i+=info.spaceskip){
     outfile << i* info.spacestep << "\t" << 0 << "\t"
-	    << norm(myIntegrator.getPoint(i));
-  }
-  do{
+	    << norm(myIntegrator.getPoint(i)) << endl;
+  }  
+    do{
     t = myIntegrator.doStep();
-    if(t%info.timeskip==0||t == 1){
+    if(t%info.timeskip==0){
       for(int i=0; i< info.Nl;i+=info.spaceskip){
-	outfile << i* info.spacestep << "\t" << t* info.timestep << "\t"
+	outfile << i* info.spacestep << "\t" << t * info.timestep << "\t"
 		<< norm(myIntegrator.getPoint(i)) << endl;
       }
     }
   }while(t<info.Nt);
   cout << "Finito"<<endl;
   outfile.close();
-  
   return 0;
 }

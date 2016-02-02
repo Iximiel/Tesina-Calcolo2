@@ -3,11 +3,11 @@
 #lunghezza
 20
 #tmax
-3
+10
 #impostazioni_gaussiana_norm_stdev_midpoint
 1 1 2.5
 #impostazioniV_Pos_Val
-5 -0.5
+10 5
 #Energia
 3
 #Ndipende_da_int=0
@@ -15,12 +15,12 @@
 #Nl
 10000
 #spacestep
-0.002
+0.001
 #Nt
 1000
 #timestep
 0.001
-#timespan
+#timeskip
+100
+#spaceskip
 10
-#spacespan
-50

@@ -92,6 +92,6 @@ crankClassD.o: crankClass.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -DDEBUG -c -o $@ $^
 
-drawer:rootdrawComplex.cpp
+drawer:drawer.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
