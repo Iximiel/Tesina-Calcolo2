@@ -21,13 +21,14 @@ CrankSolver::CrankSolver(const tridiagM &mat, int Ns, const char *options, Var C
   CS_cci = CCi;
   CS_cce =CCe;
   CS_data = nullptr;
-  CS_data = nullptr;
+  CS_data_prec = nullptr;
   CS_step = 0;
   CS_mat.create_h(CCN == 'D');
 }
 
 CrankSolver::~CrankSolver(){
   delete CS_data;
+  delete CS_data_prec;
 }
 
 void CrankSolver::SetInitialState(Var* initialVector){
@@ -44,7 +45,8 @@ int CrankSolver::doStep(){
   if(CS_step ==0){
     cout << "Non ho acquisito le condizioni iniziali"<<endl;
   }else{
-    delete CS_data_prec;
+    if(CS_data_prec!=nullptr)
+      delete CS_data_prec;
     CS_data_prec = CS_data;//sposto i vecchi punti sul nuovo array
     CS_data = new Var[CS_ns];
     Stepper();
@@ -53,7 +55,7 @@ int CrankSolver::doStep(){
   return CS_step;
 }
 
-Var CrankSolver::getPoint(int t, int x){
+Var CrankSolver::getPoint(int x){
   return CS_data[x];
 }
 //da fare: rendere lo stepper flessibile

@@ -5,9 +5,9 @@
 //NB: questo solver non e` generalizzato per CC e V variabili nel tempo
 class CrankSolver{
 public:
-  CrankSolver(const tridiagM &mat, int Ns, int Nt, const char *options, Var CCi, Var CCe);
+  CrankSolver(const tridiagM &mat, int Ns, const char *options, Var CCi, Var CCe);
   ~CrankSolver();
-  bool doStep();
+  int doStep();
   void SetInitialState(Var* );
   Var getPoint(int x);
 private:

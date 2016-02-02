@@ -8,28 +8,31 @@ using namespace std;
 
 const double PI = 4*atan(1);
 const Var I(0,1);
+const double hbar = 1;
 
 struct impostazioni{
   int Nl, spaceskip;
   double lenght, spacestep;
   double mid, stdev ,norm;
   double Vpos, Vval;
-  double vel;
+  Var V;
+  double E;
   int Vnum;
   int Nt, timeskip;
   double tmax, timestep;
-  double k;
+  double m;
+  Var Ik;
   impostazioni(string filename){
     ifstream file(filename.c_str());
     string dummy;
-    file >> dummy >> k;
+    file >> dummy >> m;
     file >> dummy >> lenght;
     file >> dummy >> tmax;
     file >> dummy >> norm >> stdev;
     file >> mid;
     //    mid = lenght/2.;
     file >> dummy >> Vpos >> Vval;
-    file >> dummy >> vel;
+    file >> dummy >> E;
     bool Ndep;
     file >> dummy >> Ndep;
     file >> dummy >> Nl;
@@ -55,12 +58,14 @@ struct impostazioni{
       Vnum = Vpos/spacestep;
       cout << "Posizione V: " << Vnum <<endl;
     }
+    Ik = I * sqrt(E*2*m/(hbar*hbar));
+    V = -I *Vval/hbar;
     file.close();
   }
-  double eta(){return k* timestep/(spacestep*spacestep);}
+  double eta(){return timestep/(spacestep*spacestep *2 *m);}
   Var gauss(int i){//Condizione iniziale
     double x = i*spacestep;
-    return (norm/stdev*sqrt(2*PI)) * exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(I*vel*x);
+    return /*(norm/stdev*sqrt(2*PI)) **/ exp(-(x-mid)*(x-mid)/(2*stdev*stdev))*exp(Ik*x);
   }
 };
 
@@ -70,35 +75,10 @@ int main(int argc, char** argv){
     filename  = argv[1];
   //carico il file di impostazioni, per ricompilare meno spesso
   impostazioni info("Cimpostazioni.txt");
-  /*
-  for(int i=1;i<argc;i++){
-  if(dummy.find("-") == 0)
-  cout << i <<" " <<argv[i+1]<<endl;
-  }
-  */
-  /***passo dipende da N***
-  double lenght=10, tmax=10;
-  int Nl = 1000, Nt = 10000;
-  double spacestep = lenght/Nl;
-  double timestep = tmax/Nt;
-  **************************/
-  /***N dipende dal passo***
-  double lenght=5, tmax=0.1;
-  double spacestep = 10./1000.;
-  double timestep = 10./10000.;
-  int Nl = lenght / spacestep;
-  int Nt = tmax / timestep;
-  ***********************
-  double k = 1;//diffusivita`*/
-  Var eta = info.eta() * I;
-  /*while(eta > 1){
-    cout << "Per rendere eta <1 (eta = " << eta << "), cambio k: "<< k <<" -> ";
-    k /= 10;//diffusivita`
-    cout << k <<endl;
-     eta = k* timestep/(spacestep*spacestep);
-     }*/
+
+  Var eta = info.eta() * I * hbar;
   
-  cout << "eta: "<<eta<<"="<<info.k<<"*"
+  cout << "eta: "<<eta<<"=Ih/(2"<<info.m<<")*"
        <<info.timestep<<"/("<<info.spacestep<<"^2)" <<endl;
 
   //condizioni iniziali
@@ -107,13 +87,17 @@ int main(int argc, char** argv){
   //condizioni al contorno:
   Var a = -1., d = 2./eta+2., c = -1.;
   Var ak = 1., dk = 2./eta-2., ck = 1.;
+  cout << "a= "<< a <<" d=" <<d << " c="<< c<<endl;
+  cout << "ak= "<< ak <<" dk=" <<dk << " ck="<< c<<endl;
+  
   initial[0] = info.gauss(0);
   mat.setUnknown(0,0,d,a+c,0);
   mat.setKnown(0,0,dk,ak+ck,0);
   for(int j = 1;j< info.Nl-1;j++){
     if(j==info.Vnum){
-      d -= -I*info.Vval * info.timestep/eta ;
-      dk+= -I*info.Vval * info.timestep/eta;
+      d -= info.V * info.timestep/eta;
+      dk+= info.V * info.timestep/eta;
+      cout << "new d = "<< d <<"\nnew dk = " << dk <<endl;
     }
     /****
      *NB: se ho CI troppo strette,
@@ -138,14 +122,27 @@ int main(int argc, char** argv){
   Var CCi = 2*info.spacestep*(a - ak)*df0;
   Var CCe =- 2*info.spacestep*(c - ck)*dfN;
   cout << "Inizializzo il Solver" <<endl;
-  CranckSolver myIntegrator(mat,info.Nl,info.Nt,"RR",CCi,CCe);
+  CrankSolver myIntegrator(mat,info.Nl,"RR",CCi,CCe);
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
   cout << "Inizio i calcoli" <<endl;
-  while(myIntegrator.doStep());
-
-  //preparo il file per root
-  myIntegrator.prepareTGraph2D(filename,info.timestep,info.spacestep,info.timeskip,info.spaceskip);
+  ofstream outfile("out.txt");
+  int t = 0;
+  for(int i=0; i< info.Nl;i+=10){
+    outfile << i* info.spacestep << "\t" << 0 << "\t"
+	    << norm(myIntegrator.getPoint(i));
+  }
+  do{
+    t = myIntegrator.doStep();
+    if(t%info.timeskip==0||t == 1){
+      for(int i=0; i< info.Nl;i+=info.spaceskip){
+	outfile << i* info.spacestep << "\t" << t* info.timestep << "\t"
+		<< norm(myIntegrator.getPoint(i)) << endl;
+      }
+    }
+  }while(t<info.Nt);
+  cout << "Finito"<<endl;
+  outfile.close();
   
   return 0;
 }

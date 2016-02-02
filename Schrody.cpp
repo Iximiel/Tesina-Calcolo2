@@ -5,6 +5,7 @@
 #include "TApplication.h"
 #define USECOMPLEX//cosi` includo complex e la variabile Var e` un "Complex<double>" -std=c++11 e` raccomandato
 #include "CrankSolver.hpp"
+#include <fstream>
 
 #include <iostream>
 using namespace std;
@@ -93,10 +94,10 @@ TGFrame* Schrody::setConditions(const TGWindow *p){
   tHFrame->AddFrame(numpar[0] = new TGNumberEntry (tHFrame,1.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[0]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,1.0,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[1] = new TGNumberEntry (tHFrame,5.1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[1]"),LabelLayout);
   gfPotenziale->AddFrame(tHFrame = new TGHorizontalFrame(gfPotenziale));
-  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,5.1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
+  tHFrame->AddFrame(numpar[2] = new TGNumberEntry (tHFrame,0.1,5,-1,TGNumberFormat::kNESReal, TGNumberFormat::kNEAAnyNumber, TGNumberFormat::kNELLimitMinMax, 0,10));
   tHFrame->AddFrame(tLabel = new TGLabel(tHFrame,"[2]"),LabelLayout);  
   //Impostazioni pacchetto d'onda (magari aggiorno realtime la canvas)
   TGGroupFrame *gfPacchetto = new TGGroupFrame(tVMainFrame,"Pacchetto Iniziale");
@@ -393,12 +394,25 @@ void Schrody::doTheThing(){
   }
 
   //do in pasto le impostazioni al solver
-  CrankSolver Solver(mat,NS,NT,infoCC,info->val0,info->valN);
+  CrankSolver Solver(mat,NS,infoCC,info->val0,info->valN);
   Solver.SetInitialState(initial);
-  while(Solver.doStep());
-  Solver. prepareTGraph2D("out.dat",Tstep , Sstep, 10, 10);
+  ofstream outfile("out.txt");
+  int t = 0;
+  for(int i=0; i< NS;i+=10){
+    outfile << i* Sstep << "\t" << 0 << "\t"
+	    << norm(Solver.getPoint(i));
+  }
+  do{
+        t = Solver.doStep();
+    if(t%10==0){
+      for(int i=0; i< NS;i+=10){
+	outfile << i* Sstep << "\t" << t* Tstep << "\t"
+		<< norm(Solver.getPoint(i)) << endl;
+      }
+    }
+  }while(t<NT);
+  outfile.close();
   //in realta` volgio usare:
-  //  bool writeEverithing(std::string ,double ,double);
   //lancio una finestra con una progressbar e faccio le cose
   //salvo tutto su un file, poi creo un visualize piu` comodo
 }

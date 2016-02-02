@@ -1,26 +1,26 @@
-#k
-0.01
+#massa
+1
 #lunghezza
-10
+20
 #tmax
-5
+3
 #impostazioni_gaussiana_norm_stdev_midpoint
 1 1 2.5
 #impostazioniV_Pos_Val
-5 100
-#Velocità
-50
+5 -0.5
+#Energia
+3
 #Ndipende_da_int=0
 0
 #Nl
 10000
 #spacestep
-0.001
+0.002
 #Nt
 1000
 #timestep
 0.001
 #timespan
-25
+10
 #spacespan
 50

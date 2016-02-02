@@ -20,7 +20,7 @@ int main()
   TGraph2D *Cgrafo = new TGraph2D("iout.txt");
   Cgrafo->Draw("pcol");*/
   TCanvas c3("c3","Norm",640,512);
-  TGraph2D *Ngrafo = new TGraph2D("Nout.txt");
+  TGraph2D *Ngrafo = new TGraph2D("out.txt");
   Ngrafo->Draw("pcol");
   //grafo.Draw("surf1");
 #ifndef __CINT__
