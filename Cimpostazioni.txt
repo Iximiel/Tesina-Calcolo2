@@ -1,26 +1,32 @@
 #massa
 1
 #lunghezza
-20
+40
 #tmax
 10
 #impostazioni_gaussiana_norm_stdev_midpoint
-1 1 2.5
+1 1 10
+#impostazionicc0_012DCR_val_pesorobin
+1 0 0
+#impostazioniccN_012DCR_val_pesorobin
+1 0 0
 #impostazioniV_Pos_Val
-10 5
+20 15
 #Energia
-3
+10
 #Ndipende_da_int=0
 0
 #Nl
 10000
-#spacestep
+#spacestep.
 0.001
 #Nt
 1000
 #timestep
 0.001
 #timeskip
-100
+25
 #spaceskip
-10
+15
+#precisione
+1e-4

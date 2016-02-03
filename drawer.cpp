@@ -8,6 +8,7 @@
 #include <TCanvas.h>
 #include <TGraph2D.h>
 #include <TGraph.h>
+#include <TMultiGraph.h>
 #include <vector>
 #include <TF1.h>
 using namespace std;
@@ -16,9 +17,9 @@ TApplication theApp("app",0,NULL);
 int main(int argc, char** argv)
 #endif
 {
-  TCanvas c3("c3","Norm",640,512);
-    TCanvas c2("c2","Err",640,512);
+  cout<<"Carico i dati\n";
   TGraph2D *g = new TGraph2D("todraw.txt");
+  cout<<"Analisi errore\n";
   int np = g->GetN(), NT = 0;
   double t = g->GetY()[0];
   double t2 = t;
@@ -30,22 +31,55 @@ int main(int argc, char** argv)
   }while(t2==t);
   //cout << g->GetY()[NT-1]<<" " << integral <<endl;
   double initial = integral;
-  vector<double> diffs, times;
+  vector<double> diffs, times, before,after;
   diffs.push_back(initial-initial);
   times.push_back(t);
+  double fhalf=0,shalf=0;
+  for(int i=0;i<NT;i++){
+    double z =  g->GetZ()[i];
+    integral += z;
+    if(i<NT/2)
+      fhalf += z;
+    else
+      shalf += z;
+  }
+  before.push_back(fhalf);
+  after.push_back(shalf);
   
   for (int j=1;j*NT<np;j++){
     int time = NT*j;
-    integral = 0;
+    integral = fhalf = shalf=0;
     for(int i=0;i<NT;i++){
-      integral += g->GetZ()[time+i];
+      double z =  g->GetZ()[time+i];
+      integral += z;
+      if(i<NT/2)
+	fhalf += z;
+      else
+	shalf += z;
     }
     diffs.push_back(initial-integral);
+    before.push_back(fhalf);
+    after.push_back(shalf);
     times.push_back(g->GetY()[time]);
   }
+  cout<<"Disegno i grafici\n";
+    TCanvas c3("c3","Grafico",640,512);
+  TCanvas c1("c1","Confronto",1280,512);
+  c1.Divide(2,1);
+  TGraph *gb = new TGraph(times.size(),times.data(),before.data());
+  TGraph *ga = new TGraph(times.size(),times.data(),after.data());
+  TMultiGraph *mg = new TMultiGraph("integrali","Integrali prima e dopo la barriera");
+  ga->SetLineColor(2);
+  mg->Add(gb);
+  mg->Add(ga);
+  c1.cd(1);
+  mg->Draw("apl");
+    
   TGraph *gerrs = new TGraph(times.size(),times.data(),diffs.data());
-  c2.cd();
+  gerrs->SetTitle("Andamento degli errori");
+  c1.cd(2);
   gerrs->Draw("apl");
+  
   c3.cd();
   g->Draw("pcol");
   //grafo.Draw("surf1");

@@ -115,6 +115,9 @@ void tridiagM::setKnown(int i, Var A, Var D, Var C, Var E){
   ek[i] = E;
 }
 
+void tridiagM::SetE(int i, Var E){e[i] = E;}
+void tridiagM::SetEk(int i, Var E){ek[i] = E;}
+
 Var tridiagM::GetE(int i){return e[i];}
 
 Var tridiagM::GetEk(int i){return ek[i];}

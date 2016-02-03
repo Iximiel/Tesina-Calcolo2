@@ -353,7 +353,7 @@ void Schrody::doTheThing(){
   tridiagM mat(NS);
   Var eta = I * (hbar/(2*mass))*(Tstep/(Sstep*Sstep));
   Var Ik = I * sqrt(E*2*mass/(hbar*hbar));//ik di ikx (E = hbar^2*k^2/2m)
-  Var perV = Tstep/eta;//moltiplicatore del potenziale
+  Var perV = -I* Tstep/eta;//moltiplicatore del potenziale
   Var *initial = new Var[NS];
   
   //imposto gli a d c generici
@@ -389,8 +389,8 @@ void Schrody::doTheThing(){
     mat.setUnknown(NS-1,0,d + Potenziale->Eval((NS-1)*Sstep) * perV,a+c,0);
     mat.setKnown(NS-1,0,dk - Potenziale->Eval((NS-1)*Sstep) * perV,ak+ck,0);    
   }else{//Robin
-    mat.setUnknown(NS-1,a+c,d-2.*c*Sstep*info->weight0 + Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
-    mat.setKnown(NS-1,ak+ck,dk-2.*ck*Sstep*info->weight0 - Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
+    mat.setUnknown(NS-1,a+c,d-2.*c*Sstep*info->weightN + Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
+    mat.setKnown(NS-1,ak+ck,dk-2.*ck*Sstep*info->weightN - Potenziale->Eval((NS-1)*Sstep) * perV,0,0);
   }
 
   //do in pasto le impostazioni al solver

@@ -13,6 +13,8 @@ public:
   Var bi(int i, Var T_nm1,Var T_n,Var T_np1);
   Var GetE(int i);
   Var GetEk(int i);
+  void SetE(int i, Var E);
+  void SetEk(int i, Var E);
   void setUnknown(int i, Var A, Var D, Var C, Var E);
   void setKnown(int i, Var A, Var D, Var C, Var E);
 protected:

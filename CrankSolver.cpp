@@ -18,8 +18,8 @@ CrankSolver::CrankSolver(const tridiagM &mat, int Ns, const char *options, Var C
   CCN = options[1];  
 
   CS_ns = Ns;
-  CS_cci = CCi;
-  CS_cce =CCe;
+  CS_cci = CCi;// CC per Dirichlet
+  CS_cce = CCe;// CC per Dirichlet
   CS_data = nullptr;
   CS_data_prec = nullptr;
   CS_step = -1;
@@ -64,23 +64,16 @@ void CrankSolver::Stepper(){
   //0 e` l'indice delle condizioni al contorno, se uso Dirichlet 0 serve a non aggiungere eccezioni all'algoritmo
   //la spiegazione e` in create_h() di Tridiag.cpp
   //preparo il vettore delle p[]
-  int pstart = 1, pstop = 1;
   if(CC0 == 'D'){
     p[0] = CS_cci;
-    pstart = 2;
-    Var b1 = CS_mat.bi(1,CS_data_prec[0],
-		       CS_data_prec[1],
-		       CS_data_prec[2]);
-	b1 -= CS_mat.GetA(1)*CS_cci;
-	p[1] =  CS_mat.pi(1,0,b1);
-	//in questo caso mi aspetto che h[0]=0
+    //in questo caso mi aspetto che h[0]=0
   }else{
-    p[0] = CS_mat.pi(0,0,
-		     CS_mat.bi(0,0,CS_data_prec[0],CS_data_prec[1])+CS_cci);
+    Var b0 = CS_mat.bi(0,0,
+		       CS_data_prec[0],
+		       CS_data_prec[1]);
+    p[0] = CS_mat.pi(0,0,b0);
   }
-  if(CCN == 'D')
-    pstop = 2;
-  for(int i=pstart;i<CS_ns-pstop;i++){
+  for(int i=1;i<CS_ns-1;i++){
     //calcolo il valore di b[i]
     Var bi = CS_mat.bi(i,CS_data_prec[i-1],
 		       CS_data_prec[i],
@@ -96,24 +89,16 @@ void CrankSolver::Stepper(){
   //assegno l'ultimo punto
   if(CCN == 'D'){
     p[CS_ns-1] = CS_cce;
-    //matematicamente e` sbagliato, ma preferisco avere meno ecezzioni possibili nell'algoritmo
-    Var bNm2 = CS_mat.bi(CS_ns-2,CS_data_prec[CS_ns-3],
-		       CS_data_prec[CS_ns-2],
-		       CS_data_prec[CS_ns-1]);
-	bNm2 -= CS_cce * CS_mat.GetC(CS_ns-2);
-	p[CS_ns-2] =  CS_mat.pi(CS_ns-2,p[CS_ns-3],bNm2);
-	//in questo caso mi aspetto che h[CS_ns-2]=0
-	CS_data[CS_ns-2] = p[CS_ns-2];
   }else{
+    Var bnm1 = CS_mat.bi(CS_ns-1,
+			 CS_data_prec[CS_ns-2],
+			 CS_data_prec[CS_ns-1],0);
     p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
-			   CS_mat.bi(CS_ns-1,
-				     CS_data_prec[CS_ns-2],
-				     CS_data_prec[CS_ns-1],
-				     0)+CS_cce);
+			   bnm1);
   }
   //ora procedo finalmente con l'assegnare i risultati
   CS_data[CS_ns-1] = p[CS_ns-1];
-  for(int i=CS_ns-pstop-1;i>=0;i--){//parte da n-2 o n-3 se uso dirichlet
+  for(int i=CS_ns-2;i>=0;i--){
     CS_data[i] = p[i] - CS_mat.H(i) * CS_data[i+1];
     //da pi = xi + hi x(i+1)
 #ifdef DEBUG
