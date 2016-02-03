@@ -290,7 +290,7 @@ La spiegazione e l'esempio per questa risoluzione lo fornisco nel paragrafo dedi
 
 \subsection{Robin}
 Conosco una combinazione lineare tra la derivata e il valore della funzione negli estremi del dominio.
-$$s(x,t)\pde Fx(x,t) +r(x,t) F(x,t) = f(x,t) \forall x \in \partial D$$
+$$\pde Fx(x,t) +r(x,t) F(x,t) = f(x,t) \forall x \in \partial D$$
 
 Un esempio \`e necessario per poter affrontare queste Condizioni. Prima per\`o una piccola precisazione sulla derivata che devo utilizzare.
 
@@ -298,12 +298,12 @@ Per mantenere la precisione del metodo ($\Delta x^2$) non posso usare la definiz
 $$\pde Fx(x(i=0),t(j=j+1)) = \frac{F_{1}^{j+1}-F_{-1}^{j+1}}{2\Delta x}$$
 
 La condizione \`e:
-$$s(x,t)\pde Fx(x,t) +r(x,t) F(x,t) = f(x,t) \forall x \in \partial D$$
+$$\pde Fx(x,t) +r(x,t) F(x,t) = f(x,t) \forall x \in \partial D$$
 
 E svolgo il calcolo per $i=0$:
 
-$$S_0^n\frac{F_{1}^{n}-F_{-1}^{n}}{2\Delta x} + R_0^nF_{0}^{n} = f_0^n  \to 
-F_{-1}^{n} = F_{1}^{n} + \frac 2{S_0^n}\Delta x \lrt{R_0^nF_{0}^{n}-f^n_0}$$
+$$\frac{F_{1}^{n}-F_{-1}^{n}}{2\Delta x} + R_0^nF_{0}^{n} = f_0^n  \to 
+F_{-1}^{n} = F_{1}^{n} + 2\Delta x \lrt{R_0^nF_{0}^{n}-f^n_0}$$
 
 Parto dalla forma matriciale del problema generico:
 
@@ -314,40 +314,40 @@ $$
 
 e sostituisco $F_{-1}^{n}$:
 $$
-a_0 \lrt{ F_{1}^{j+1} + \frac {2 \Delta x}{S_0^{j+1}} \lrt{R_0^{j+1}F_{0}^{j+1}-f^{j+1}_0}} +d_0 F_{0}^{j+1} +c_{0}F_{1}^{j+1} = 
-ak_0 \lrt{F_{1}^{j} + \frac {2 \Delta x}{S_0^{j}} \lrt{R_0^jF_{0}^{j}-f^{j}_0}} + dk_0 F_{0}^{j} + ck_0 F_{1}^{j}
+a_0 \lrt{ F_{1}^{j+1} + 2 \Delta x \lrt{R_0^{j+1}F_{0}^{j+1}-f^{j+1}_0}} +d_0 F_{0}^{j+1} +c_{0}F_{1}^{j+1} = 
+ak_0 \lrt{F_{1}^{j} + 2 \Delta x \lrt{R_0^jF_{0}^{j}-f^{j}_0}} + dk_0 F_{0}^{j} + ck_0 F_{1}^{j}
 $$
 
 $$
-\lrt{d_0 + 2 a_0 \frac{R_0^{j+1}}{S_0^{j+1}}\Delta x} F_0^{j+1} + \lrt{c_0+a_0}F^{j+1}_1 = 
-\lrt{dk_0 + 2 ak_0 \frac{R_0^{j}}{S_0^{j}}\Delta x} F_0^{j} + \lrt{ck_0+ak_0}F^{j}_1 + 
-2 \Delta x \lrt{a_0 \frac{f^{j+1}_0}{S^{j+1}_0}-ak_0\frac{f^j_0}{S^{j}_0}}
+\lrt{d_0 + 2 a_0 R_0^{j+1}\Delta x} F_0^{j+1} + \lrt{c_0+a_0}F^{j+1}_1 = 
+\lrt{dk_0 + 2 ak_0 R_0^{j}\Delta x} F_0^{j} + \lrt{ck_0+ak_0}F^{j}_1 + 
+2 \Delta x \lrt{a_0 f^{j+1}_0-ak_0 f^j_0}
 $$
 per il calcolo di $b_0$ andranno usati i seguenti parametri, quelli senza apice sono quelli originali:
 $$
 \begin{array}{ll}
 a'_0 = 0 & ak'_0= 0\\
-d_0' = d_0 + 2 a_0 \frac{R_0^{j+1}}{S_0^{j+1}}\Delta x& dk'_0 = dk_0 + 2 ak_0 \frac{R_0^{j}}{S_0^{j}}\Delta x\\
+d_0' = d_0 + 2 a_0 R_0^{j+1}\Delta x& dk'_0 = dk_0 + 2 ak_0 R_0^{j}\Delta x\\
 c_0' = a_0+c_0 & ck_0' = ak_0+ck_0
 \end{array}
 $$
 
-$$b_0 = dk'_0 F_0^j  + ck_0' F_1^j + 2 \Delta x \lrt{a_0 \frac{f^{j+1}_0}{S^{j+1}_0}-ak_0\frac{f^j_0}{S^{j}_0}}$$
+$$b_0 = dk'_0 F_0^j  + ck_0' F_1^j + 2 \Delta x \lrt{a_0 f^{j+1}_0-ak_0 f^j_0}$$
 
 Mentre se la condizione si presenta come ultimo punto del dominio:
-$$S_{N-1}^n\frac{F_{N}^{n}-F_{N-2}^{n}}{2\Delta x} + R_{N-1}^nF_{N-1}^{n} = f_{N-1}^n  \to 
-F_{N}^{n} = F_{N-2}^{n} - \frac 2{S_{N-1}^n}\Delta x \lrt{R_{N-1}^nF_{N-1}^{n}-f^n_{N-1}}$$
+$$\frac{F_{N}^{n}-F_{N-2}^{n}}{2\Delta x} + R_{N-1}^nF_{N-1}^{n} = f_{N-1}^n  \to 
+F_{N}^{n} = F_{N-2}^{n} - 2\Delta x \lrt{R_{N-1}^nF_{N-1}^{n}-f^n_{N-1}}$$
 
 per il calcolo di $b_{N-1}$ andranno usati i seguenti parametri, quelli senza apice sono quelli originali:
 $$
 \begin{array}{ll}
 a_{N-1}' = a_{N-1}+c_{N-1} & ak_{N-1}' = ak_{N-1}+ck_{N-1}\\
-d_{N-1}' = d_{N-1} - 2 c_{N-1} \frac{R_{N-1}^{j+1}}{S_{N-1}^{j+1}}\Delta x& dk'_{N-1} = dk_{N-1} - 2 ck_{N-1} \frac{R_{N-1}^{j}}{S_{N-1}^{j}}\Delta x\\
+d_{N-1}' = d_{N-1} - 2 c_{N-1} R_{N-1}^{j+1}\Delta x& dk'_{N-1} = dk_{N-1} - 2 ck_{N-1} R_{N-1}^{j}\Delta x\\
 c'_{N-1} = 0 & ck'_{N-1}= 0
 \end{array}
 $$
 
-$$b_{N-1} = ak_{N-1}' F_{N-2}^j + dk'_{N-1} F_{N-1}^j - 2 \Delta x \lrt{c_0 \frac{f^{j+1}_0}{S^{j+1}_0}-ck_0\frac{f^j_0}{S^{j}_0}}$$
+$$b_{N-1} = ak_{N-1}' F_{N-2}^j + dk'_{N-1} F_{N-1}^j - 2 \Delta x \lrt{c_0 f^{j+1}_0-ck_0 f^j_0}$$
 
 Con $r=0$ ottengo le CC di Neumann.
 
