@@ -37,14 +37,13 @@ int main(int argc, char** argv)
   double fhalf=0,shalf=0;
   for(int i=0;i<NT;i++){
     double z =  g->GetZ()[i];
-    integral += z;
     if(i<NT/2)
       fhalf += z;
     else
       shalf += z;
   }
-  before.push_back(fhalf);
-  after.push_back(shalf);
+  before.push_back(fhalf/initial);
+  after.push_back(shalf/initial);
   
   for (int j=1;j*NT<np;j++){
     int time = NT*j;
@@ -58,8 +57,8 @@ int main(int argc, char** argv)
 	shalf += z;
     }
     diffs.push_back(initial-integral);
-    before.push_back(fhalf);
-    after.push_back(shalf);
+    before.push_back(fhalf/integral);
+    after.push_back(shalf/integral);
     times.push_back(g->GetY()[time]);
   }
   cout<<"Disegno i grafici\n";

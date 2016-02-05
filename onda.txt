@@ -1,0 +1,8 @@
+#impostazioni_gaussiana_norm_stdev_midpoint
+1 1 15
+#impostazionicc0_012DCR_val_pesorobin
+1 0 0
+#impostazioniccN_012DCR_val_pesorobin
+1 0 0
+#Energia
+10

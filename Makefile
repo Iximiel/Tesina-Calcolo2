@@ -7,7 +7,7 @@ CFLAGSROOT= `root-config --cflags`
 LIBROOT	= `root-config --glibs`
 LDROOT	= `root-config --ldflags`
 
-all:main
+all:maincrankC
 
 #https://root.cern.ch/interacting-shared-libraries-rootcint
 
@@ -52,6 +52,14 @@ crank: MainCrank.cpp crankClass.o crankTridiag.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main crankClass.o crankTridiag.o Main.cpp
 
+impostazioni.o: impostazioni.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c $^ 
+
+impostazioniC.o: impostazioni.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c -o $@ $^ -DUSECOMPLEX
+
 CrankSolverC.o: CrankSolver.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c -o $@ $^ -DUSECOMPLEX
@@ -76,21 +84,21 @@ Tridiag.o: Tridiag.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^
 
+crankClassD.o: crankClass.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -DDEBUG -c -o $@ $^
+
 debug: MainCrank.cpp CrankSolverD.o Tridiag.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -DDEBUG -o main $^
 
-maincrankC: MainC.cpp TridiagC.o TridiagMoreC.o CrankSolverC.o
+maincrankC: MainC.cpp TridiagC.o TridiagMoreC.o CrankSolverC.o impostazioniC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^  -DUSECOMPLEX
 
-maincrank: Main.cpp Tridiag.o TridiagMore.o CrankSolver.o
+maincrank: Main.cpp Tridiag.o TridiagMore.o CrankSolver.o impostazioni.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^
-
-crankClassD.o: crankClass.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -DDEBUG -c -o $@ $^
 
 drawer:drawer.cpp
 	@echo Compilo $@
