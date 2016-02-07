@@ -1,11 +1,11 @@
 #ifndef _Crank
 #define _Crank
-#include "TridiagMore.hpp"
+#include "Tridiag.hpp"
 
 //NB: questo solver non e` generalizzato per CC e V variabili nel tempo
 class CrankSolver{
 public:
-  CrankSolver(const tridiagM &mat, int Ns, const char *options, Var CCi, Var CCe);
+  CrankSolver(const tridiag &mat, int Ns, const char *options, Var CCi, Var CCe);
   ~CrankSolver();
   int doStep();
   void SetInitialState(Var* );
@@ -18,7 +18,7 @@ private:
   Var CS_cci,CS_cce;
   int CS_ns;
   int CS_step;
-  tridiagM CS_mat;
+  tridiag CS_mat;
 };
 
 #endif //_Cranck

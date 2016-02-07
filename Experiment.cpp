@@ -14,7 +14,7 @@ void experiment(impostazioni* info, string name){
   info->potentialsetting(ifilename.c_str());//ricarico il potenziale
   
   //condizioni iniziali
-  tridiagM mat(info->NL());
+  tridiag mat(info->NL());
   Var *initial = new Var[info->NL()];
   Var perV =-I*info->timeStep()/eta;//moltiplicatore del potenziale
   //imposto a d c e le CI
@@ -71,9 +71,9 @@ void experiment(impostazioni* info, string name){
   }
   
   cout << "Inizializzo il Solver" <<endl;
-  CrankSolver myIntegrator(mat,info->NL(),info->CCSettings(),CCi,CCe);
+  CrankSolver *myIntegrator = new CrankSolver(mat,info->NL(),info->CCSettings(),CCi,CCe);
   cout << "Imposto le condizioni iniziali" <<endl;
-  myIntegrator.SetInitialState(initial);
+  myIntegrator->SetInitialState(initial);
   cout << "Inizio i calcoli" <<endl;
   ofstream outfile(ofilename.c_str());
   int t = 0;
@@ -81,19 +81,19 @@ void experiment(impostazioni* info, string name){
   double integral = 0;//precisione voluta
   
   for(int i=0; i< info->NL();i+=info->spaceSkip()){
-    double z = norm(myIntegrator.getPoint(i));
+    double z = norm(myIntegrator->getPoint(i));
     integral +=z;
     outfile << i* info->spaceStep() << "\t" << t * info->timeStep() << "\t"
 	    << z << endl;
   }
 
   do{
-    t = myIntegrator.doStep();
+    t = myIntegrator->doStep();
     if(t%info->timeSkip()==0){
       double control = 0;
       double Time = t * info->timeStep();
       for(int i=0; i< info->NL();i+=info->spaceSkip()){
-	double z = norm(myIntegrator.getPoint(i));
+    double z = norm(myIntegrator->getPoint(i));
 	control +=z;
 	outfile << i* info->spaceStep() << "\t" << Time << "\t"
 		<< z << endl;
@@ -101,6 +101,8 @@ void experiment(impostazioni* info, string name){
       precision = info->doNextStep(abs(integral-control));
     }
   }while(t<info->NT()&&precision);
+  delete myIntegrator;
+  delete initial;
   cout << "Tempo trascorso (nella simulazione): " << t*info->timeStep() <<endl;
     cout << "Scritto il file: " << ofilename <<endl;
   outfile.close();

@@ -6,9 +6,9 @@ DEFINES += "USECOMPLEX"
 
 SOURCES += Experiment.cpp \
     impostazioni.cpp \
-    TridiagMore.cpp \
-    CrankSolver.cpp
+    CrankSolver.cpp \
+    Tridiag.cpp
 
 HEADERS += impostazioni.hpp \
-    TridiagMore.hpp \
-    CrankSolver.hpp
+    CrankSolver.hpp \
+    Tridiag.hpp

@@ -117,7 +117,7 @@ Var impostazioni::Initial(int i){//Condizione iniziale
   return /*(norm/stdev*sqrt(2*PI)) **/ gauss(x,mid,stdev)*exp(Ik*x);
 }
 
-bool impostazioni::doNextStep(double error){
+impostazioni::doNextStep(double error){
   if(error>precision){
     cout <<"Annullo per degenerazione della precisione"<<endl;
     return false;
@@ -125,15 +125,15 @@ bool impostazioni::doNextStep(double error){
     return true;
 }
 
-const double impostazioni::spaceStep(){return spacestep;}
-const double impostazioni::timeStep(){return timestep;}
-const int impostazioni::NT(){return Nt;}
-const int impostazioni::NL(){return Nl;}
-const int impostazioni::timeSkip(){return timeskip;}
-const int impostazioni::spaceSkip(){return spaceskip;}
-const char impostazioni::CCSetting(int i){return infoCC[i];}
-const char* impostazioni::CCSettings(){return infoCC;}
-const double impostazioni::getCC0(){return CC0;};
-const double impostazioni::getweight0(){return weight0;};
-const double impostazioni::getweightN(){return weightN;};
-const double impostazioni::getCCN(){return CCN;};
+ double impostazioni::spaceStep(){return spacestep;}
+ double impostazioni::timeStep(){return timestep;}
+ int impostazioni::NT(){return Nt;}
+ int impostazioni::NL(){return Nl;}
+ int impostazioni::timeSkip(){return timeskip;}
+ int impostazioni::spaceSkip(){return spaceskip;}
+ char impostazioni::CCSetting(int i){return infoCC[i];}
+ char* impostazioni::CCSettings(){return infoCC;}
+ double impostazioni::getCC0(){return CC0;}
+ double impostazioni::getweight0(){return weight0;}
+ double impostazioni::getweightN(){return weightN;}
+ double impostazioni::getCCN(){return CCN;}
