@@ -102,7 +102,7 @@ void experiment(impostazioni* info, string name){
     }
   }while(t<info->NT()&&precision);
   delete myIntegrator;
-  delete initial;
+  delete[] initial;
   cout << "Tempo trascorso (nella simulazione): " << t*info->timeStep() <<endl;
     cout << "Scritto il file: " << ofilename <<endl;
   outfile.close();
