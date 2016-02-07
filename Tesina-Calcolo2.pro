@@ -7,13 +7,13 @@ DEFINES += "USECOMPLEX"
 SOURCES += \
     MainC.cpp \
     CrankSolver.cpp \
-    TridiagMore.cpp \
-    Tridiag.cpp
+    Tridiag.cpp \
+    impostazioni.cpp
 
 HEADERS += \
     CrankSolver.hpp \
-    TridiagMore.hpp \
-    Tridiag.hpp
+    Tridiag.hpp \
+    impostazioni.hpp
 
 
 DISTFILES += \

@@ -11,8 +11,8 @@ void wait(){
 
 using namespace std;
 
-CrankSolver::CrankSolver(const tridiag &mat, int Ns, const char *options, Var CCi, Var CCe)
-  :CS_mat(mat){
+CrankSolver::CrankSolver(tridiag *mat, int Ns, const char *options, Var CCi, Var CCe){
+  CS_mat = mat;
   
   CC0 = options[0];
   CCN = options[1];  
@@ -23,13 +23,12 @@ CrankSolver::CrankSolver(const tridiag &mat, int Ns, const char *options, Var CC
   CS_data = nullptr;
   CS_data_prec = nullptr;
   CS_step = -1;
-  CS_mat.create_h(CCN == 'D');
+  CS_mat->create_h(CCN == 'D');
 }
 
 CrankSolver::~CrankSolver(){
   delete[] CS_data;
   delete[] CS_data_prec;
-  delete &CS_mat;
 }
 
 void CrankSolver::SetInitialState(Var* initialVector){
@@ -69,21 +68,21 @@ void CrankSolver::Stepper(){
     p[0] = CS_cci;
     //in questo caso mi aspetto che h[0]=0
   }else{
-    Var b0 = CS_mat.bi(0,0,
+    Var b0 = CS_mat->bi(0,0,
 		       CS_data_prec[0],
 		       CS_data_prec[1]);
-    p[0] = CS_mat.pi(0,0,b0);
+    p[0] = CS_mat->pi(0,0,b0);
   }
   for(int i=1;i<CS_ns-1;i++){
     //calcolo il valore di b[i]
-    Var bi = CS_mat.bi(i,CS_data_prec[i-1],
+    Var bi = CS_mat->bi(i,CS_data_prec[i-1],
 		       CS_data_prec[i],
 		       CS_data_prec[i+1]);
-    p[i] = CS_mat.pi(i,p[i-1],bi);
+    p[i] = CS_mat->pi(i,p[i-1],bi);
 #ifdef DEBUG
     if(abs(CS_ns/2.-i)<=5){
       cout << i <<": b[i] = "<< bi <<" p[i]= "<<p[i];//<<endl;
-      cout << "\t" <<  (CS_mat.d[i]-CS_mat.a[i]*h[i-1])<< " " << h[i-1]<<endl;
+      cout << "\t" <<  (CS_mat->d[i]-CS_mat->a[i]*h[i-1])<< " " << h[i-1]<<endl;
     }
 #endif //DEBUG
   }
@@ -91,16 +90,16 @@ void CrankSolver::Stepper(){
   if(CCN == 'D'){
     p[CS_ns-1] = CS_cce;
   }else{
-    Var bnm1 = CS_mat.bi(CS_ns-1,
+    Var bnm1 = CS_mat->bi(CS_ns-1,
 			 CS_data_prec[CS_ns-2],
 			 CS_data_prec[CS_ns-1],0);
-    p[CS_ns-1] = CS_mat.pi(CS_ns-1,p[CS_ns-2],
+    p[CS_ns-1] = CS_mat->pi(CS_ns-1,p[CS_ns-2],
 			   bnm1);
   }
   //ora procedo finalmente con l'assegnare i risultati
   CS_data[CS_ns-1] = p[CS_ns-1];
   for(int i=CS_ns-2;i>=0;i--){
-    CS_data[i] = p[i] - CS_mat.H(i) * CS_data[i+1];
+    CS_data[i] = p[i] - CS_mat->H(i) * CS_data[i+1];
     //da pi = xi + hi x(i+1)
 #ifdef DEBUG
     if(abs(CS_ns/2.-i)<=5)
