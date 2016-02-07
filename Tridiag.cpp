@@ -30,6 +30,17 @@ tridiag::tridiag(const tridiag& x){
   }
 }
 
+tridiag::~tridiag(){
+  delete[] a;
+  delete[] c;
+  delete[] d;
+  delete[] ak;
+  delete[] ck;
+  delete[] dk;
+  if(h!=nullptr)
+    delete[] h;
+}
+
 tridiag& tridiag::operator=(const tridiag& x){
   if (this != &x){ // protect against invalid self-assignment
     dim = x.dim;
@@ -82,13 +93,7 @@ Var tridiag::bi(int i, Var F_nm1,Var F_n,Var F_np1){
   return toreturn;
 }
 
-Var tridiag::pi(int i, Var pim1, Var bi){
-  //preferisco avere il vettore dei pi esterno, dato che sara` temporaneo
-  if(i==0)
-    return bi/d[i];
-  else
-    return (bi-a[i]*pim1)/(d[i]-a[i]*h[i-1]);
-}
+
 
 void tridiag::setUnknown(int i, Var A, Var D, Var C){
   a[i] = A;
@@ -102,14 +107,6 @@ void tridiag::setKnown(int i, Var A, Var D, Var C){
   ck[i] = C;
 }
 
-Var tridiag::H(int i){
-  return h[i];
-}
 
-Var tridiag::GetA(int i){return a[i];}
-Var tridiag::GetD(int i){return d[i];}
-Var tridiag::GetC(int i){return c[i];}
 
-Var tridiag::GetAk(int i){return ak[i];}
-Var tridiag::GetDk(int i){return dk[i];}
-Var tridiag::GetCk(int i){return ck[i];}
+

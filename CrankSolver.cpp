@@ -11,7 +11,7 @@ void wait(){
 
 using namespace std;
 
-CrankSolver::CrankSolver(const tridiagM &mat, int Ns, const char *options, Var CCi, Var CCe)
+CrankSolver::CrankSolver(const tridiag &mat, int Ns, const char *options, Var CCi, Var CCe)
   :CS_mat(mat){
   
   CC0 = options[0];
@@ -27,8 +27,9 @@ CrankSolver::CrankSolver(const tridiagM &mat, int Ns, const char *options, Var C
 }
 
 CrankSolver::~CrankSolver(){
-  delete CS_data;
-  delete CS_data_prec;
+  delete[] CS_data;
+  delete[] CS_data_prec;
+  delete &CS_mat;
 }
 
 void CrankSolver::SetInitialState(Var* initialVector){
@@ -46,7 +47,7 @@ int CrankSolver::doStep(){
     cout << "Non ho acquisito le condizioni iniziali"<<endl;
   }else{
     if(CS_data_prec!=nullptr)
-      delete CS_data_prec;
+      delete[] CS_data_prec;
     CS_data_prec = CS_data;//sposto i vecchi punti sul nuovo array
     CS_data = new Var[CS_ns];
     Stepper();
@@ -107,6 +108,7 @@ void CrankSolver::Stepper(){
 	   <<"=>x[i](t)="<<CS_data[i]<<endl;
 #endif //DEBUG
   }
+  delete[] p;
 #ifdef DEBUG
   wait();
 #endif //DEBUG
