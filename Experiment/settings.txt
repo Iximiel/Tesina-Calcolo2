@@ -3,7 +3,7 @@
 #lunghezza
 60
 #tmax
-5.5
+10
 #Ndipende_da_int=0
 0
 #Nl

@@ -84,6 +84,7 @@ int main(int argc, char** argv)
     TGraph *gerrs = new TGraph(times.size(),times.data(),diffs.data());
   
     merr->Add(gerrs);
+    g->Clear();
     delete g;
   }
   TCanvas c1("c1","Confronto",1280,512);

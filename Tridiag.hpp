@@ -24,8 +24,8 @@ public:
   Var GetCk(int i);
   Var GetEk(int i);
   Var H(int i);
-    void create_h(bool lastPointDirichlet=false);
-      Var pi(int i, Var bi, Var pim1);
+  void create_h(bool lastPointDirichlet=false);
+  Var pi(int i, Var bi, Var pim1);
   void SetE(int i, Var E);
   void SetEk(int i, Var E);
   void setUnknown(int i, Var A, Var D, Var C, Var E);

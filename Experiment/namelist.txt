@@ -1,4 +1,4 @@
-Muro2_5V
-Muro2_10V
-Muro2_15V
-Muro2_20V
+Muro_5V
+Muro_10V
+Muro_15V
+Muro_20V

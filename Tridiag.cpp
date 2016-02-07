@@ -1,21 +1,21 @@
 #include "Tridiag.hpp"
 
 tridiag::tridiag(int N){
-    dim = N;
-    a = new Var[dim];
-    c = new Var[dim];
-    d = new Var[dim];
-    ak = new Var[dim];
-    ck = new Var[dim];
-    dk = new Var[dim];
+  dim = N;
+  a = new Var[dim];
+  c = new Var[dim];
+  d = new Var[dim];
+  ak = new Var[dim];
+  ck = new Var[dim];
+  dk = new Var[dim];
   e = new Var[dim];
   ek = new Var[dim];
-      h = nullptr;
+  h = nullptr;
 }
 
 tridiag::tridiag(const tridiag& x)
 {
-   dim = x.dim;
+  dim = x.dim;
   a = new Var[dim];
   c = new Var[dim];
   d = new Var[dim];
@@ -24,9 +24,9 @@ tridiag::tridiag(const tridiag& x)
   ck = new Var[dim];
   dk = new Var[dim];
   ek = new Var[dim];
-   h = nullptr;
+  h = nullptr;
   for(int i=0;i<dim;i++){
-     a[i] = x.a[i];
+    a[i] = x.a[i];
     c[i] = x.c[i];
     d[i] = x.d[i];
     e[i] = x.e[i];
@@ -39,14 +39,14 @@ tridiag::tridiag(const tridiag& x)
 
 
 tridiag::~tridiag(){
-    delete[] a;
-    delete[] c;
-    delete[] d;
-    delete[] ak;
-    delete[] ck;
-    delete[] dk;
-    if(h!=nullptr)
-      delete[] h;
+  delete[] a;
+  delete[] c;
+  delete[] d;
+  delete[] ak;
+  delete[] ck;
+  delete[] dk;
+  if(h!=nullptr)
+    delete[] h;
   delete[] e;
   delete[] ek;
 }
@@ -111,9 +111,9 @@ Var tridiag::pi(int i, Var pim1, Var bi){
 
 Var tridiag::bi(int i, Var F_nm1,Var F_n,Var F_np1){
   //preferisco avere il vettore dei bi esterno, dato che sara` temporaneo,
-    //anzi me ne servira` uno alla volta, l'eccezione delle condizioni
-    //al contorno sara` data nell'algoritmo che includera` questa funzione
-    Var toreturn = ak[i] * F_nm1 + dk[i] * F_n + ck[i] *F_np1;
+  //anzi me ne servira` uno alla volta, l'eccezione delle condizioni
+  //al contorno sara` data nell'algoritmo che includera` questa funzione
+  Var toreturn = ak[i] * F_nm1 + dk[i] * F_n + ck[i] *F_np1;
   toreturn += ek[i] - e[i];
   return toreturn;
 }

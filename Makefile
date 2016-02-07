@@ -68,15 +68,7 @@ TridiagC.o: Tridiag.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c -o $@ $^ -DUSECOMPLEX
 
-TridiagMoreC.o: TridiagMore.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -c -o $@ $^ -DUSECOMPLEX
-
 CrankSolver.o: CrankSolver.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -c $^
-
-TridiagMore.o: TridiagMore.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^
 
@@ -92,17 +84,17 @@ debug: MainCrank.cpp CrankSolverD.o Tridiag.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -DDEBUG -o main $^
 
-experiment: Experiment.cpp TridiagC.o TridiagMoreC.o CrankSolverC.o impostazioniC.o
+experiment: Experiment.cpp TridiagC.o CrankSolverC.o impostazioniC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^  -DUSECOMPLEX
 	@echo Sposto il main nella cartella apposita
 	@mv main ./Experiment
 
-maincrankC: MainC.cpp TridiagC.o TridiagMoreC.o CrankSolverC.o impostazioniC.o
+maincrankC: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^  -DUSECOMPLEX
 
-maincrank: Main.cpp Tridiag.o TridiagMore.o CrankSolver.o impostazioni.o
+maincrank: Main.cpp Tridiag.o CrankSolver.o impostazioni.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^
 

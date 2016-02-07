@@ -20,7 +20,7 @@ int main(int argc, char** argv){
        <<info.timeStep()<<"/("<<info.spaceStep()<<"^2)" <<endl;
 
   //condizioni iniziali
-  tridiagM mat(info.NL());
+  tridiag mat(info.NL());
   Var *initial = new Var[info.NL()];
   Var perV =-I*info.timeStep()/eta;//moltiplicatore del potenziale
 
