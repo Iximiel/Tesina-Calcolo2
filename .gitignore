@@ -4,6 +4,9 @@ drawer
 CCDict.cpp
 SchrodyDict.cpp
 *out.txt
+todraw.txt
+*.dat
+analisi
 
 #dizionari bit
 *pcm

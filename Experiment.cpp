@@ -8,10 +8,10 @@ using namespace std;
 
 void experiment(impostazioni* info, string name){
   Var eta = info->eta() * I * hbar;
-  cout << "Esperimento " << name << endl;
+  cout << "Esperimento \"" << name << "\"" << endl;
   string ifilename = name+".txt";//file del potenziale
   string ofilename = name+".dat";
-  info->potentialsetting(ifilename.C_str());//ricarico il potenziale
+  info->potentialsetting(ifilename.c_str());//ricarico il potenziale
   
   //condizioni iniziali
   tridiagM mat(info->NL());
@@ -75,7 +75,7 @@ void experiment(impostazioni* info, string name){
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
   cout << "Inizio i calcoli" <<endl;
-  ofstream outfile(ofilename.C_str());
+  ofstream outfile(ofilename.c_str());
   int t = 0;
   bool precision = true;//controlla che l'integrale non vari troppo
   double integral = 0;//precisione voluta
@@ -111,12 +111,13 @@ int main(int argc, char** argv){
   if(argc>1)
     filename  = argv[1];
   //carico il file di impostazioni, per ricompilare meno spesso
-  impostazioni info = new impostazioni("onda.txt", "potenziale.txt", "settings.txt");
-  
+  impostazioni *info = new impostazioni("onda.txt", "potenziale.txt", "settings.txt");
+
+  Var eta = info->eta() * I * hbar;
   cout << "eta: "<<eta<<"=Ih/(2m)*"
        <<info->timeStep()<<"/("<<info->spaceStep()<<"^2)" <<endl;
   ifstream filenames("namelist.txt");
-  while(filenames.is_good()){
+  while(filenames.good()){
     string fname;
     filenames >> fname;//fname non deve contenere spazi e ".txt"
     experiment(info, fname);

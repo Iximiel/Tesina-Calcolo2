@@ -7,12 +7,13 @@
 using namespace std;
 
 int main(int argc, char** argv){
-  string filename = "out.txt";
+  string filename = "out";
   if(argc>1)
     filename  = argv[1];
+  cout << "eseguo " << filename<<endl;
   //carico il file di impostazioni, per ricompilare meno spesso
-  impostazioni info("onda.txt", "potenziale.txt", "settings.txt");
-
+  impostazioni info("onda.txt", (filename+".txt").c_str(), "settings.txt");
+  filename+=".dat";
   Var eta = info.eta() * I * hbar;
   
   cout << "eta: "<<eta<<"=Ih/(2m)*"
@@ -79,8 +80,8 @@ int main(int argc, char** argv){
   CrankSolver myIntegrator(mat,info.NL(),info.CCSettings(),CCi,CCe);
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator.SetInitialState(initial);
-  cout << "Inizio i calcoli" <<endl;
-  ofstream outfile("todraw.txt");
+  cout << "Inizio i calcoli, salvo su "<< filename << endl;
+  ofstream outfile(filename);
   int t = 0;
 
   bool precision = true;//controlla che l'integrale non vari troppo

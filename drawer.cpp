@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 #endif
 {
   cout<<"Carico i dati\n";
-  TGraph2D *g = new TGraph2D("todraw.txt");
+  TGraph2D *g = new TGraph2D("free.dat");
   cout<<"Analisi errore\n";
   int np = g->GetN(), NT = 0;
   double t = g->GetY()[0];
