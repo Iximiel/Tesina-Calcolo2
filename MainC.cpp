@@ -14,7 +14,7 @@ int main(int argc, char** argv){
   //carico il file di impostazioni, per ricompilare meno spesso
   impostazioni info("onda.txt", (filename+".txt").c_str(), "settings.txt");
   filename+=".dat";
-  Var eta = info.eta() * I * hbar;
+  Var eta = info.eta() * costanti::I * costanti::hbar;
   
   cout << "eta: "<<eta<<"=Ih/(2m)*"
        <<info.timeStep()<<"/("<<info.spaceStep()<<"^2)" <<endl;
@@ -22,7 +22,7 @@ int main(int argc, char** argv){
   //condizioni iniziali
   tridiag *mat = new tridiag(info.NL());
   Var *initial = new Var[info.NL()];
-  Var perV =-I*info.timeStep()/eta;//moltiplicatore del potenziale
+  Var perV =-costanti::I*info.timeStep()/eta;//moltiplicatore del potenziale
 
   //imposto a d c e le CI
   Var a = -1., d = 2./eta+2., c = -1.;

@@ -10,14 +10,16 @@ typedef double Var;
 #endif
 #endif
 
+namespace costanti{
 #ifdef USECOMPLEX
-const Var I(0,1);
+  const Var I(0,1);
 #else
-const Var I=1.;
+  const Var I=1.;
 #endif
 
-const double PI = 4*atan(1);
-const double hbar = 1;
+  const double PI = 4*atan(1);
+  const double hbar = 1;
+}
 
 class impostazioni{
 private:

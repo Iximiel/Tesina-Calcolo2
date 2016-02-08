@@ -9,6 +9,7 @@ double zero(double /*x*/, double /*a*/, double /*b*/){return 0;}
 double H(double x, double a, double /*b*/){return (x > a)?1:0;}
 double barrier (double x, double a, double b){return H(x,a,0) * H(b,x,0);}
 double gauss(double x, double a, double b){return exp(-(x-a)*(x-a)/(2*b*b));}
+double bump(double x, double a, double b){return (abs(x-a)<b)?exp(-1/(b*b-(x-a)*(x-a))):0;}
 
 impostazioni::impostazioni(const char* wavefile, const char* potentialfile, const char* simulationfile){
   wavesetting(wavefile);
@@ -95,7 +96,7 @@ void impostazioni::simulationsetting(const char* simulationfile){
     cout << "Passi spaziali: " << Nl <<endl;
     cout << "Passi temporali: " << Nt <<endl;
   }
-  Ik = I * sqrt(E*2*m/(hbar*hbar));
+  Ik = costanti::I * sqrt(E*2*m/(costanti::hbar*costanti::hbar));
   file.close();
 }
   
@@ -114,7 +115,7 @@ double impostazioni::potenziale(int i){
   
 Var impostazioni::Initial(int i){//Condizione iniziale
   double x = i*spacestep;
-  return /*(norm/stdev*sqrt(2*PI)) **/ gauss(x,mid,stdev)*exp(Ik*x);
+  return /*(norm/stdev*sqrt(2*PI)) **/ bump(x,mid,stdev)*exp(Ik*x);
 }
 
 bool impostazioni::doNextStep(double error){

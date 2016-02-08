@@ -10,7 +10,7 @@
 using namespace std;
 TApplication theApp("app",0,NULL);
 //g++ allDataPrint.cpp `root-config --cflags --glibs`
-int main()
+int main(int argv, char** argc)
 #endif
 {
   /*  TCanvas c("c","Real",640,512);
@@ -20,7 +20,7 @@ int main()
   TGraph2D *Cgrafo = new TGraph2D("iout.txt");
   Cgrafo->Draw("pcol");*/
   TCanvas c3("c3","Norm",640,512);
-  TGraph2D *Ngrafo = new TGraph2D("out.txt");
+  TGraph2D *Ngrafo = new TGraph2D(argc[1]);
   Ngrafo->Draw("pcol");
   //grafo.Draw("surf1");
 #ifndef __CINT__

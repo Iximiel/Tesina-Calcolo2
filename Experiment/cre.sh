@@ -12,7 +12,7 @@ else
     for N in 5 10 15 20
     do
 	echo $Fname"$N"V.txt
-	echo "#" >> $Fname"$N"V.txt
+	echo "#" > $Fname"$N"V.txt
 	echo $2 >> $Fname"$N"V.txt
 	echo "#" >> $Fname"$N"V.txt
 	echo $N $3 $4 >> $Fname"$N"V.txt

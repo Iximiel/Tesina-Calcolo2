@@ -1,7 +1,7 @@
 #massa
 1
 #lunghezza
-60
+40
 #tmax
 10
 #Ndipende_da_int=0
@@ -9,7 +9,7 @@
 #Nl
 10000
 #spacestep.
-0.0015
+0.001
 #Nt
 1000
 #timestep
@@ -17,6 +17,6 @@
 #timeskip
 100
 #spaceskip
-20
+30
 #precisione
 5e-3
