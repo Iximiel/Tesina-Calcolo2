@@ -325,6 +325,7 @@ void Schrody::Preview(){
   showCanvas->Update();
 }
 void Schrody::doTheThing(){
+  /*
   double Sstep, Tstep, Slim, Tlim;
   int NS, NT;
   //blocca();
@@ -411,7 +412,7 @@ void Schrody::doTheThing(){
       }
     }
   }while(t<NT);
-  outfile.close();
+  outfile.close();*/
   //in realta` volgio usare:
   //lancio una finestra con una progressbar e faccio le cose
   //salvo tutto su un file, poi creo un visualize piu` comodo

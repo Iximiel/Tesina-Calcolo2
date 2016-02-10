@@ -8,12 +8,16 @@ using namespace std;
 
 int main(int argc, char** argv){
   string filename = "out";
+  string ondaSet = "gauss";
   if(argc>1)
     filename  = argv[1];
-  cout << "eseguo " << filename<<endl;
+  if(argc>2)
+    ondaSet  = argv[2];
+  cout << "********************************************"<<endl;
+  cout << "carico le impostazioni da " << filename << ".set, " << ondaSet << ".set e settings.set" <<  endl;
   //carico il file di impostazioni, per ricompilare meno spesso
-  impostazioni info("onda.txt", (filename+".txt").c_str(), "settings.txt");
-  filename+=".dat";
+  impostazioni info((ondaSet+".set").c_str(), (filename+".set").c_str(), "settings.set");
+
   Var eta = info.eta() * costanti::I * costanti::hbar;
   
   cout << "eta: "<<eta<<"=Ih/(2m)*"
@@ -54,14 +58,17 @@ int main(int argc, char** argv){
     mat->setUnknown(j,a,d - info.potenziale(j) * perV,c,0);
     mat->setKnown(j,ak,dk + info.potenziale(j) * perV,ck,0);
   }
-  if(info.CCSetting(0)=='D')
+  if(info.CCSetting(0)=='D'){
+    mat->SetA(1,0);
     mat->SetE(1,a*info.getCC0());//si sottrae a b1
+  }
   //ultimo punto di CI
   initial[info.NL()-1] = info.Initial(info.NL()-1);
   //CC in N
   if(info.CCSetting(1)=='D'){
     mat->setUnknown(info.NL()-1,0,1,0,0);
     mat->setKnown(info.NL()-1,0,1,0,0);
+    mat->SetC(info.NL()-2,0);
     mat->SetE(info.NL()-2,c*info.getCCN());//si sottrae a bN-2
     CCe = info.getCCN();//moltiplicato per c in crancsolver
   }else if(info.CCSetting(1)=='N'){
@@ -80,8 +87,11 @@ int main(int argc, char** argv){
   CrankSolver *myIntegrator = new CrankSolver(mat,info.NL(),info.CCSettings(),CCi,CCe);
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator->SetInitialState(initial);
-  cout << "Inizio i calcoli, salvo su "<< filename << endl;
-  ofstream outfile(filename);
+  //file in una cartella superiore
+  filename+="_"+ondaSet;
+  filename = "./results/"+filename;
+  cout << "Inizio i calcoli, salvo su "<< filename << ".dat" << endl;
+  ofstream outfile(filename+".dat");
   int t = 0;
 
   bool precision = true;//controlla che l'integrale non vari troppo
@@ -113,6 +123,7 @@ int main(int argc, char** argv){
   delete myIntegrator;
   cout << "Tempo trascorso (nella simulazione): " << t*info.timeStep() <<endl;
   outfile.close();
+  info.plotSettings((filename+".nfo").c_str(),t*info.timeStep());
   cout << "Finito"<<endl;
   return 0;
 }

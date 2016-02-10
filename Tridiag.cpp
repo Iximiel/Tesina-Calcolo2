@@ -78,7 +78,7 @@ tridiag& tridiag::operator=(const tridiag& x){
   return *this;
 }
 
-void tridiag::create_h(bool lastPointDirichlet){
+void tridiag::create_h(){
   if(h!=nullptr)
     delete h;
 
@@ -96,9 +96,6 @@ void tridiag::create_h(bool lastPointDirichlet){
 
   for(int i=1;i<dim-1;i++)
     h[i] = c[i]/(d[i]-a[i]*h[i-1]);
-
-  if(lastPointDirichlet)
-    h[dim-2]=0;
 }
 
 Var tridiag::pi(int i, Var pim1, Var bi){
@@ -133,7 +130,8 @@ void tridiag::setKnown(int i, Var A, Var D, Var C, Var E){
 }
 
 void tridiag::SetE(int i, Var E){e[i] = E;}
-void tridiag::SetEk(int i, Var E){ek[i] = E;}
+void tridiag::SetA(int i, Var A){a[i] = A;}
+void tridiag::SetC(int i, Var C){c[i] = C;}
 
 Var tridiag::H(int i){return h[i];}
 

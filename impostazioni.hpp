@@ -38,11 +38,13 @@ private:
   double weight0, weightN;
   double precision;
   double (*pot)(double,double,double);
+  double (*ini)(double,double,double);
 public:
   impostazioni(const char* wavefile, const char* potentialfile, const char* simulationfile);
   void wavesetting(const char* wavefile);
   void potentialsetting(const char* potentialfile);
   void simulationsetting(const char* simulationfile);
+  void plotSettings(const char*, double);
   double eta();
   double potenziale(int i);
   double spaceStep();

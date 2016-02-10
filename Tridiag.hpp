@@ -24,10 +24,11 @@ public:
   Var GetCk(int i);
   Var GetEk(int i);
   Var H(int i);
-  void create_h(bool lastPointDirichlet=false);
+  void create_h();
   Var pi(int i, Var bi, Var pim1);
   void SetE(int i, Var E);
-  void SetEk(int i, Var E);
+  void SetA(int i,Var A);
+  void SetC(int i,Var C);
   void setUnknown(int i, Var A, Var D, Var C, Var E);
   void setKnown(int i, Var A, Var D, Var C, Var E);
 protected:

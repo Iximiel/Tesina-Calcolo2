@@ -81,6 +81,7 @@ int main(int argc, char** argv)
   
   c3.cd();
   g->Draw("pcol");
+  //g->Draw();
   //grafo.Draw("surf1");
 #ifndef __CINT__
    theApp.Run(true);

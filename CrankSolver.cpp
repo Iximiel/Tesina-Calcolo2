@@ -11,19 +11,14 @@ void wait(){
 
 using namespace std;
 
-CrankSolver::CrankSolver(tridiag *mat, int Ns, const char *options, Var CCi, Var CCe){
+CrankSolver::CrankSolver(tridiag *mat, int Ns){
   CS_mat = mat;
-  
-  CC0 = options[0];
-  CCN = options[1];  
 
   CS_ns = Ns;
-  CS_cci = CCi;// CC per Dirichlet
-  CS_cce = CCe;// CC per Dirichlet
   CS_data = nullptr;
   CS_data_prec = nullptr;
   CS_step = -1;
-  CS_mat->create_h(CCN == 'D');
+  CS_mat->create_h();
 }
 
 CrankSolver::~CrankSolver(){
@@ -60,19 +55,15 @@ Var CrankSolver::getPoint(int x){
 }
 //da fare: rendere lo stepper flessibile
 void CrankSolver::Stepper(){
+  //preparo il vettore delle p[]
   Var *p = new Var [CS_ns];
   //0 e` l'indice delle condizioni al contorno, se uso Dirichlet 0 serve a non aggiungere eccezioni all'algoritmo
   //la spiegazione e` in create_h() di Tridiag.cpp
-  //preparo il vettore delle p[]
-  if(CC0 == 'D'){
-    p[0] = CS_cci;
-    //in questo caso mi aspetto che h[0]=0
-  }else{
-    Var b0 = CS_mat->bi(0,0,
-		       CS_data_prec[0],
-		       CS_data_prec[1]);
-    p[0] = CS_mat->pi(0,0,b0);
-  }
+  Var b0 = CS_mat->bi(0,0,
+		      CS_data_prec[0],
+		      CS_data_prec[1]);
+  p[0] = CS_mat->pi(0,0,b0);
+  
   for(int i=1;i<CS_ns-1;i++){
     //calcolo il valore di b[i]
     Var bi = CS_mat->bi(i,CS_data_prec[i-1],
@@ -86,16 +77,11 @@ void CrankSolver::Stepper(){
     }
 #endif //DEBUG
   }
-  //assegno l'ultimo punto
-  if(CCN == 'D'){
-    p[CS_ns-1] = CS_cce;
-  }else{
-    Var bnm1 = CS_mat->bi(CS_ns-1,
-			 CS_data_prec[CS_ns-2],
-			 CS_data_prec[CS_ns-1],0);
-    p[CS_ns-1] = CS_mat->pi(CS_ns-1,p[CS_ns-2],
-			   bnm1);
-  }
+  Var bnm1 = CS_mat->bi(CS_ns-1,
+			CS_data_prec[CS_ns-2],
+			CS_data_prec[CS_ns-1],0);
+  p[CS_ns-1] = CS_mat->pi(CS_ns-1,p[CS_ns-2],
+			  bnm1);
   //ora procedo finalmente con l'assegnare i risultati
   CS_data[CS_ns-1] = p[CS_ns-1];
   for(int i=CS_ns-2;i>=0;i--){

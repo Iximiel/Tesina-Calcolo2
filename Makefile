@@ -11,7 +11,7 @@ all:maincrankC
 
 #https://root.cern.ch/interacting-shared-libraries-rootcint
 
-main: main.cpp Schrody.o DefineCC.o TridiagC.o TridiagMoreC.o CrankSolverC.o libSchrody.so libCC.so
+main: main.cpp Schrody.o DefineCC.o TridiagC.o CrankSolverC.o libSchrody.so libCC.so
 	@echo Compilo il main
 	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
 
@@ -90,9 +90,17 @@ experiment: Experiment.cpp TridiagC.o CrankSolverC.o impostazioniC.o
 	@echo Sposto il main nella cartella apposita
 	@mv main ./Experiment
 
+CVD: CVDrawer.cpp impostazioniC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX $(LIBROOT) $(CFLAGSROOT)
+	@echo Sposto il main nella cartella apposita
+	@mv $@ ./Experiment
+
 maincrankC: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^  -DUSECOMPLEX
+	@echo Sposto il main nella cartella apposita
+	@mv main ./Experiment
 
 maincrank: Main.cpp Tridiag.o CrankSolver.o impostazioni.o
 	@echo Compilo $@

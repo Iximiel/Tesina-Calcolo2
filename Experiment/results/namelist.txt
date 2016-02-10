@@ -1,8 +1,9 @@
+Gauss_025_10V_bump.dat
 Gauss_025_10V_gauss.dat
+Gauss_025_15V_bump.dat
 Gauss_025_15V_gauss.dat
+Gauss_025_20V_bump.dat
 Gauss_025_20V_gauss.dat
+Gauss_025_5V_bump.dat
 Gauss_025_5V_gauss.dat
 Gauss_25_10V_gauss.dat
-Gauss_25_15V_gauss.dat
-Gauss_25_20V_gauss.dat
-Gauss_25_5V_gauss.dat

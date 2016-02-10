@@ -6,25 +6,31 @@
 using namespace std;
 
 double zero(double /*x*/, double /*a*/, double /*b*/){return 0;}
+double gauss(double x, double a, double b){return exp(-(x-a)*(x-a)/(2*b*b));}
+double bump(double x, double a, double b){return (abs(x-a)<b)? M_E*exp(-b*b/(b*b-(x-a)*(x-a))):0;}
 double H(double x, double a, double /*b*/){return (x > a)?1:0;}
 double barrier (double x, double a, double b){return H(x,a,0) * H(b,x,0);}
-double gauss(double x, double a, double b){return exp(-(x-a)*(x-a)/(2*b*b));}
-double bump(double x, double a, double b){return (abs(x-a)<b)?exp(-1/(b*b-(x-a)*(x-a))):0;}
 
 impostazioni::impostazioni(const char* wavefile, const char* potentialfile, const char* simulationfile){
-  wavesetting(wavefile);
   simulationsetting(simulationfile);
+  wavesetting(wavefile);
   potentialsetting(potentialfile);
-  cout << "Condizioni iniziali:exp(-( x -" << mid
-       << ")^2/(2*" << stdev << "^2))*exp(" << Ik << "* x )"<<endl;
-  cout << "Energia: " << E << endl;
-  cout << "Altezza potenziale:" << Vval << endl;
 }
   
 void impostazioni::wavesetting(const char* wavefile){
   ifstream file(wavefile);
   char nameCC[3]={'D','C','R'};
   string dummy;
+  char tipo;
+  file >> dummy >> tipo;
+  cout << "Condizioni iniziali:" << endl;
+  if(tipo == 'B'||tipo == 'b'){
+    ini = bump;
+    cout << "\t\"Bump\""<<endl;
+  }else{
+    ini = gauss;
+    cout << "\tGaussiana"<<endl;
+  }
   file >> dummy >> norm >> stdev;
   file >> mid;
   int icc;
@@ -33,6 +39,10 @@ void impostazioni::wavesetting(const char* wavefile){
   file >> dummy >> icc >> CCN >> weightN;
   infoCC[1] = nameCC[icc];
   file >> dummy >> E;
+  cout << "\tEnergia: " << E << endl;
+  Ik = costanti::I * sqrt(E*2*m/(costanti::hbar*costanti::hbar));
+  cout<< "\tPunto centrale: " << mid
+       << ", Larghezza:" << stdev << ", Parametro Ik" << Ik <<endl;
 }
   
 void impostazioni::potentialsetting(const char* potentialfile){
@@ -47,27 +57,39 @@ void impostazioni::potentialsetting(const char* potentialfile){
   file >> dummy >> type;
   file >> dummy >> Vval;
   file >> Vpos >> Vpar;//posizione parametro (per muro e` la discesa, per G e` la stdev)
+  pot = nullptr;
   if(Vval == 0){
-    pot = zero;
+    pot = &zero;
     cout << "Senza potenziale" <<endl;
   }else{
-    cout << "Valore potenziale: " << Vval <<endl;
-    if(type == 'G'){
-      pot = gauss;
-      cout << "Potenzialegaussiana: valor medio:" << Vpos << ", deviazione std:" << Vpar <<endl;
-    }if(type == 'M'){
+    cout << "Potenziale: " <<endl;
+    cout <<"\tAltezza: " << Vval <<endl;
+    switch(type){//gli switch non mi piacciono, ma non fanno dimenticare gli else
+    case 'b':
+    case 'B':
+      pot = &bump;
+      cout << "\tBump:\n\t\tpunto medio:" << Vpos << ", larghezza:" << Vpar <<endl;
+      break;
+    case 'g':
+    case 'G':
+      cout << "\tGaussiana\n\t\tpunto medio:" << Vpos << ", deviazione std:" << Vpar <<endl;
+      pot = &gauss;
+      break;
+    case 'm':
+    case 'M':
       if(Vpos > Vpar){
 	double temp = Vpos;
 	Vpos = Vpar;
 	Vpar = temp;
       }
-      cout << "Salita potenziale: " << Vpos <<" discesa "<< Vpar <<endl;  
-      pot = barrier;
-    }else{
-      cout << "Posizione Salto: " << Vpos <<endl;  
-      pot = H;
+      cout << "\tBarriera:\n\t\tsalita: " << Vpos <<", discesa "<< Vpar <<endl;  
+      pot = &barrier;
+      break;
+    default:
+      cout << "\tSalto:\n\t\tposizione: " << Vpos <<endl;  
+      pot = &H;
     }
-  }
+  }   
 }
   
 void impostazioni::simulationsetting(const char* simulationfile){
@@ -96,26 +118,32 @@ void impostazioni::simulationsetting(const char* simulationfile){
     cout << "Passi spaziali: " << Nl <<endl;
     cout << "Passi temporali: " << Nt <<endl;
   }
-  Ik = costanti::I * sqrt(E*2*m/(costanti::hbar*costanti::hbar));
   file.close();
 }
   
 double impostazioni::eta(){return timestep/(spacestep*spacestep *2 *m);}
   
 double impostazioni::potenziale(int i){
-  //double x = i*spacestep;
-  //gradino
   double x = i*spacestep;
   return Vval*pot(x,Vpos,Vpar);
-  /*    if(i>Vnum)
-	return Vval;
-	else
-	return 0;*/
+}
+
+void impostazioni::plotSettings(const char* file, double myTmax){
+  //non metto i nomi dei dati
+  ofstream ofile(file);
+  ofile << spacestep << " " << timestep << " " << precision << endl;
+  ofile << lenght << " " << tmax  << " " << myTmax << endl;
+  ofile << E <<endl;
+  ofile << norm << " " << mid << " " << stdev;
+  ofile << Vval << " " << Vpos << " " << Vpar;
+  ofile << infoCC[0] << " " << CC0 << " " << weight0;
+  ofile << infoCC[1] << " " << CCN << " " << weightN;
+  ofile.close();
 }
   
 Var impostazioni::Initial(int i){//Condizione iniziale
   double x = i*spacestep;
-  return /*(norm/stdev*sqrt(2*PI)) **/ bump(x,mid,stdev)*exp(Ik*x);
+  return /*(norm/stdev*sqrt(2*PI)) **/norm * ini(x,mid,stdev)*exp(Ik*x);
 }
 
 bool impostazioni::doNextStep(double error){
