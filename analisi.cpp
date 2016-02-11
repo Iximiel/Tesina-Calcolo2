@@ -85,7 +85,7 @@ int main(int argc, char** argv)
       ga->SetLineStyle(3);
       gb->SetLineColor(colore++);
       mg->Add(gb);
-      mg->Add(ga);
+      //mg->Add(ga);
       merr->Add(gerrs);
       g->Clear();
       delete g;

@@ -45,7 +45,7 @@ linkcolor=black}
 \newcommand{\media}[1]{\lr{<}{>}{#1}}
 
 \newcommand{\infint}{\int\limits_{-\infty}^{+\infty}}
-\newcommand{\MB}{Maxwell-Boltzmann}
+\newcommand{\Schrodinger}{Schr\"{o}dinger }
 
 %vettori
 \renewcommand{\vec}[1]{\boldsymbol{#1}}
@@ -447,33 +447,47 @@ e di conseguenza $F_{N-1}^{j+1} = p_{N-1}'$, anche perch\`e \`e il primo punto d
 
 Se faccio in modo di eliminare il coefficiente che moltiplica il valore della funzione (gli $R$) ottengo le condizioni a  contorno di Neuman.
 \subsection{Osservazione}
-Il modo in cui ho trattato i parametri per quanto riguarda le condizioni al contorno di Dirichlet nei punti $0$ e $N-1$, non \`e matematicamente correttissimo infatti i parametri andrebbero messi tutti a 0 in quanto quei punti non fanno parte dell'algoritmo. I numeri che ho messo servono per avere un algoritmo che possa svolgere il calcolo rispettando le condizioni al contorno senza sapere quali siano, mettendo nelle mani dell'utente che si occuper\`a di impostare i corretti parametri della matrice la gestione delle condizioni.
-\section{applicazione}
+Il modo in cui ho trattato i parametri per quanto riguarda le condizioni al contorno di Dirichlet nei punti $0$ e $N-1$, non \`e matematicamente correttissimo infatti i parametri andrebbero messi tutti a 0 in quanto quei punti non fanno parte dell'algoritmo. Ho impostato i valori  per avere un algoritmo che possa svolgere il calcolo rispettando le condizioni al contorno senza sapere quali siano, mettendo nelle mani dell'utente che si occuper\`a di impostare i corretti parametri della matrice la gestione delle condizioni.
+\section{Applicazione}
 \subsection{Equazione del calore}
-\subsection{Equazione di Schrodinger}
-Lavoriamo con l'equazione di Schrodinger dipendente dal tempo:
-$$i\hbar\pde \psi t(x,t) =\lrq{-\frac{\hbar^2}{2m}\pde{^2}{x^2}+V(x,t)} \psi(x,t)$$
+Riprendiamo l'equazione del calore:
+\begin{equation}
+\pde T t(x,t) =k\pde{^2}{x^2}T(x,t)
+\end{equation}
 
-Similmente si arriva  a:
-$$\begin{aligned}
-i\hbar\frac{\psi(x,t+\Delta t)-\psi(x,t)}{\Delta t} = -\frac{\hbar^2}{4m} &\lr(.{\frac{\psi(x+\Delta x,t)+\psi(x-\Delta x,t)-2\psi(x,t)}{\Delta x^2}}\\
-&\lr.){+\frac{\psi(x+\Delta x,t+\Delta t)+\psi(x-\Delta x,t+\Delta t)-2\psi(x,t+\Delta t)}{\Delta x^2}}\\
-&+ \frac 12\lrt{\psi(x,t)V(x,t)+ \psi(x,t+\Delta t)V(x,t+\Delta t)}
-\end{aligned}$$
-Come prima definisco un $\eta = i\frac{\hbar}{2m} \frac{\Delta t}{\Delta x^2} $ e riscrivo:
-$$\begin{aligned}
-2\frac{\psi(x,t+\Delta t)-\psi(x,t)}{\eta} = & \psi(x+\Delta x,t)+\psi(x-\Delta x,t)-2\psi(x,t)\\
-&+\psi(x+\Delta x,t+\Delta t)+\psi(x-\Delta x,t+\Delta t)-2\psi(x,t+\Delta t)\\
-&+ \frac {\Delta t}\eta\lrt{\psi(x,t)V(x,t)+ \psi(x,t+\Delta t)V(x,t+\Delta t)}
-\end{aligned}$$
-E similmente a  prima ottengo un'equazione in cui separo i termini a tempi differenti:
-$$\begin{aligned}
-\lrt{\frac{2-\Delta t V(x,t+\Delta t)}{\eta}+2}\psi(x,t+\Delta t) -&\psi(x+\Delta x,t+\Delta t)-\psi(x-\Delta x,t+\Delta t) =\\
-& \lrt{\frac{2+\Delta t V(x,t)}{\eta}-2}\psi(x,t) +\psi(x+\Delta x,t)+\psi(x-\Delta x,t)
-\end{aligned}$$
-per impostare la tabella tridiagonale discretizzo $\psi$ e $V$, $i$ indice spaziale $j$ indice temporale:
-$$
--\psi_{i-1}^{j+1}+\lrt{\frac{2-\Delta t V_i^{j+1}}{\eta}+2}\psi_{i}^{j+1} -\psi_{i+1}^{j+1} = 
-\psi_{i-1}^{j}+\lrt{\frac{2+ \Delta t V_{i}^{j}}{\eta}-2}\psi_{i}^{j} +\psi_{i+1}^{j}
-$$
+Per rispettare la convenzione di prima $D_2 = k$ , $D_1 = U = V(x,t) = 0$. 
+
+
+A questo punto posso sostituire, con $\eta = k\frac{\Delta t}{\Delta x^2}$:
+\begin{equation}\label{eq:pararametriHeat}
+\begin{array}{ll}
+a_i^j = -1            & ak_i^j =1\\
+d_i^j = \frac2\eta +2 & dk_i^j = \frac2\eta -2 \\
+c_i^j = -1             & ck_i^j =1\\
+e_i^j = 0             & ek_i^j =0
+\end{array}
+\end{equation}
+e procedere con i calcoli.
+\subsection{Equazione di \Schrodinger}
+Lavoriamo con l'equazione di \Schrodinger  dipendente dal tempo:
+\begin{equation}
+i\hbar\pde \psi t(x,t) =\lrq{-\frac{\hbar^2}{2m}\pde{^2}{x^2}+V(x,t)} \psi(x,t)
+\end{equation}
+prima di tutto portiamola in una forma tale che non ci sia nulla a moltiplicare la derivata temporale:
+\begin{equation}
+\pde \psi t(x,t) =\lrq{i\frac{\hbar}{2m}\pde{^2}{x^2}+\frac{\varLambda(x,t)}{i\hbar}} {\psi(x,t)}
+\end{equation} 
+
+Per rispettare la convenzione di prima $D_2 = i\frac{\hbar}{2m}$ , $D_1 = U = 0$ e $V(x,t) = \frac{\varLambda(x,t)}{i\hbar}$. Ho usato $\varLambda$ per indicare il potenziale in modo da evitare confusione.
+
+
+A questo punto posso sostituire, con $\eta = i\frac{\hbar}{2m}\frac{\Delta t}{\Delta x^2}$:
+\begin{equation}\label{eq:pararametriSC}
+\begin{array}{ll}
+a_i^j = -1            & ak_i^j =1\\
+d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1}} +2 & dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j}} -2 \\
+c_i^j = -1             & ck_i^j =1\\
+e_i^j = 0             & ek_i^j =0
+\end{array}
+\end{equation}
 \end{document}

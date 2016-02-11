@@ -1,14 +1,6 @@
 #ifndef _Impostazioni
 #define _Impostazioni
-
-#ifndef _Tridiag
-#ifdef USECOMPLEX
-#include <complex>
-typedef std::complex<double> Var;
-#else
-typedef double Var;
-#endif
-#endif
+#include "Tridiag.hpp"
 
 namespace costanti{
 #ifdef USECOMPLEX
@@ -41,6 +33,7 @@ private:
   double (*ini)(double,double,double);
 public:
   impostazioni(const char* wavefile, const char* potentialfile, const char* simulationfile);
+  impostazioni(const char* wavefile, const char* simulationfile);
   void wavesetting(const char* wavefile);
   void potentialsetting(const char* potentialfile);
   void simulationsetting(const char* simulationfile);
@@ -60,6 +53,7 @@ public:
   double getweightN();
   double getCCN();
   bool doNextStep(double error);
+  tridiag* createTriMatrix();
   Var Initial(int i);
 };
 

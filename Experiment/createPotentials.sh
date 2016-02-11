@@ -7,6 +7,11 @@ if [ "$#" -ne 4 ]; then
     echo Gauss G 30 0.1
     echo sapendo che:
     grep "#lunghezza" settings.set -A1
+    echo codici per i potenziali:
+    echo *Gaussiana scrivo G
+    echo *Bump scrivo B
+    echo *Muro scrivo M:  __-__
+    echo *Salto scrovo S: __---
 else
     echo con impostazione "$2", Vpos =$3 e Vpar =$4
     for N in 5 10 15 20

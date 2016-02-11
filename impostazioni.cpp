@@ -11,6 +11,11 @@ double bump(double x, double a, double b){return (abs(x-a)<b)? M_E*exp(-b*b/(b*b
 double H(double x, double a, double /*b*/){return (x > a)?1:0;}
 double barrier (double x, double a, double b){return H(x,a,0) * H(b,x,0);}
 
+impostazioni::impostazioni(const char* wavefile, const char* simulationfile){
+  simulationsetting(simulationfile);
+  wavesetting(wavefile);
+}
+
 impostazioni::impostazioni(const char* wavefile, const char* potentialfile, const char* simulationfile){
   simulationsetting(simulationfile);
   wavesetting(wavefile);
@@ -51,6 +56,7 @@ void impostazioni::potentialsetting(const char* potentialfile){
   char type;
   /*
    *Gaussiana scrivo G
+   *Bump scrivo B
    *Muro scrivo M:  __-__
    *Salto scrovo S: __---
    */
@@ -89,7 +95,7 @@ void impostazioni::potentialsetting(const char* potentialfile){
       cout << "\tSalto:\n\t\tposizione: " << Vpos <<endl;  
       pot = &H;
     }
-  }   
+  }
 }
   
 void impostazioni::simulationsetting(const char* simulationfile){
@@ -152,6 +158,61 @@ bool impostazioni::doNextStep(double error){
     return false;
   }else
     return true;
+}
+
+tridiag* impostazioni::createTriMatrix(){
+  tridiag *mat = new tridiag(Nl);
+    Var Eta = eta() * costanti::I * costanti::hbar;
+  
+  cout << "eta: "<<Eta<<"=Ih/(2m)*"
+       <<timestep<<"/("<<spacestep<<"^2)" <<endl;
+  Var perV =-costanti::I*timestep/Eta;//moltiplicatore del potenziale
+  //imposto a d c di base
+  Var a = -1., d = 2./Eta+2., c = -1.;
+  Var ak = 1., dk = 2./Eta-2., ck = 1.;
+  cout << "a= "<< a <<" d=" <<d << " c="<< c<<endl;
+  cout << "ak= "<< ak <<" dk=" <<dk << " ck="<< c<<endl;
+  //CC in 0
+  if(infoCC[0]=='D'){
+    mat->setUnknown(0,0,1,0,0);
+    mat->setKnown(0,0,1,0,0);
+  }else if(infoCC[0]=='N'){
+    mat->setUnknown(0,0,d - potenziale(0) * perV,a+c,
+		   (-2.) * a * spacestep * CC0);
+    mat->setKnown(0,0,dk + potenziale(0) * perV,ak+ck,
+		 (-2.) * ak * spacestep * CC0);
+  }else{//Robin
+    mat->setUnknown(0,0,d - potenziale(0) * perV + 2.*a*spacestep* weight0,a+c,
+		    (-2.) * a * spacestep * CC0);
+    mat->setKnown(0,0,dk + potenziale(0) * perV + 2.*ak*spacestep*weight0,ak+ck,
+		 (-2.) * ak * spacestep * CC0);
+  }
+  for(int j = 1;j < Nl-1;j++){
+    mat->setUnknown(j,a,d - potenziale(j) * perV,c,0);
+    mat->setKnown(j,ak,dk + potenziale(j) * perV,ck,0);
+  }
+  if(infoCC[0]=='D'){
+    mat->SetA(1,0);
+    mat->SetE(1,a*CC0  );//si sottrae a b1
+  }
+  //CC in N
+  if(infoCC[1]=='D'){
+    mat->setUnknown(Nl-1,0,1,0,0);
+    mat->setKnown(Nl-1,0,1,0,0);
+    mat->SetC(Nl-2,0);
+    mat->SetE(Nl-2,c*CCN);//si sottrae a bN-2
+  }else if(infoCC[1]=='N'){
+    mat->setUnknown(Nl-1,a+c,d - potenziale(Nl-1) * perV,0,
+		    (-2.) * c * spacestep * CCN);
+    mat->setKnown(Nl-1,ak+ck,dk + potenziale(Nl-1) * perV,0,
+		 (-2.) * ck * spacestep * CCN);
+  }else{//Robin
+    mat->setUnknown(Nl-1,a+c,d - potenziale(Nl-1) * perV - 2.*c*spacestep*weightN,0,
+		   (-2.) * c * spacestep * CCN);
+    mat->setKnown(Nl-1,ak+ck,dk + potenziale(Nl-1) * perV -2.*ck*spacestep*weightN,0,
+		 (-2.) * ck * spacestep * CCN);
+  }
+  return mat;
 }
 
 double impostazioni::spaceStep(){return spacestep;}
