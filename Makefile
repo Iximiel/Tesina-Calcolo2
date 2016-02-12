@@ -1,19 +1,49 @@
-BASE	=../esercitazione1/
 CC	= g++
 CC11	= g++ -std=c++11
-PIC	= -fPIC #(Position-Indipendent-Code) non e` detto che questa riga funzioni, su ububtu 15.10 32bit non serviva, su lubuntu 15.10 64bit non metterla non fa compilare le .so, potrebbe servire scrivere -fpic, oppure ometterla del tutto
 CFLAGS	= -g -Wall
+DIR	= Experiment
+#Root
 CFLAGSROOT= `root-config --cflags`
 LIBROOT	= `root-config --glibs`
 LDROOT	= `root-config --ldflags`
-
-all:maincrankC
+#Position-Indipendent-Code
+PIC	= -fPIC
+#non e` detto che questa riga funzioni, su ubuntu 15.10_32bit non e` necessaria.
+#su lubuntu 15.10 64bit non metterla non fa compilare le .so
+#potrebbe servire scrivere -fpic, oppure ometterla del tutto
+all:single drawer analisi experiment
 
 #https://root.cern.ch/interacting-shared-libraries-rootcint
-
-main: main.cpp Schrody.o DefineCC.o TridiagC.o CrankSolverC.o libSchrody.so libCC.so
+#risolve un'equazione di Schodinger: come primo argonento il file del potenziale
+#come secondo, opzionale, il file che indica le CI, di base e` gauss.set
+single: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
+#disegna soluzione, errore e pesi dell'integrale del file di dati in argomento
+drawer:drawer.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
+#controlla i .dat letti in namelist.txt
+analisi:analisi.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
+#si comporta come maincrankC, solo che carica i nomi dei file del potenziale da
+#namelist.txt, e come argomento opzionale ha il file delle CI
+experiment: Experiment.cpp TridiagC.o CrankSolverC.o impostazioniC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
+#visualizza vari potenziali in diversi files.
+CVD: CVDrawer.cpp impostazioniC.o TridiagC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX $(LIBROOT) $(CFLAGSROOT)
+#una interfaccia grafica per impostare un esperimento alla volta
+gui: main.cpp Schrody.o DefineCC.o TridiagC.o CrankSolverC.o libSchrody.so libCC.so
 	@echo Compilo il main
 	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
+
+install: single drawer CVD experiment analisi
+	@echo Sposto i programmi nella cartella Experiment
+	@cp $? ./$(DIR) -v
 
 Schrody.o: Schrody.cpp
 	@echo Compilo $@
@@ -38,20 +68,10 @@ CCDict.cpp: DefineCC.hpp CCLinkDef.h
 libCC.so: CCDict.cpp
 	@echo Compilo la libreria $@
 	@$(CC) $(CFLAGS) $(PIC) -shared -o $@ `root-config --ldflags` $(CFLAGSROOT) $^
-
 #@echo elimino i file GuiPDEDict.*
 #@rm GuiPDEDict.*
 
-clean:
-	@echo Elimino i file *.o
-	@rm *.o -v
-
-
 #ricordati di usare -DUSECOMPLEX!!!
-crank: MainCrank.cpp crankClass.o crankTridiag.o
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o main crankClass.o crankTridiag.o Main.cpp
-
 impostazioni.o: impostazioni.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^ 
@@ -75,43 +95,11 @@ CrankSolver.o: CrankSolver.cpp
 Tridiag.o: Tridiag.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^
-
-crankClassD.o: crankClass.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -DDEBUG -c -o $@ $^
-
-debug: MainCrank.cpp CrankSolverD.o Tridiag.o
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -DDEBUG -o main $^
-
-experiment: Experiment.cpp TridiagC.o CrankSolverC.o impostazioniC.o
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o main $^  -DUSECOMPLEX
-	@echo Sposto il main nella cartella apposita
-	@mv main ./Experiment
-
-CVD: CVDrawer.cpp impostazioniC.o
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX $(LIBROOT) $(CFLAGSROOT)
-	@echo Sposto il main nella cartella apposita
-	@mv $@ ./Experiment
-
-maincrankC: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o main $^  -DUSECOMPLEX
-	@echo Sposto il main nella cartella apposita
-	@mv main ./Experiment
-
+#riolve l'equazione del calore
 maincrank: Main.cpp Tridiag.o CrankSolver.o impostazioni.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o main $^
 
-drawer:drawer.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
-
-analisi:analisi.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
-	@echo Sposto analisi nella cartella apposita
-	@mv analisi ./Experiment
+clean:
+	@echo Elimino i file *.o
+	@rm *.o -v

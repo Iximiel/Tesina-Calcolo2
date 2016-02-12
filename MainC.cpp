@@ -3,20 +3,33 @@
 #include <fstream>
 
 #include "CrankSolver.hpp"
-#include "impostazioni.hpp"//contiene le costanti e il file di impostazioni
+#include "impostazioni.hpp"//contiene le costanti e il file di impostazioniemac
 using namespace std;
 
 int main(int argc, char** argv){
   string filename = "out";
   string ondaSet = "gauss";
-  if(argc>1)
+  string settings = "settings";
+  if(argc>1){
     filename  = argv[1];
-  if(argc>2)
+    size_t num = filename.find(".set");
+    if(num!=string::npos)
+      filename.erase(num);
+  }if(argc>2){
     ondaSet  = argv[2];
+    size_t num = ondaSet.find(".set");
+    if(num!=string::npos)
+      ondaSet.erase(num);
+  }if(argc>3){
+    settings  = argv[3];
+    size_t num = settings.find(".set");
+    if(num!=string::npos)
+      settings.erase(num);
+  }
   cout << "********************************************"<<endl;
-  cout << "carico le impostazioni da " << filename << ".set, " << ondaSet << ".set e settings.set" <<  endl;
+  cout << "carico le impostazioni da " << filename << ".set, " << ondaSet << ".set e "<<settings<<".set" <<  endl;
   //carico il file di impostazioni, per ricompilare meno spesso
-  impostazioni info((ondaSet+".set").c_str(), (filename+".set").c_str(), "settings.set");
+  impostazioni info((ondaSet+".set").c_str(), (filename+".set").c_str(), (settings+".set").c_str());
 
   //imposto la matrice
   tridiag *mat = info.createTriMatrix();
@@ -41,7 +54,7 @@ int main(int argc, char** argv){
   CrankSolver *myIntegrator = new CrankSolver(mat,info.NL());
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator->SetInitialState(initial);
-  filename+="_"+ondaSet;
+  filename=settings+"_"+ondaSet+"_"+filename;
   //file in una cartella superiore
   filename = "./results/"+filename;
   cout << "Inizio i calcoli, salvo su "<< filename << ".dat" << endl;
@@ -64,7 +77,7 @@ int main(int argc, char** argv){
       double control = 0;
       double Time = t * info.timeStep();
       for(int i=0; i< info.NL();i+=info.spaceSkip()){
-    double z = norm(myIntegrator->getPoint(i));
+	double z = norm(myIntegrator->getPoint(i));
 	control +=z;
 	outfile << i* info.spaceStep() << "\t" << Time << "\t"
 		<< z << endl;

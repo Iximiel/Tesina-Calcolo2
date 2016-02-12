@@ -1,0 +1,76 @@
+\section{Introduzione: matematica}
+\subsection{Derivate numeriche}
+Per prima cosa inizio con un piccolo elenco di derivate numeriche, usando il metodo delle differenze numeriche:
+
+La derivata prima (in avanti) \`e:
+\begin{equation}
+\pde{F}x(a) \simeq \frac{F(a+h)-F(a)}{h} + O(h)
+\end{equation}
+Ma la sua precisione \`e al primo ordine, per cui utilizzer\`o la versione cosiddetta ''centrale'':
+\begin{equation}
+\pde{F}x(a) \simeq \frac{F(a+h)-F(a-h)}{2*h} + O(h^2)
+\end{equation}
+
+Per la derivata seconda il discorso e` simile ma in entrambi i casi la precisione \`e sempre al secondo ordine:
+\begin{equation}
+\pde{^2F}{x^2}(a) \simeq \frac{\pde{F}x(a+h)-\pde{F}x(a)}{h} = \frac{F(a+2h)+F(a)-2F(a+h)}{h^2} + O(h^2)
+\end{equation}
+
+\begin{equation}
+\pde{^2F}{x^2}(a) \simeq  \frac{F(a+h)+F(a-h)-2F(a)}{h^2} + O(h^2)
+\end{equation}
+\subsection{Equazione del calore}
+Per prima cosa parto dall'equazione del calore
+\begin{equation}\label{eq:calore}
+\pde Tt =K \pde{^2T}{x^2}
+\end{equation}
+Per calcolare l'equazione come prima cosa calcoliamo le derivate:
+
+\begin{equation}
+\pde Tt\lrt{x,t} = \frac{T(x,t+\Delta t)-T(x,t)}{\Delta t}
+\end{equation}
+e
+\begin{equation}
+\pde{^2T}{x^2}(x,t) = \frac{T(x+\Delta x,t)+T(x-\Delta x,t)-2T(x,t)}{\Delta x^2}
+\end{equation}
+
+Per prima cosa eguaglio le derivate (ma devo ricordare che la risoluzione che si avrebbe precisione $\Delta x^2$ nello spazio e $\Delta t$ nel tempo):
+\begin{equation}
+T(x,t+\Delta t) = k\frac{\Delta t}{\Delta x^2} \lrt{T(x+\Delta x,t)+T(x-\Delta x,t)-2T(x,t)} + T(x,t)
+\end{equation}
+e andando avanti:
+\begin{equation}
+\frac{T(x,t+\Delta t)-T(x,t)}{\Delta t} = k \frac{T(x+\Delta x,t)+T(x-\Delta x,t)-2T(x,t)}{\Delta x^2}
+\end{equation}
+A questo punto calcolo ogni punto conoscendo i tre del passo precedente, ma non aproffondir\`o la cosa.
+
+Oppure posso mettere ugualiare con la derivata spaziale all'istante sucessivo:
+\begin{equation}
+\frac{T(x,t+\Delta t)-T(x,t)}{\Delta t} = k \frac{T(x+\Delta x,t+\Delta t)+T(x-\Delta x,t+\Delta t)-2T(x,t+\Delta t)}{\Delta x^2}
+\end{equation}
+proseguo:
+\begin{equation}
+T(x,t+\Delta t)- k \frac{\Delta t}{\Delta x^2}\lrt{T(x+\Delta x,t+\Delta t)+T(x-\Delta x,t+\Delta t)-2T(x,t+\Delta t)} = T(x,t)
+\end{equation}
+
+Anche in questo caso non approfondisco, preferisco ricavare il metodo di Crank-Nicolson per poi generalizzarlo e descriverne l'algoritmo utilizzato per la risoluzione dell'equazione:
+
+\subsection{Un'esempio di come ricavare il metodo di Crank Nicolson: l'equazione del calore}
+Innanzitutto utilizzamo la definizione centrale della derivata prima in modo da avere una precisione di $\Delta t^2$ anche per quanto riguarda il tempo, ma la calcolo in $t+\Delta t/2$ con incremento $\Delta t$:
+\begin{equation}
+\pde{T}t(x,t+\Delta t/2) \simeq \frac{T(x,t+\Delta t/2+\Delta t/2)-T(x,t-\Delta t/2+\Delta t/2)}{2*\Delta t/2} = \frac{T(x,t+\Delta t)-T(x,t)}{\Delta t}
+\end{equation}
+Per lo spazio utilizziamo le derivate calcolate negli esempi precedenti.
+A questo punto abbiamo $\pde{T}t(x,t+\Delta t/2)$, $\pde{^2T}{x^2}(x,t)$ e $\pde{^2T}{x^2}(x,t+\Delta t)$ per rispettare l'equazione facciamo la media delle due derivate spaziali ai tempi $t$ e $t+\Delta t$.
+\begin{equation}\label{eq:HeatForCrank}
+\begin{aligned}
+\frac{T(x,t+\Delta t)-T(x,t)}{\Delta t} = \frac K2 &\lr(.{\frac{T(x+\Delta x,t)+T(x-\Delta x,t)-2T(x,t)}{\Delta x^2}}\\
+&\lr.){+\frac{T(x+\Delta x,t+\Delta t)+T(x-\Delta x,t+\Delta t)-2T(x,t+\Delta t)}{\Delta x^2}}
+\end{aligned}
+\end{equation}
+
+In pochi passaggi si arriva a separare le parti a tempo differente:, con $\eta = K\frac{\Delta t}{\Delta x^2}$:
+\begin{equation}
+\lrt{\frac 2\eta +2}T(x,t+\Delta t) -T(x+\Delta x,t+\Delta t)-T(x-\Delta x,t+\Delta t) = \lrt{\frac 2\eta -2}T(x,t)+T(x+\Delta x,t)+T(x-\Delta x,t)
+\end{equation}
+Per ogni istante di tempo ho una matrice tridiagonale per il passo temporale che conosco e per quello successivo. In \autoref{section:soluzionetri} descriver\`o come si risolve una di queste matrici.

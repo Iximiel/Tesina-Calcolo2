@@ -1,6 +1,8 @@
 #eseguibili e file generati
 main
 drawer
+experiment
+single
 CCDict.cpp
 SchrodyDict.cpp
 *out.txt
