@@ -3,6 +3,7 @@ main
 drawer
 experiment
 single
+CVD
 CCDict.cpp
 SchrodyDict.cpp
 *out.txt
