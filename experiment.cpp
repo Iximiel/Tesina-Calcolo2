@@ -51,8 +51,9 @@ void experiment(impostazioni* info, string name, string ondaSet){
     Var z = myIntegrator->getPoint(i);
     integral += norm(z);
     outfile << z <<"\n";
+    //outfile << z.real() <<"\t"<<z.imag()<<"\n";
   }
-  // outfile << endl;
+  
   do{
     t = myIntegrator->doStep();
     if(t%info->timeSkip()==0){
@@ -61,8 +62,8 @@ void experiment(impostazioni* info, string name, string ondaSet){
 	Var z = myIntegrator->getPoint(i);
 	control += norm(z);
 	outfile << z <<"\n";
+	//outfile << z.real() <<"\t"<<z.imag()<<"\n";
       }
-      // outfile << endl;
       precision = info->doNextStep(abs(integral-control));
     }
   }while(t<info->NT()&&precision);
