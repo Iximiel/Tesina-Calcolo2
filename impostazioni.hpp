@@ -1,6 +1,7 @@
 #ifndef _Impostazioni
 #define _Impostazioni
 #include "Tridiag.hpp"
+#include <cmath>
 
 namespace costanti{
 #ifdef USECOMPLEX

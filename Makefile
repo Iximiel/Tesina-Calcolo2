@@ -16,7 +16,7 @@ all:single drawer analisi experiment
 #https://root.cern.ch/interacting-shared-libraries-rootcint
 #risolve un'equazione di Schodinger: come primo argonento il file del potenziale
 #come secondo, opzionale, il file che indica le CI, di base e` gauss.set
-single: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o
+single: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
 #disegna soluzione, errore e pesi dell'integrale del file di dati in argomento
@@ -29,7 +29,7 @@ analisi:analisi.cpp
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 #si comporta come maincrankC, solo che carica i nomi dei file del potenziale da
 #namelist.txt, e come argomento opzionale ha il file delle CI
-experiment: Experiment.cpp TridiagC.o CrankSolverC.o impostazioniC.o
+experiment: Experiments.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
 #visualizza vari potenziali in diversi files.
@@ -88,6 +88,10 @@ TridiagC.o: Tridiag.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c -o $@ $^ -DUSECOMPLEX
 
+experimentC.o: experiment.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c -o $@ $^ -DUSECOMPLEX
+
 CrankSolver.o: CrankSolver.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^
@@ -95,6 +99,11 @@ CrankSolver.o: CrankSolver.cpp
 Tridiag.o: Tridiag.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^
+
+experiment.o: experiment.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c $^
+
 #riolve l'equazione del calore
 maincrank: Main.cpp Tridiag.o CrankSolver.o impostazioni.o
 	@echo Compilo $@

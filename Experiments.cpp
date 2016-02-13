@@ -5,10 +5,15 @@
 
 using namespace std;
 
+
 int main(int argc, char** argv){
   string CI = "gauss";
-  if(argc>1)
+  if(argc>1){
     CI  = argv[1];
+    size_t num = CI.find(".set");
+    if(num!=string::npos)
+      CI.erase(num);
+  }
   //carico il file di impostazioni, per ricompilare meno spesso
   impostazioni *info = new impostazioni((CI+".set").c_str(), "settings.set");
 
@@ -21,7 +26,7 @@ int main(int argc, char** argv){
       fname.erase(num);
     experiment(info, fname, CI);
     filenames >> fname;
- }
+  }
   filenames.close();
   cout << "Finito"<<endl;
   return 0;
