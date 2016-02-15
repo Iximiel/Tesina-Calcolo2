@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void experiment(impostazioni* info, string name, string ondaSet){
+void experiment(impostazioni* info, string name, string ondaSet, string settings){
   cout << "Esperimento \"" << name << "\"" << endl;
 
   info->potentialsetting((name+".set").c_str());
@@ -33,15 +33,16 @@ void experiment(impostazioni* info, string name, string ondaSet){
   CrankSolver *myIntegrator = new CrankSolver(mat,info->NL());
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator->SetInitialState(initial);
-  name+="_"+ondaSet;
+  name+="_"+ondaSet+"_"+settings;
   //file in una cartella superiore
   name = "./results/"+name;
   cout << "Inizio i calcoli, salvo su "<< name << ".dat" << endl;
   ofstream outfile(name+".dat");
   int t = 0;
 
-  bool precision = true;//controlla che l'integrale non vari troppo
-  double integral = 0;//precisione voluta
+  bool precision = true, simP2 = true;
+  double integral = 0;
+  
   outfile << info->spaceSkip()
 	  << "\t" << info->NL()
 	  << "\t" <<info->spaceStep()
@@ -49,21 +50,36 @@ void experiment(impostazioni* info, string name, string ondaSet){
   outfile << info->timeSkip()*info->timeStep() << endl;//il delta t tra le righe
   for(int i=0; i< info->NL();i+=info->spaceSkip()){
     Var z = myIntegrator->getPoint(i);
-    integral += norm(z);
+    //integrale di simpson
+    if(i == 0||i== info->NL()-1)
+      integral += norm(z);
+    else{
+      integral += norm(z)*2.*(1+simP2);
+      simP2 = !simP2;
+    }
     outfile << z <<"\n";
     //outfile << z.real() <<"\t"<<z.imag()<<"\n";
   }
-  
+  integral*=info->spaceStep()*info->spaceSkip()/3.;
+  integral = sqrt(integral);
   do{
     t = myIntegrator->doStep();
     if(t%info->timeSkip()==0){
+      simP2 = true;
       double control = 0;
       for(int i=0; i< info->NL();i+=info->spaceSkip()){
 	Var z = myIntegrator->getPoint(i);
-	control += norm(z);
+	if(i == 0||i== info->NL()-1)
+	  integral += norm(z);
+	else{
+	  integral += norm(z)*2.*(1+simP2);
+	  simP2 = !simP2;
+	}
 	outfile << z <<"\n";
 	//outfile << z.real() <<"\t"<<z.imag()<<"\n";
       }
+      control*=info->spaceStep()*info->spaceSkip()/3.;
+      control = sqrt(control);
       precision = info->doNextStep(abs(integral-control));
     }
   }while(t<info->NT()&&precision);

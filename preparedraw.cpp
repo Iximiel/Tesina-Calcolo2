@@ -1,30 +1,26 @@
-#ifndef __CINT__
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <vector>
-#include <complex>
-#include <TROOT.h>
-#include <TApplication.h>
-#include <TStyle.h>
-#include <TCanvas.h>
-#include <TGraph2D.h>
-#include <TGraph.h>
-#include <TAxis.h>
-#include <TMultiGraph.h>
-#include <TF1.h>
 
 using namespace std;
 
-typedef complex<double> Var;
-
-TApplication theApp("app",0,NULL);
-//g++ allDataPrint.cpp `root-config --cflags --glibs`
-int main(int argc, char** argv)
-#endif
-{
-  cout<<"Carico i dati!\n";
-  ifstream f(argv[1]);
+void preparedraw(string fname, TGraph2D* data, TGraph *errs, TGraph *firsthalf, TGraph *secondhalf){
+  if(data!=nullptr){
+    data->Clear();
+    delete data;
+  }
+  if(errs!=nullptr){
+    errs->Clear();
+    delete secondhalf;
+  }
+  if(firsthalf!=nullptr){
+    firsthalf->Clear();
+    delete secondhalf;
+  }
+  if(secondhalf!=nullptr){
+    secondhalf->Clear();
+    delete secondhalf;
+  }
+  cout<<"Carico i dati di "<<fname<<"!\n";
+  ifstream f(fname);
   int Nl, sskip;
   double sstep,tstep;
   //carico le impostazioni
@@ -115,34 +111,8 @@ int main(int argc, char** argv)
     }
   }
   
-  TGraph2D *g = new TGraph2D(Z.size(),X.data(),T.data(),Z.data());
-  g->GetXaxis()->SetTitle("X");
-  g->GetYaxis()->SetTitle("T");
-  cout<<"Disegno i grafici\n";
-  TCanvas c3("c3","Grafico",640,512);
-  TCanvas c1("c1","Confronto",1280,512);
-  c1.Divide(2,1);
-  TGraph *gb = new TGraph(times.size(),times.data(),before.data());
-  TGraph *ga = new TGraph(times.size(),times.data(),after.data());
-  TMultiGraph *mg = new TMultiGraph("integrali","Integrali prima e dopo la barriera");
-  ga->SetLineColor(2);
-  mg->Add(gb);
-  mg->Add(ga);
-  c1.cd(1);
-  mg->Draw("apl");
-    
-  TGraph *gerrs = new TGraph(times.size(),times.data(),diffs.data());
-  gerrs->SetTitle("Andamento degli errori");
-  c1.cd(2);
-  gerrs->Draw("apl");
-  
-  c3.cd();
-  //g->Draw("cont1");
-  g->Draw("pcol");
-  //g->Draw();
-  //grafo.Draw("surf1");
-#ifndef __CINT__
-  theApp.Run(true);
-  return 0;
-#endif
+  data = new TGraph2D(Z.size(),X.data(),T.data(),Z.data());
+  firsthalf = new TGraph(times.size(),times.data(),before.data());
+  secondhalf = new TGraph(times.size(),times.data(),after.data());
+  errs = new TGraph(times.size(),times.data(),diffs.data());
 }

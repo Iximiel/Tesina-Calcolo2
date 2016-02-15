@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
+#include <complex>
 #include <TROOT.h>
 #include <TApplication.h>
 #include <TStyle.h>
@@ -9,9 +11,9 @@
 #include <TGraph2D.h>
 #include <TGraph.h>
 #include <TMultiGraph.h>
-#include <vector>
 #include <TF1.h>
 using namespace std;
+typedef complex<double> Var;
 TApplication theApp("app",0,NULL);
 //g++ allDataPrint.cpp `root-config --cflags --glibs`
 int main(int argc, char** argv)
@@ -29,50 +31,66 @@ int main(int argc, char** argv)
     if(fname.find(".dat")==string::npos)
       fname+=".dat";
     if(fname!=".dat"){
-      cout << fname << ":" << endl;
-      TGraph2D *g = new TGraph2D(fname.c_str());
+      cout << fname << ":" << endl;typedef complex<double> Var;
       cout<<"Analisi errore e integrali \n";
-      int np = g->GetN(), NT = 0;
-      double t = g->GetY()[0];
-      double t2 = t;
-      double integral = g->GetZ()[0];
-      do{
-	NT++;
-	t2 = g->GetY()[NT];
-	integral += g->GetZ()[NT];
-      }while(t2==t);
-      //cout << g->GetY()[NT-1]<<" " << integral <<endl;
-      double initial = integral;
-      vector<double> diffs, times, before,after;
-      diffs.push_back(initial-initial);
-      times.push_back(t);
-      double fhalf=0,shalf=0;
-      for(int i=0;i<NT;i++){
-	double z =  g->GetZ()[i];
-	if(i<NT/2)
-	  fhalf += z;
+      ifstream f(fname);
+      int Nl, sskip;
+      double sstep,tstep;
+      //carico le impostazioni
+      f >> sskip >> Nl >> sstep >> tstep;
+      cout << "Salto spaziale: "<< sskip << ", Passi spaziali:" << Nl
+	   << ", Passo spaziale:" << sstep << "\nPasso temporale:" << tstep << endl;
+      //carico i dati
+      vector<double> Z;
+      //vector<Var> Z;
+      vector<double> X,T;
+      double integral = 0, fhalf=0,shalf=0;
+      //primo passo in t
+      for(int i=0;i<Nl;i+=sskip){
+	Var z;
+	f >> z;
+	integral+=norm(z);//norma L2
+	if(i<Nl/2)
+	  fhalf += norm(z);
 	else
-	  shalf += z;
+	  shalf += norm(z);
+	Z.push_back(abs(z));
+	X.push_back(i*sstep);
+	T.push_back(0);
+	//      g->SetPoint(g->GetN()+1,j*tstep,i*sstep,abs(z));
       }
+      double initial = integral;
+      vector<double> diffs, before,after,times;
+      diffs.push_back(initial-initial);
       before.push_back(fhalf/initial);
       after.push_back(shalf/initial);
-  
-      for (int j=1;j*NT<np;j++){
-	int time = NT*j;
+      times.push_back(T.back());
+      for(int j=1;f.good();j++){
 	integral = fhalf = shalf=0;
-	for(int i=0;i<NT;i++){
-	  double z =  g->GetZ()[time+i];
-	  integral += z;
-	  if(i<NT/2)
-	    fhalf += z;
-	  else
-	    shalf += z;
+	for(int i=0;i<Nl&&f.good();i+=sskip){
+	  Var z;
+	  f >> z;
+	  if(f.good()){
+	    integral+=norm(z);//norma L2
+	    if(i<Nl/2)
+	      fhalf += norm(z);
+	    else
+	      shalf += norm(z);
+	    Z.push_back(abs(z));
+	    X.push_back(i*sstep);
+	    T.push_back(j*tstep);
+	  }
 	}
-	diffs.push_back(initial-integral);
-	before.push_back(fhalf/integral);
-	after.push_back(shalf/integral);
-	times.push_back(g->GetY()[time]);
+	if(f.good()){
+	  diffs.push_back(initial-integral);
+	  before.push_back(fhalf/integral);
+	  after.push_back(shalf/integral);
+	  times.push_back(T.back());
+	}
       }
+  
+      //TGraph2D *g = new TGraph2D(Z.size(),X.data(),T.data(),Z.data());
+
 
       TGraph *gb = new TGraph(times.size(),times.data(),before.data());
       gb->SetTitle(("Prima meta` in " +fname).c_str());    
@@ -87,15 +105,15 @@ int main(int argc, char** argv)
       mg->Add(gb);
       //mg->Add(ga);
       merr->Add(gerrs);
-      g->Clear();
-      delete g;
+      //g->Clear();
+      //delete g;
     }
   }
   TCanvas c1("c1","Confronto",1280,512);
   // c1.Divide(2,1);
   //c1.cd(1);
   // merr->Draw("apl");
-    mg->Draw("apl");
+  mg->Draw("apl");
   c1.BuildLegend(0.2,0.35,0.4,0.65);
   /*
     c1.cd(2);

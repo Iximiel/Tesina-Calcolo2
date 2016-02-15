@@ -162,11 +162,12 @@ bool impostazioni::doNextStep(double error){
 
 tridiag* impostazioni::createTriMatrix(){
   tridiag *mat = new tridiag(Nl);
-    Var Eta = eta() * costanti::I * costanti::hbar;
+  Var Eta = eta() * costanti::I * costanti::hbar;
   
   cout << "eta: "<<Eta<<"=Ih/(2m)*"
        <<timestep<<"/("<<spacestep<<"^2)" <<endl;
-  Var perV =-costanti::I*timestep/Eta;//moltiplicatore del potenziale
+  //moltiplicatore del potenziale
+  Var perV =-(costanti::I*timestep)/(costanti::hbar*Eta);
   //imposto a d c di base
   Var a = -1., d = 2./Eta+2., c = -1.;
   Var ak = 1., dk = 2./Eta-2., ck = 1.;
@@ -187,10 +188,12 @@ tridiag* impostazioni::createTriMatrix(){
     mat->setKnown(0,0,dk + potenziale(0) * perV + 2.*ak*spacestep*weight0,ak+ck,
 		 (-2.) * ak * spacestep * CC0);
   }
+  
   for(int j = 1;j < Nl-1;j++){
     mat->setUnknown(j,a,d - potenziale(j) * perV,c,0);
     mat->setKnown(j,ak,dk + potenziale(j) * perV,ck,0);
   }
+  
   if(infoCC[0]=='D'){
     mat->SetA(1,0);
     mat->SetE(1,a*CC0  );//si sottrae a b1

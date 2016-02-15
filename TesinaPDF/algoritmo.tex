@@ -11,29 +11,37 @@ Il coefficiente della derivata temporale \`e ignorato perch\'e \`e incluso negli
 Inoltre preferisco lasciare $D_1$ e $D_2$ come costanti nel tempo e nello spazio, e lascio la dipendenza temporale e spaziale a $V$ e $U$, che possono essere costanti a loro volta.
 
 In seguito indicher\`o la il passo nello spazio a pedice con $i$ e quello nel tempo in apice con $j$.
-Discretizzando l'equazione ottengo quindi (ho mantenuto la definizione di derivata centrale anche per quella prima spaziale in modo da mantenere la precisione):
+Discretizzando l'equazione ottengo quindi (ho mantenuto la definizione di derivata centrale anche per quella prima spaziale in modo da mantenere la precisione).
+
 \begin{equation}
 \begin{aligned}
-\frac{F_i^{j+1} - F_i^j}{\Delta t} = \frac 12&\lr(.{D_2\frac{F^j_{i+1}+F^{j}_{i-1}-2F_i^{j}}{\Delta x^2} + D_1\frac{F^j_{i+1}-F^{j}_{i-1}}{2\Delta x} + F_i^j V_i^j + U_i^j+}\\
-&\lr.){D_2\frac{F^{j+1}_{i+1}+F^{j+1}_{i-1}-2F_i^{j+1}}{\Delta x^2} + D_1\frac{F^{j+1}_{i+1}-F^{j+1}_{i-1}}{2\Delta x} + F_i^{j+1} V_i^{j+1} + U_i^{j+1}}
+\frac{F_i^{j+1} - F_i^j}{\Delta t} = \frac 12&\lr(.{D_2\frac{F^j_{i+1}+F^{j}_{i-1}-2F_i^{j}}{\Delta x^2} + D_1\frac{F^j_{i+1}-F^{j}_{i-1}}{2\Delta x} + F_i^j V_i^{j+1/2} + U_i^{j+1/2}+}\\
+&\lr.){D_2\frac{F^{j+1}_{i+1}+F^{j+1}_{i-1}-2F_i^{j+1}}{\Delta x^2} + D_1\frac{F^{j+1}_{i+1}-F^{j+1}_{i-1}}{2\Delta x} + F_i^{j+1} V_i^{j+1/2} + U_i^{j+1/2}}
 \end{aligned}
 \end{equation}
-Salto i passaggi e indico con $\eta = \frac {D_2 \Delta t}{\Delta x^2}$ posso scrivere:
+
+Ricordo che l'equazione \`e calcolata all'istante $j+1/2$ e che faccio le medie delle derivate spaziali e della funzione tra gli istanti $j$  e $j+1$, mentre le Funzioni esterne $V$ e $U$ le calcolo in $j+1/2$, dato che sono note.
+Salto i passaggi e indico con $\eta = \frac {D_2 \Delta t}{\Delta x^2}$, posso scrivere:
 \begin{equation}
 \begin{aligned}
-\lrt{-\eta+D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j+1} + \lrt{2 + 2\eta- \Delta t V_i^{j+1}} F^{j+1}_i + \lrt{-\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j+1} - \Delta t U_i^{j+1} = \\
-\lrt{\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j} + \lrt{2-2\eta+\Delta t V_i^{j}} F^{j}_i + \lrt{\eta +D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j} + \Delta t U_i^{j}
+\lrt{-\eta+D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j+1} + \lrt{2 + 2\eta- \Delta t V_i^{j+1/2}} F^{j+1}_i + \lrt{-\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j+1} - \Delta t U_i^{j+1/2} = \\
+\lrt{\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j} + \lrt{2-2\eta+\Delta t V_i^{j+1/2}} F^{j}_i + \lrt{\eta +D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j} + \Delta t U_i^{j+1/2}
 \end{aligned}
 \end{equation}
 
 Per rendere pi\`u chiara spiegazione e risoluzione della matrice tridiagonale riassumo l'equazione precedente in:
 
+\begin{equation}
+a_i^j F_{i-1}^{j+1} + d_i^j F^{j+1}_i + c_i^j F_{i+1}^{j+1} + e_i^j = 
+ak_i^j F_{i-1}^{j} + dk_i^j F^{j}_i + ck_i^j F_{i+1}^{j} + ek_i^j
+\end{equation}
+con:
 \begin{equation}\label{eq:pararametri}
 \begin{array}{ll r}
 a_i^j = -1+\frac{D_1}{D_2}\frac{\Delta x}2             & ak_i^j =1-\frac{D_1}{D_2}\frac{\Delta x}2&\text{parametri dei }(F^*_{i-1})\\
-d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1}} +2 & dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j}} -2 &\text{parametri dei }(F^*_{i})\\
+d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1/2}} +2 & dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j}+1/2} -2 &\text{parametri dei }(F^*_{i})\\
 c_i^j = -1-\frac{D_1}{D_2}\frac{\Delta x}2             & ck_i^j =1+\frac{D_1}{D_2}\frac{\Delta x}2&\text{parametri dei }(F^*_{i+1})\\
-e_i^j = -\frac{\Delta x^2}{D_2} U_i^{j+1}              & ek_i^j =\frac{\Delta x^2}{D_2} U_i^{j}&\text{funzioni esterne}
+e_i^j = -\frac{\Delta x^2}{D_2} U_i^{j+1/2}              & ek_i^j =\frac{\Delta x^2}{D_2} U_i^{j+1/2}&\text{funzioni esterne}
 \end{array}
 \end{equation}
 \subsection{La matrice Tridiagonale: soluzione}\label{section:soluzionetri}

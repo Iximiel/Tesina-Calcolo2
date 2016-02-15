@@ -1,9 +1,9 @@
 \section{Il programma}
-Per semplicita` e allegerire i calcoli ho impostato $\hbar=1$, 
+Per semplicit\`a e allegerire i calcoli ho impostato $\hbar=1$, 
 Gli eseguibili compilabili dal Makefile sono i seguenti, nei commenti \`e spiegato come eseguirli:
 \lstinputlisting[language=make, firstline = 16, lastline = 43,frame = single]{../Makefile}
 \subsection{Impostazioni}
-Il programma piu` semplice, compilabile con \lstinline|$> make maincrankC| carica i dati da tre file di impostazioni:
+Il programma pi\`u semplice, compilabile con \lstinline|$> make maincrankC| carica i dati da tre file di impostazioni:
 il file generale delle impostazioni:
 \lstinputlisting[frame = single,caption=Impostazioni principali]{../settings.set}
 Il file delle condizioni iniziali:
@@ -11,9 +11,15 @@ Il file delle condizioni iniziali:
 Il file del potenziale:
 \lstinputlisting[frame = single,caption=Impostazioni potenziale]{../potenziale.set}
 \subsection{Lancio senza potenziale: errore}
-Prima di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda
+Prima di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
+
+Ho bisogno di definire un ''errore'' per capire quanto la simulazione possa essere andata a buon fine:
+la mia scelta \`e stata di utilizzare la norma della funzione, ricordando che le funzioni d'onda sono $L^2$ e quindi la loro norma \`e  $\lr||f^2=\int_X\lr||f^2d\mu$, utilizzando la definizione dell'integrale discreto di Simpson, il che mi limita a poter fare solo simulazioni con un numero di passi pari (e in particolare miltipli di 4 per avrer un integrale preciso anche quando calcolo prima e seconda met\`a) nello spazio.
+
 scelta dell'integrale -> errore
+
 varie scelte di passi spaziali e temporali e visualizzazione dei vari errori
+
 \subsection{Condizioni al contorno}
 Quello che io voglio simulare \`e un pacchetto d'onda che sia partito da $-\infty$ e arrivi nel ''punto interessante'', che \`e l'area che osservo nella simulazione e poi prosegua fino all'infinito (o venga eventualmente riflesso).
 
@@ -25,19 +31,23 @@ Per quanto riguarda le condizioni al contorno ho avuto idee:
 \end{itemize}
 La prima ipotesi \`e stata quella che ho usato in tutte le prove che ho effettuato prima di iniziare a raccogliere dati.
 
-Per la seconda ipotesi dovrei usare come condizione iniziale una funzione e calcolarne la derivata per ogni passo negli estremi a priori il discorso non si applica ma i pacccheti d'onda hanno una dispersione tendono ad allargarsi, per cui se  per esempio avessi un pacchetto d'onda generico ($\Psi(x,t) = e^{ikx} \psi(x,t)$)la relazione dovrebbe essere $\partial_x \Psi(x,t) = ik \Psi(x,t) + e^{ikx}\partial_x\psi(x,t)$ e potrei quindi utilizzare le CC di Robin in caso conoscessi come la funzione si disperde nel tempo potrei ricalcolare ad ogni passo le condizioni al contorno ed applicarle. Questo per\`o mi porterebbe a svariati problemi quali l'incertezza che la simulazione e la teoria siano esattamente parallele su questa caratteristica dei pacchetti d'onda.
+Per la seconda ipotesi dovrei usare come condizione iniziale una funzione e calcolarne la derivata per ogni passo negli estremi a priori il discorso non si applica ma i pacccheti d'onda hanno una dispersione tendono ad allargarsi, per cui se  per esempio avessi un pacchetto d'onda generico ($\Psi(x,t) = e^{ikx} \psi(x,t)$)la relazione dovrebbe essere $\partial_x \Psi(x,t) = ik \Psi(x,t) + e^{ikx}\partial_x\psi(x,t)$ e potrei quindi utilizzare le CC di Robin in caso conoscessi come la funzione si disperde nel tempo potrei ricalcolare ad ogni passo le condizioni al contorno ed applicarle. Questo per\`o mi porterebbe a svariati problemi quali l'incertezza che la simulazione e la teoria siano esattamente parallele sulla dispersione 
 
-La terza idea potrebbe essere valida, ma mi renderebbe complesso calcolare i coefficienti di riflessione e trasmissione, in quanto le pareti farebbero rimbalzare l'onda.
+La terza idea equivale a utilizzare Dirichlet con il valore della funzione pari a 0 nei bordi. In pratica assomiglia alla mia prima idea, specie se blocco la simulazione prima dell'impatto
 
-Per cui ho deciso di ricercare un'idea che simulasse l'assenza di vincoli: ho trovato le cosiddette condizioni al contorno trasparenti.
+%Per cui ho deciso di ricercare un'idea che simulasse l'assenza di vincoli: ho trovato le cosiddette condizioni al contorno trasparenti.
+%Ma ho lasciato perdere data la loro complessit\`a e il poco tempo a mia disposizione, in quanto utilizza la trasformazione Z
 \subsection{Dispersione e forme dei pacchetti d'onda}
 dispersione teoria e pratica
 \subsection{Condizioni iniziali}
 teoria
+
 simulazione
 \subsection{Dispersione}
 teoria
+
 simulazione
 \subsection{Potenziali}
 teoria
+
 simulazione

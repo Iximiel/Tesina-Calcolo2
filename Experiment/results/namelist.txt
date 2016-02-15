@@ -1,8 +1,0 @@
-Muro_10_10V_gauss.dat
-Muro_10_15V_gauss.dat
-Muro_10_20V_gauss.dat
-Muro_10_5V_gauss.dat
-Bump_10_10V_gauss.dat
-Bump_10_15V_gauss.dat
-Bump_10_20V_gauss.dat
-Bump_10_5V_gauss.dat
