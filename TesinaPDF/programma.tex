@@ -14,11 +14,44 @@ Il file del potenziale:
 Prima di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
 
 Ho bisogno di definire un ''errore'' per capire quanto la simulazione possa essere andata a buon fine:
-la mia scelta \`e stata di utilizzare la norma della funzione, ricordando che le funzioni d'onda sono $L^2$ e quindi la loro norma \`e  $\lr||f^2=\int_X\lr||f^2d\mu$, utilizzando la definizione dell'integrale discreto di Simpson, il che mi limita a poter fare solo simulazioni con un numero di passi pari (e in particolare miltipli di 4 per avrer un integrale preciso anche quando calcolo prima e seconda met\`a) nello spazio.
+la mia scelta \`e stata di utilizzare la norma della funzione, ricordando che le funzioni d'onda sono $L^2$ e quindi la loro norma \`e  $\lr||f^2=\int_X\lr||f^2d\mu$, utilizzando la definizione dell'integrale discreto di Simpson, il che mi limita a poter fare solo simulazioni con un numero di passi pari (e in particolare multipli di 4 per aver un integrale preciso anche quando calcolo l'integrale solo nella prima o seconda met\`a del dominio) nello spazio.
 
-scelta dell'integrale -> errore
+Nella simulazione blocco il calcolo se la norma della funzione si discosta troppo dalla norma delle condizioni iniziali.
 
-varie scelte di passi spaziali e temporali e visualizzazione dei vari errori
+Per capire come impostare le simulazioni ho effettuato diversi lanci con varie combinazioni di passo temporale e passo spaziale. Riporto i vari grafici degli errori.
+Da questi lanci capisco che devo scartare l'idea di usare un passo temporale grande in quanto ho notato che le funzioni d'onda vengono ''rallentate'', come si pu\`o vedere in \autoref{fig:velocita}. Dalle figure noto che le simulazioni devono avere come massimo passo temporale $0.01$. Il punto in cui gli andamenti perdono l'andamento lineare e` dovuto al fatto che il pacchetto sta impattando contro il bordo del dominio e quindi inizia a rimbalzare.
+
+Dato che ho simulato onde con una energia di $10 udm$ mi aspetto che la velocit\`a sia:.....%%%%%
+
+\begin{figure}\label{fig:velocita}
+	\centering
+\begin{subfigure}[b]{0.49\textwidth}
+\includegraphics[width=\textwidth]{IMG/v_g1_0001}
+\caption[Differenze in 0.001]{Le differenze per $dS = 0.001$}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.49\textwidth}
+\includegraphics[width=\textwidth]{IMG/v_g1_001}
+\caption[Differenze in 0.01]{Le differenze per $dS = 0.01$}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.5\textwidth}
+\includegraphics[width=\textwidth]{IMG/v_g1_01}
+\caption[Differenze in 0.1]{Le differenze per $dS = 0.1$}
+\end{subfigure}
+\caption{Le posizioni dei massimi nel tempo della simulazione a vari passi temporali  e spaziali}
+\end{figure}
+
+Poi ho quindi guardato l'errore di alcune simulazioni. Scarto a priori i passi pi\`u grandi di $0.01$.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{IMG/e_g1full}
+\caption[Errori completo]{Il grafico completo degli errori, si vede anche quanto la rilfessione cambi il modulo della funzione}
+\label{fig:fullErr}
+\end{figure}
+
+A questo punto ho fatto una simulazione 
 
 \subsection{Condizioni al contorno}
 Quello che io voglio simulare \`e un pacchetto d'onda che sia partito da $-\infty$ e arrivi nel ''punto interessante'', che \`e l'area che osservo nella simulazione e poi prosegua fino all'infinito (o venga eventualmente riflesso).
@@ -45,6 +78,8 @@ teoria
 simulazione
 \subsection{Dispersione}
 teoria
+
+pacchetti di airi non disperdono-> provare
 
 simulazione
 \subsection{Potenziali}

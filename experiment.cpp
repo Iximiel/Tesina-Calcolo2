@@ -33,7 +33,7 @@ void experiment(impostazioni* info, string name, string ondaSet, string settings
   CrankSolver *myIntegrator = new CrankSolver(mat,info->NL());
   cout << "Imposto le condizioni iniziali" <<endl;
   myIntegrator->SetInitialState(initial);
-  name+="_"+ondaSet+"_"+settings;
+  name+="_"+ondaSet+"-"+settings;
   //file in una cartella superiore
   name = "./results/"+name;
   cout << "Inizio i calcoli, salvo su "<< name << ".dat" << endl;
@@ -47,6 +47,9 @@ void experiment(impostazioni* info, string name, string ondaSet, string settings
 	  << "\t" << info->NL()
 	  << "\t" <<info->spaceStep()
 	  << endl;
+  outfile << info->timeSkip()
+	  << "\t" << info->timeStep()
+	  << endl;  
   outfile << info->timeSkip()*info->timeStep() << endl;//il delta t tra le righe
   for(int i=0; i< info->NL();i+=info->spaceSkip()){
     Var z = myIntegrator->getPoint(i);
@@ -70,9 +73,9 @@ void experiment(impostazioni* info, string name, string ondaSet, string settings
       for(int i=0; i< info->NL();i+=info->spaceSkip()){
 	Var z = myIntegrator->getPoint(i);
 	if(i == 0||i== info->NL()-1)
-	  integral += norm(z);
+	  control += norm(z);
 	else{
-	  integral += norm(z)*2.*(1+simP2);
+	  control += norm(z)*2.*(1+simP2);
 	  simP2 = !simP2;
 	}
 	outfile << z <<"\n";

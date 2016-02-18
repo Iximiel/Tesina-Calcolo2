@@ -11,6 +11,7 @@ todraw.txt
 *.dat
 *.nfo
 analisi
+namelist.txt
 
 #dizionari bit
 *pcm

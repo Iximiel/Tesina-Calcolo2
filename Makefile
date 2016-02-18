@@ -20,11 +20,11 @@ single: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
 #disegna soluzione, errore e pesi dell'integrale del file di dati in argomento
-drawer:drawer.cpp
+drawer:drawer.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 #controlla i .dat letti in namelist.txt
-analisi:analisi.cpp
+analisi:analisi.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 #si comporta come maincrankC, solo che carica i nomi dei file del potenziale da
@@ -72,6 +72,10 @@ libCC.so: CCDict.cpp
 #@rm GuiPDEDict.*
 
 #ricordati di usare -DUSECOMPLEX!!!
+preparedraw.o: preparedraw.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c $^ $(CFLAGSROOT)
+
 impostazioni.o: impostazioni.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^ 

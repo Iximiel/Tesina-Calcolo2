@@ -1,27 +1,52 @@
+#include "preparedraw.hpp"
 #ifndef __CINT__
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
-#include <complex>
 #include <TROOT.h>
 #include <TApplication.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-#include <TGraph2D.h>
-#include <TGraph.h>
 #include <TMultiGraph.h>
-#include <TF1.h>
+//#include <TF1.h>
 using namespace std;
-typedef complex<double> Var;
-TApplication theApp("app",0,NULL);
+
 //g++ allDataPrint.cpp `root-config --cflags --glibs`
 int main(int argc, char** argv)
 #endif
 {
+  string opt = "-e";
+  if(argc>1){
+    if(argv[1][0]=='-')
+      opt = argv[1];
+    if(opt=="--help"){
+      cout << "Di base mostra l'errore dei file .dat elencati in \"namelist.txt\""<<endl;
+      cout << "se in argomente passi un \"-\" seguito da:"<<endl;
+      cout << "\"E\" o \"e\" per mostrare l'errore"<< endl;
+      cout << "\"V\" o \"v\" per mostrare la posizione del massimo"<< endl;
+      cout << "\"F\" o \"f\" per mostrare l'integrale fino a meta` dominio"<< endl;
+      cout << "\"S\" o \"s\" per mostrare l'integrale dopo meta` dominio"<< endl;
+      cout << "Puoi concatenare piu` copmandi es \"-eF\""<<endl;
+      return 0;
+    }
+  }
+  //parser
+  bool err,fh,sh,gv;
+  err=fh=sh=gv=false;
+  if(opt.find('e')!=string::npos||opt.find('E')!=string::npos)
+    err = true;
+  if(opt.find('f')!=string::npos||opt.find('F')!=string::npos)
+    fh = true;
+  if(opt.find('s')!=string::npos||opt.find('S')!=string::npos)
+    sh = true;
+  if(opt.find('v')!=string::npos||opt.find('V')!=string::npos)
+    gv = true;
+#ifndef __CINT__
+  TApplication theApp("app",0,NULL);
+#endif
   int colore = 2;
-  TMultiGraph *mg = new TMultiGraph("integrali","Integrali prima e dopo la barriera");
+  TMultiGraph *mg = new TMultiGraph("integrali","Integrali");
   TMultiGraph *merr = new TMultiGraph("errori","Andamento degli errori");
+  TMultiGraph *mm = new TMultiGraph("massimi","Posizione del massimo nel tempo"); 
   cout<<"Carico i dati\n";
   ifstream filenames("namelist.txt");
   while(!filenames.eof()){
@@ -31,95 +56,67 @@ int main(int argc, char** argv)
     if(fname.find(".dat")==string::npos)
       fname+=".dat";
     if(fname!=".dat"){
-      cout << fname << ":" << endl;typedef complex<double> Var;
-      cout<<"Analisi errore e integrali \n";
-      ifstream f(fname);
-      int Nl, sskip;
-      double sstep,tstep;
-      //carico le impostazioni
-      f >> sskip >> Nl >> sstep >> tstep;
-      cout << "Salto spaziale: "<< sskip << ", Passi spaziali:" << Nl
-	   << ", Passo spaziale:" << sstep << "\nPasso temporale:" << tstep << endl;
-      //carico i dati
-      vector<double> Z;
-      //vector<Var> Z;
-      vector<double> X,T;
-      double integral = 0, fhalf=0,shalf=0;
-      //primo passo in t
-      for(int i=0;i<Nl;i+=sskip){
-	Var z;
-	f >> z;
-	integral+=norm(z);//norma L2
-	if(i<Nl/2)
-	  fhalf += norm(z);
-	else
-	  shalf += norm(z);
-	Z.push_back(abs(z));
-	X.push_back(i*sstep);
-	T.push_back(0);
-	//      g->SetPoint(g->GetN()+1,j*tstep,i*sstep,abs(z));
-      }
-      double initial = integral;
-      vector<double> diffs, before,after,times;
-      diffs.push_back(initial-initial);
-      before.push_back(fhalf/initial);
-      after.push_back(shalf/initial);
-      times.push_back(T.back());
-      for(int j=1;f.good();j++){
-	integral = fhalf = shalf=0;
-	for(int i=0;i<Nl&&f.good();i+=sskip){
-	  Var z;
-	  f >> z;
-	  if(f.good()){
-	    integral+=norm(z);//norma L2
-	    if(i<Nl/2)
-	      fhalf += norm(z);
-	    else
-	      shalf += norm(z);
-	    Z.push_back(abs(z));
-	    X.push_back(i*sstep);
-	    T.push_back(j*tstep);
-	  }
-	}
-	if(f.good()){
-	  diffs.push_back(initial-integral);
-	  before.push_back(fhalf/integral);
-	  after.push_back(shalf/integral);
-	  times.push_back(T.back());
-	}
-      }
-  
-      //TGraph2D *g = new TGraph2D(Z.size(),X.data(),T.data(),Z.data());
+      cout <<"*\n"<< fname << ":" << endl;
 
-
-      TGraph *gb = new TGraph(times.size(),times.data(),before.data());
-      gb->SetTitle(("Prima meta` in " +fname).c_str());    
-      TGraph *ga = new TGraph(times.size(),times.data(),after.data());
-      ga->SetTitle(("Seconda meta` in " +fname).c_str());
-      TGraph *gerrs = new TGraph(times.size(),times.data(),diffs.data());
-      gerrs->SetTitle((fname).c_str());
-      gerrs->SetLineColor(colore);
-      ga->SetLineColor(colore);
-      ga->SetLineStyle(3);
-      gb->SetLineColor(colore++);
-      mg->Add(gb);
-      //mg->Add(ga);
-      merr->Add(gerrs);
-      //g->Clear();
-      //delete g;
+      TGraph2D *g = nullptr;
+      TGraph *gb = nullptr;//before
+      TGraph *ga = nullptr;//after
+      TGraph *gerrs = nullptr;
+      TGraph *maxs = nullptr;
+	    
+      preparedraw(fname,g,gerrs,gb,ga,maxs);
+      
+      //aggiungo i grafici ai multigraph e cancello oi grafici che pesano sulla memoria
+      if(gv){
+	maxs->SetLineColor(colore);	
+	mm->Add(maxs);
+      }else
+	delete maxs;
+      
+      if(fh){
+	gb->SetLineColor(colore);
+	mg->Add(gb);
+      }else
+	delete gb;
+      
+      if(sh){
+	ga->SetLineColor(colore);
+	ga->SetLineStyle(3);
+	mg->Add(ga);
+      }else
+	delete ga;
+      
+      if(err){
+	gerrs->SetLineColor(colore);
+	merr->Add(gerrs);
+      }else
+	delete gerrs;
+      
+      delete g;
+      colore++;
     }
   }
-  TCanvas c1("c1","Confronto",1280,512);
-  // c1.Divide(2,1);
-  //c1.cd(1);
-  // merr->Draw("apl");
-  mg->Draw("apl");
-  c1.BuildLegend(0.2,0.35,0.4,0.65);
-  /*
-    c1.cd(2);
+  TCanvas*E   = nullptr;
+  TCanvas*PM  = nullptr;
+  TCanvas*Int = nullptr;
+  
+  if(fh||sh){
+    Int = new TCanvas("Int","Integrale",800,600);
+    mg->Draw("apl");
+    Int->BuildLegend(0.2,0.35,0.4,0.65);
+  }
+  if(err){
+    E = new TCanvas("E","Errore",800,600);
+    E->cd();
     merr->Draw("apl");
-    c1.BuildLegend();
-  */
+    E->BuildLegend(0.5,0.875,0.125,0.675);
+  }
+  if(gv){
+    PM = new TCanvas("PM","Posizione Massimi",800,600);
+    PM->cd();
+    mm->Draw("apl");
+    PM->BuildLegend(0.5,0.875,0.125,0.675);
+  }
 #ifndef __CINT__
   theApp.Run(true);
   return 0;
