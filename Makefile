@@ -24,7 +24,7 @@ drawer:drawer.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 #controlla i .dat letti in namelist.txt
-analisi:analisi.cpp preparedraw.o
+analisi:analisi.cpp preparedraw1D.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 #si comporta come maincrankC, solo che carica i nomi dei file del potenziale da
@@ -37,8 +37,12 @@ CVD: CVDrawer.cpp impostazioniC.o TridiagC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX $(LIBROOT) $(CFLAGSROOT)
 #una interfaccia grafica per impostare un esperimento alla volta
+preview: preview.cpp visual.o libVisual.so
+	@echo Compilo $@ 
+	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
+
 gui: main.cpp Schrody.o DefineCC.o TridiagC.o CrankSolverC.o libSchrody.so libCC.so
-	@echo Compilo il main
+	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
 
 install: single drawer CVD experiment analisi
@@ -52,6 +56,14 @@ Schrody.o: Schrody.cpp
 DefineCC.o: DefineCC.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^ $(LIBROOT) $(CFLAGSROOT)
+
+visualDict.cpp: visual.hpp visualLinkDef.h
+	@echo Chiamo rootcint per compilare la libreria $@
+	@rootcint -f $@ -c $^
+
+libVisual.so: visualDict.cpp
+	@echo Compilo la libreria $@
+	@$(CC) $(CFLAGS) $(PIC) -shared -o $@ `root-config --ldflags` $(CFLAGSROOT) $^
 
 SchrodyDict.cpp: Schrody.hpp SchrodyLinkDef.h
 	@echo Chiamo rootcint per compilare la libreria $@
@@ -72,9 +84,17 @@ libCC.so: CCDict.cpp
 #@rm GuiPDEDict.*
 
 #ricordati di usare -DUSECOMPLEX!!!
+visual.o: visual.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c $^ $(CFLAGSROOT)
+
 preparedraw.o: preparedraw.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^ $(CFLAGSROOT)
+
+preparedraw1D.o: preparedraw.cpp
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -c -o $@ $^ $(CFLAGSROOT) -D_NO2D
 
 impostazioni.o: impostazioni.cpp
 	@echo Compilo $@

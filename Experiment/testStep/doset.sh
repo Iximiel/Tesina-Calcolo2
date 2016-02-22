@@ -5,7 +5,7 @@ do
     do
 	fname=sets$dS'_'$dT.set
 	echo $fname
-	../../single free.set gauss1.set $fname
+#	../../single free.set gauss1.set $fname
 	../../single free.set gauss2.set $fname
     done
 done

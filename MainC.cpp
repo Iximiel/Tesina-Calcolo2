@@ -10,7 +10,7 @@ int main(int argc, char** argv){
   if(argc>1){
     filename  = argv[1];
     if(filename == "--help"){
-      cout << "Utilizzo degli argomenti:\n"
+      cout << "Utilizzo degli argomenti: nomepotenziale nomeCondizioniIniziali nomefileimpostazioni\n"
 	   << "nomepotenziale(.set) il file che contiene il potenziale, default \"free.set\"\n"
 	   << "nomeCondizioniIniziali(.set) il file che condiete le informazioni sulle condizioni iniziali, default \"gauss.set\"\n"
 	   << "nomefileimpostazioni(.set) di base \"settings.set\"\n";

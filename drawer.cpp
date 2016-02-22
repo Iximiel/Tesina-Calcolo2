@@ -19,11 +19,11 @@ int main(int argc, char** argv)
   TCanvas c1("c1","Confronto",1280,512);
   c1.Divide(2,1);
   
-  TGraph2D *g = nullptr;
-  TGraph *gb = nullptr;//before
-  TGraph *ga = nullptr;//after
-  TGraph *gerrs = nullptr;
-  TGraph *dummy = nullptr;
+  TGraph2D *g = new TGraph2D();
+  TGraph *gb = new TGraph();//before
+  TGraph *ga = new TGraph();//after
+  TGraph *gerrs = new TGraph();
+  TGraph *dummy = new TGraph();
   
   preparedraw(argv[1],g,gerrs,gb,ga,dummy);
 

@@ -7,38 +7,27 @@
 using namespace std;
 
 typedef complex<double> Var;
-
-void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthalf, TGraph *&secondhalf, TGraph *&maximum){
-  if(data!=nullptr){
-    data->Clear();
-    delete data;
-  }
-  if(errs!=nullptr){
-    errs->Clear();
-    delete secondhalf;
-  }
-  if(firsthalf!=nullptr){
-    firsthalf->Clear();
-    delete secondhalf;
-  }
-  if(secondhalf!=nullptr){
-    secondhalf->Clear();
-    delete secondhalf;
-  }
-  if(maximum!=nullptr){
-    maximum->Clear();
-    delete maximum;
-  }
+#ifdef _NO2D
+void preparedraw(string fname, TGraph *errs, TGraph *firsthalf, TGraph *secondhalf, TGraph *maximum){
+#else
+void preparedraw(string fname, TGraph2D* data, TGraph *errs, TGraph *firsthalf, TGraph *secondhalf, TGraph *maximum){
+  data->Clear();
+#endif  
+  errs->Clear();
+  firsthalf->Clear();
+  secondhalf->Clear();
+  maximum->Clear();
+  
   cout<<"Carico i dati di "<<fname<<"!\n";
   ifstream f(fname);
   int Nl, sskip, tskip;
   double sstep,atstep,tstep;
   //carico le impostazioni
   f >> sskip >> Nl >> sstep >>tskip >> atstep;
-  tstep = atstep * tskip;
+  f >> tstep;//tstep tra le righe
   cout << "Salto spaziale: "<< sskip << ", Passi spaziali:" << Nl
        << ", Passo spaziale:" << sstep <<endl;
-  cout << "Salto temporale: "<< sskip << ", Passo temporale:" << atstep
+  cout << "Salto temporale: "<< tskip << ", Passo temporale:" << atstep
        << "\nPasso temporale registrato: "<< tstep << endl;
   //carico i dati
   vector<double> Z;
@@ -49,7 +38,8 @@ void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthal
   double max = -999999;
   double pos = 0;
   //primo passo in t
-  for(int i=0;i<Nl;i+=sskip){
+
+  for(int i=0;i<Nl;i++){
     Var z;
     f >> z;
     //integrale di simpson
@@ -72,7 +62,7 @@ void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthal
       simP2 = !simP2;
     }
     Z.push_back(abs(z));
-    X.push_back(i*sstep);
+    X.push_back(i*sskip*sstep);
     T.push_back(0);
     
     if(Z.back()>max){
@@ -80,7 +70,7 @@ void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthal
       pos = X.back();
     }
   }
-  
+
   integral *= sstep*sskip/3.;
   fhalf *= sstep*sskip/3.;
   shalf *= sstep*sskip/3.;
@@ -100,7 +90,7 @@ void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthal
     simP2 = true;
     max = -999999;
     pos = 0;
-    for(int i=0;i<Nl&&f.good();i+=sskip){
+    for(int i=0;i<Nl&&f.good();i++){
       Var z;
       f >> z;
       if(f.good()){
@@ -124,7 +114,7 @@ void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthal
 	  simP2 = !simP2;
 	}
 	Z.push_back(abs(z));
-	X.push_back(i*sstep);
+	X.push_back(i*sskip*sstep);
 	T.push_back(j*tstep);
 	
 	if(Z.back()>max){
@@ -169,11 +159,13 @@ void preparedraw(string fname, TGraph2D* &data, TGraph *&errs, TGraph *&firsthal
   sprintf(title,"%s, %s, dT=%g, dS=%g",pot.c_str(),CI.c_str(),atstep,sstep);
   sprintf(title2,"dT=%g, dS=%g in %s %s",atstep,sstep,pot.c_str(),CI.c_str());
   //to_string();
-  data       = new TGraph2D(Z.size(),X.data(),T.data(),Z.data());
-  firsthalf  = new TGraph(times.size(), times.data(), before.data());
-  secondhalf = new TGraph(times.size(), times.data(), after.data());
-  errs       = new TGraph(times.size(), times.data(), diffs.data());
-  maximum    = new TGraph(times.size(), times.data(), maxs.data());
+#ifndef _NO2D
+  *data       = *(new TGraph2D(Z.size(),X.data(),T.data(),Z.data()));
+#endif
+  *firsthalf  = *(new TGraph(times.size(), times.data(), before.data()));
+  *secondhalf = *(new TGraph(times.size(), times.data(), after.data()));
+  *errs       = *(new TGraph(times.size(), times.data(), diffs.data()));
+  *maximum    = *(new TGraph(times.size(), times.data(), maxs.data()));
   /*  firsthalf  -> SetTitle((title).c_str());
   secondhalf -> SetTitle((title).c_str());
   errs       -> SetTitle((title2).c_str());

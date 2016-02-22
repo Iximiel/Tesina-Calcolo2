@@ -1,3 +1,4 @@
+#define _NO2D
 #include "preparedraw.hpp"
 #ifndef __CINT__
 #include <iostream>
@@ -58,13 +59,12 @@ int main(int argc, char** argv)
     if(fname!=".dat"){
       cout <<"*\n"<< fname << ":" << endl;
 
-      TGraph2D *g = nullptr;
-      TGraph *gb = nullptr;//before
-      TGraph *ga = nullptr;//after
-      TGraph *gerrs = nullptr;
-      TGraph *maxs = nullptr;
+      TGraph *gb = new TGraph();//before
+      TGraph *ga = new TGraph();//after
+      TGraph *gerrs = new TGraph();
+      TGraph *maxs = new TGraph();
 	    
-      preparedraw(fname,g,gerrs,gb,ga,maxs);
+      preparedraw(fname,gerrs,gb,ga,maxs);
       
       //aggiungo i grafici ai multigraph e cancello oi grafici che pesano sulla memoria
       if(gv){
@@ -91,11 +91,11 @@ int main(int argc, char** argv)
 	merr->Add(gerrs);
       }else
 	delete gerrs;
-      
-      delete g;
+     
       colore++;
     }
   }
+
   TCanvas*E   = nullptr;
   TCanvas*PM  = nullptr;
   TCanvas*Int = nullptr;

@@ -23,7 +23,7 @@ Da questi lanci capisco che devo scartare l'idea di usare un passo temporale gra
 
 Dato che ho simulato onde con una energia di $10 udm$ mi aspetto che la velocit\`a sia:.....%%%%%
 
-\begin{figure}\label{fig:velocita}
+\begin{figure}[h]
 	\centering
 \begin{subfigure}[b]{0.49\textwidth}
 \includegraphics[width=\textwidth]{IMG/v_g1_0001}
@@ -39,19 +39,47 @@ Dato che ho simulato onde con una energia di $10 udm$ mi aspetto che la velocit\
 \includegraphics[width=\textwidth]{IMG/v_g1_01}
 \caption[Differenze in 0.1]{Le differenze per $dS = 0.1$}
 \end{subfigure}
-\caption{Le posizioni dei massimi nel tempo della simulazione a vari passi temporali  e spaziali}
+\caption{Le posizioni dei massimi nel tempo della simulazione a vari passi temporali  e spaziali}\label{fig:velocita}
 \end{figure}
 
 Poi ho quindi guardato l'errore di alcune simulazioni. Scarto a priori i passi pi\`u grandi di $0.01$.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics[width=0.7\linewidth]{IMG/e_g1full}
-\caption[Errori completo]{Il grafico completo degli errori, si vede anche quanto la rilfessione cambi il modulo della funzione}
-\label{fig:fullErr}
+\begin{subfigure}[b]{0.49\textwidth}
+\includegraphics[width=\linewidth]{IMG/e_g1full}
+\caption[Errori completo]{Il grafico completo degli errori, si vede anche quanto la riflessione influsisca sul modulo della funzione}\label{fig:fullErr}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.49\textwidth}
+	\includegraphics[width=\linewidth]{IMG/e_g1res}
+	\caption[Errori zoom]{Il grafico completo degli errori uno zoom sugli andamenti non influenzati dalla riflessione}\label{fig:fullErrzoom}
+\end{subfigure}
 \end{figure}
 
-A questo punto ho fatto una simulazione 
+A questo punto ho fatto una simulazione diminuendo il tempo a $6$ in modo da non avere a che fare con l'esplosione dell'errore dovuta al limite del dominio. e cosi` da poter osservare quale fosse il miglior passo spaziale. Ho fatto i lanci con due diverse condizioni al contorno (gaussiano con $\sigma$ $1$ e $2$). 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{IMG/eChoosy1}
+		\caption{CI: gaussiana($\sigma=2$)}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{IMG/eChoosy2}
+		\caption{CI: gaussiana($\sigma=2$)}
+	\end{subfigure}
+	\caption{I passi che mi se,bravano pi\`u opportuni a confronto}\label{fig:SceltaErrori}
+\end{figure}
+
+Osservando \autoref{fig:SceltaErrori} utilizzare come passi spaziali e temporali valori compresi tra $0.01$ e $0.001$ ha un buon rapporto errore(il cui modulo \`e inferiore a $10^-7$)/peso sul calcolatore, in particolare si nota che il passo spaziale pesa di pi\`u sull'errore. Ho scelto di continuare con $dT = 0.01$ e $dS = 0.005$ in quanto hanno errore molto simile a $dS = 0.001$ (\autopageref{fig:sceltaPassi}) ma sono pi\`u rapidi nei calcoli (sulla mia macchina).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{IMG/sceltaPassi}
+\caption[Scelta Passi]{Gli errori dei passi che ritengo pi\`u convenienti}\label{fig:sceltaPassi}
+\end{figure}
 
 \subsection{Condizioni al contorno}
 Quello che io voglio simulare \`e un pacchetto d'onda che sia partito da $-\infty$ e arrivi nel ''punto interessante'', che \`e l'area che osservo nella simulazione e poi prosegua fino all'infinito (o venga eventualmente riflesso).
@@ -71,15 +99,162 @@ La terza idea equivale a utilizzare Dirichlet con il valore della funzione pari 
 %Per cui ho deciso di ricercare un'idea che simulasse l'assenza di vincoli: ho trovato le cosiddette condizioni al contorno trasparenti.
 %Ma ho lasciato perdere data la loro complessit\`a e il poco tempo a mia disposizione, in quanto utilizza la trasformazione Z
 \subsection{Dispersione e forme dei pacchetti d'onda}
-dispersione teoria e pratica
+
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{IMG/dispersione_0}
+	\end{subfigure}\\
+\foreach \x in {1,3,7,10}{
+\begin{subfigure}[b]{0.4\textwidth}
+\centering
+\includegraphics[width=\textwidth]{IMG/dispersione_\x}
+\end{subfigure}
+\ifthenelse{\equal{\x}{3}}{\\}{~} 
+}
+\caption{La dispersione delle gaussiana a $\sigma =1$}\label{fig:dispersione}
+\end{figure}
+
+La prima cosa che si pu\`o osservare nelle simulazioni (e in particolare in \autoref{fig:dispersione}) \`e la dispersione dell'onda, ovvero il pacchetto si allarga nel tempo. Questa \`e una caratteristica dell'equazione di \Schrodinger.
+Per ottenere la soluzione dell'equazione con condizioni iniziali $\psi\lrt{x,0}=e^{-\frac{x^2}{2\sigma^2}}$ si passa dalla trasformata di Fourier spaziale $\hat\psi\lrt{x,0}=\sqrt{2\pi\sigma^2} e^{-\frac{k^2 \sigma^2}2}$, che porta ad avere la funzione, con dipendenza temporale:
+
+\begin{equation}
+\hat{\psi}\lrt{k,t} = \sqrt{2\pi\sigma^2} e^{-\frac{k^2 \sigma^2}2} e^{-i\frac E\hbar t} =
+\sqrt{2\pi\sigma^2} e^{-\frac{k^2 \sigma^2}2} e^{-i\frac {\hbar^2 k^2/2m}\hbar t} = 
+\sqrt{2\pi\sigma^2} e^{-k^2\frac{\lrt{\sigma^2+i\hbar t/m}}2 }
+\end{equation}
+e poi ritrasformando:
+\begin{equation}
+\psi\lrt{x,t} = \frac{\sigma}{\sqrt{\sigma^2 + i\hbar t /m}}
+e^{-\frac{k^2}{2\lrt{\sigma + i\hbar t/m}}}
+\end{equation}
+quelle che rappresento sono i valori assoluti della funzione:
+\begin{equation}
+\lr||{\psi\lrt{x,t}} = \frac{\sigma}{\sqrt[4]{\sigma^4 + \lrt{\hbar t /m}^2}}
+e^{-\frac{k^2}2\frac{\sigma^2}{\sigma^4 + \lrt{\hbar t /m}^2}} = \sqrt{\frac{\sigma_0}{\sigma(t)}}e^{-\frac{k^2}{2\sigma^2(t)}}
+\end{equation}
+
+E, chiamando $\sigma_0$ il valore assegnato nelle condizioni iniziali, mi aspetto dalla simulazione che $\sigma$ evolva come
+\begin{equation}\label{eq:sigmat}
+\sigma(t) = \sqrt{\frac{\sigma_0^4+\lrt{\frac\hbar m t}^2}{\sigma_0^2}}
+\end{equation}
+
+Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori di $\sigma$ iniziali, utilizzando come funzione da fittare \eqref{eq:sigmat}. E l'algoritmo sembra funzionare per quanto riguarda la dispersione,  come si pu\`o vede re in \autoref{fig:dispersioneFitSigma1}, in
+\autoref{fig:dispersioneFitSigma4} e \autoref{fig:dispersioneFitE} in dove la funzione ha energia diversa da 0
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+	\includegraphics[width=\linewidth]{IMG/dispersione_p}
+	\caption{$\sigma_0=1$, $m=1$}
+	\end{subfigure}
+		~
+\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m10}
+		\caption{$\sigma_0=1$, $m=10$}
+ \end{subfigure}
+ ~
+ \begin{subfigure}[b]{0.3\textwidth}
+ 	\includegraphics[width=\linewidth]{IMG/dispersione_m2}
+ 	\caption{$\sigma_0=1$, $m=2$}
+ \end{subfigure}
+ \caption{Alcuni fit dell'andamento della dispersione}\label{fig:dispersioneFitSigma1}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m1s4}
+		\caption{$\sigma_0=4$, $m=1$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m10s4}
+		\caption{$\sigma_0=4$, $m=10$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m2s4}
+		\caption{$\sigma_0=4$, $m=10$}
+	\end{subfigure}
+	\caption{Alcuni fit dell'andamento della dispersione}\label{fig:dispersioneFitSigma4}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m1s1e10}
+		\caption{$\sigma_0=1$, $m=1$, con $E=10$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m1s2e10}
+		\caption{$\sigma_0=2$, $m=1$, con $E=10$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\linewidth]{IMG/dispersione_m1s1e10}
+		\caption{$\sigma_0=4$, $m=1$, con $E=10$}
+	\end{subfigure}
+	\caption{Alcuni fit dell'andamento della dispersione}\label{fig:dispersioneFitE}
+\end{figure}
+
+\begin{table}
+	\centering
+\begin{tabular}{cccc|cccc}
+	\toprule
+	t	&$\alpha$	&$\bar x$& $\sigma$ &	t	&	$\alpha$	&$\bar x$& $\sigma$\\ \toprule
+	0   & 1        & 40 & 1       & 5.5 & 0.422955 & 40 & 5.59001 \\ \midrule
+	0.5 & 0.94574  & 40 & 1.11803 & 6   & 0.405467 & 40 & 6.08259 \\ \midrule
+	1   & 0.840898 & 40 & 1.4142  & 6.5 & 0.389951 & 40 & 6.57628 \\ \midrule
+	1.5 & 0.744796 & 40 & 1.80272 & 7   & 0.376066 & 40 & 7.07086 \\ \midrule
+	2   & 0.668766 & 40 & 2.23596 & 7.5 & 0.363549 & 40 & 7.56615 \\ \midrule
+	2.5 & 0.609451 & 40 & 2.69242 & 8   & 0.352191 & 40 & 8.06202 \\ \midrule
+	3   & 0.562349 & 40 & 3.16219 & 8.5 & 0.341825 & 40 & 8.55837 \\ \midrule
+	3.5 & 0.524146 & 40 & 3.63995 & 9   & 0.332317 & 40 & 9.05512 \\ \midrule
+	4   & 0.492486 & 40 & 4.12299 & 9.5 & 0.323555 & 40 & 9.55221 \\ \midrule
+	4.5 & 0.465765 & 40 & 4.60964 & 10  & 0.315447 & 40 & 10.0496 \\ \midrule
+	5   & 0.442856 & 40 & 5.09887 &     &          &    &         \\ \bottomrule
+\end{tabular}
+\caption{I dati di una simulazione, con $\alpha = 1$, $\sigma=1$ e $m=1$ }\label{table:dispersioneg1}
+\end{table}
+
 \subsection{Condizioni iniziali}
-teoria
+A questo punto provo anche a utilizzare la funzione ''bump'' come condizioni iniziale:
+\begin{equation}
+bump\lrt{x} = \lr\{.{\begin{array}{lr}
+e^{-\frac{1}{1-x^2}}&\text{per }\lr||{x}<1\\
+0&\text{altrove}
+\end{array}}
+\end{equation}
+
+\begin{figure}
+	\centering
+\begin{tikzpicture}
+\draw[->] (-2,0) -- (2,0) node[right] {$x$};
+\draw[->] (0,-0.2) -- (0,1) node[above] {$y$};
+%\draw[domain=-0.9:0.9,variable=\x,blue] plot[id = bump] ({\x},{exp(-1/(1-\x*\x))});
+\draw[domain=-2:2, samples =501,variable=\x,blue] plot[id=bump] function{x*x<1? exp(-1/(1-x*x)) :0};
+
+\end{tikzpicture}
+	\caption{La funzione bump}
+\end{figure}
+
+In particolare io ho usato:
+\begin{equation}\label{eq:mybump}
+bump = \lrt{x} = \lr\{.{\begin{array}{lr}
+	e^{-\frac{b^2}{b^2-\lrt{x-a}^2}}&\text{per }\lr||{x-a}<b\\
+	0&\text{altrove}
+	\end{array}}
+\end{equation}
 
 simulazione
 \subsection{Dispersione}
 teoria
 
-pacchetti di airi non disperdono-> provare
+%pacchetti di Airy non disperdono-> provare
 
 simulazione
 \subsection{Potenziali}
