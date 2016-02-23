@@ -1,7 +1,7 @@
 #!/bin/bash
-for dT in 0.01 0.001 0.0001
+for dT in 0.01 0.001
 do
-    for dS in 0.1 0.01 0.001
+    for dS in 0.01 0.001
     do
 	fname=sets$dS'_'$dT.set
 	echo $fname

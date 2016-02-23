@@ -29,10 +29,13 @@ void impostazioni::wavesetting(const char* wavefile){
   char tipo;
   file >> dummy >> tipo;
   cout << "Condizioni iniziali:" << endl;
-  if(tipo == 'B'||tipo == 'b'){
+  switch(tipo){
+  case 'B':
+  case 'b':
     ini = bump;
     cout << "\t\"Bump\""<<endl;
-  }else{
+    break;
+  default:
     ini = gauss;
     cout << "\tGaussiana"<<endl;
   }
@@ -83,11 +86,9 @@ void impostazioni::potentialsetting(const char* potentialfile){
       break;
     case 'm':
     case 'M':
-      if(Vpos > Vpar){
-	double temp = Vpos;
-	Vpos = Vpar;
-	Vpar = temp;
-      }
+      //converto centro+larghezza in salita+discesa
+      Vpos -= Vpar/2.;
+      Vpar += Vpos;
       cout << "\tBarriera:\n\t\tsalita: " << Vpos <<", discesa "<< Vpar <<endl;  
       pot = &barrier;
       break;
@@ -124,6 +125,11 @@ void impostazioni::simulationsetting(const char* simulationfile){
     cout << "Passi spaziali: " << Nl <<endl;
     cout << "Passi temporali: " << Nt <<endl;
   }
+  //protezione da errore di scrittura
+  if(timeskip<1)
+    timeskip = 1;
+  if(spaceskip<1)
+    spaceskip = 1;
   file.close();
 }
   
@@ -153,7 +159,9 @@ Var impostazioni::Initial(int i){//Condizione iniziale
 }
 
 bool impostazioni::doNextStep(double error){
-  if(error>precision){
+  if(precision <=0)
+    return true;
+  else if(error>precision){
     cout <<"Annullo per degenerazione della precisione"<<endl;
     return false;
   }else
@@ -171,8 +179,9 @@ tridiag* impostazioni::createTriMatrix(){
   //imposto a d c di base
   Var a = -1., d = 2./Eta+2., c = -1.;
   Var ak = 1., dk = 2./Eta-2., ck = 1.;
-  cout << "a= "<< a <<" d=" <<d << " c="<< c<<endl;
-  cout << "ak= "<< ak <<" dk=" <<dk << " ck="<< c<<endl;
+  cout << "Valori di base: " << endl;
+  cout << "a= "<< a <<" d=" << d << " c=" << c <<endl;
+  cout << "ak= "<< ak <<" dk=" << dk << " ck=" << c <<endl;
   //CC in 0
   if(infoCC[0]=='D'){
     mat->setUnknown(0,0,1,0,0);

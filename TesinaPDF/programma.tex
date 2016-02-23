@@ -1,16 +1,54 @@
 \section{Il programma}
-Per semplicit\`a e allegerire i calcoli ho impostato $\hbar=1$, 
+Per semplicit\`a e alleggerire i calcoli ho impostato $\hbar=1$, 
 Gli eseguibili compilabili dal Makefile sono i seguenti, nei commenti \`e spiegato come eseguirli:
 \lstinputlisting[language=make, firstline = 16, lastline = 43,frame = single]{../Makefile}
+
+Il programma pi\`u semplice (\lstinline|$> make single|) \`e composto da un blocco \textit{impostazioni} che carica i file con le informazioni sulla simulazione, crea la trimatrice e le condizioni iniziali ,e un blocco \textit{CrankSolver} che si occupa di svolgere risolvere il sistema passo per passo (nel nostro caso non avendo potenziali che dipendono dal tempo la riduzione della trimatrice viene fatta solo una volta, nella costruzione del \textit{CrankSolver}).
+Ho scelto di impostare il \textit{CrankSolver} in modo che contenga solo i punti del passo attuale perch\'e l'elevato numero di punti rischia di intasare la memoria del sistema piuttosto in fretta: i punti calcolati vengono salvati su un file in una cartella ''./results'' che deve essere creata prima di lanciare l'eseguibile, il numero di punti e la frequenza di essi viene deciso nei file di impostazione.
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}[mindmap, concept color = orange!50,every node/.style = {concept}]
+\node (main){main}
+	child[concept color = orange,grow = 180]{node(impostazioni){Impostazioni}
+	child[concept color = red, grow = 200]{node {file\\potenziale}}
+	child[concept color = red, grow = 20]{node (pot){Potenziale}
+		child[concept color = yellow, grow = right, level 2 concept]{node(tridiag){matrice\\tridiagonale}}}
+	child[concept color = blue!75, grow = 140]{node {file\\onda}}
+	child[concept color = blue!75, grow = -20]{node (CC){CC}}
+	child[concept color = blue!75, grow = -60]{node (CI){CI}}
+	child[concept color = green, grow = 240]{node {file\\settings}}
+	child[concept color = green, grow = 60]{node (con){passi e \\costanti}
+		child[concept color = green, grow = right] {node(eta){$\eta$}}}
+}
+	child[concept color = orange,grow =05] {node (Solver) {CrankSolver}}
+	child[concept color = red!50,grow = down]{node(out){output}};
+	\path(tridiag) to[circle connection bar switch color = from (yellow) to (green)](eta);
+	\path(tridiag) to[circle connection bar switch color = from (yellow) to (orange)](Solver);
+	\path(tridiag) to[circle connection bar switch color = from (yellow) to (blue!75)](CC);
+	\path(Solver) to[circle connection bar switch color = from (orange) to (blue!75)](CI);
+	\path(Solver) to[circle connection bar switch color = from (orange) to (red!50)](out);
+	\end{tikzpicture}
+	\caption{Collegamenti tra i blocchi del programma}
+\end{figure}
+
 \subsection{Impostazioni}
-Il programma pi\`u semplice, compilabile con \lstinline|$> make maincrankC| carica i dati da tre file di impostazioni:
-il file generale delle impostazioni:
-\lstinputlisting[frame = single,caption=Impostazioni principali]{../settings.set}
+Il programma pi\`u semplice, compilabile con \lstinline|$> make single| carica i dati da tre file di impostazioni, in cui viene alternata una riga di commento, anticipata da un ''\textit{\#}'' e una con i valori dell'impostazione, l'ordine \`e importante e il commento non deve contenere spazi.
+
+Il file generale delle impostazioni:
+\lstinputlisting[frame = single,caption=Impostazioni principali]{../settings.set}\label{lst:settings}
+In questo file fornisco i parametri principali della simulazione, quelli che ho previsto che avrei cambiato pi\`u di rado durante la simulazione. La massa, la lunghezza sono ovvi, tmax \`e il tempo a cui si ferma la simulazione. L'opzione ''\textit{\#Ndipende\_da\_intervallo=0}'' se impostata uguale a $0$ fa si` che il numero di passi (spaziali e temporali) venga calcolato conoscendo la lunghezza totale e il passo, se impostata diversa da $0$ invece fa s\`i che il programma calcoli il passo a partire dalla lunghezza totale e il numero di punti voluti. Le opzioni ''\textit{\#timeskip}'' e ''\textit{\#spaceskip}'' servono nel momento di salvare i risultati: il primo imposta ogni quanti passi temporali esportare il vettore di punti, che vengono salvati ad intervalli decisi dal secondo parametro. Il parametro ''\textit{\#precisione}'' invece blocca la simulazione prima del tempo massimo se l'errore (vedi \autoref{sec:errore}) supera il valore impostato, se lo si imposta a 0 salta il controllo.
+
 Il file delle condizioni iniziali:
 \lstinputlisting[frame = single,caption=Impostazioni CI]{../gauss.set}
+Il primo parametro deve essere una lettera e serve a indicare al programma la forma del pacchetto d'onda nelle condizioni iniziali, se viene scritto ''\textit{b}'' il programma disegner\`a la funzione ''bump'' con parametri presi dalla riga successiva, nell'ordine ''altezza del massimo'', ''larghezza'' e ''punto del massimo''; negli altri casi una gaussiana con i parametri ''altezza'', ''deviazione standard'' e ''punto medio''. I due set successivi alle impostazioni dell'onda riguardano le condizioni al contorno, la prima che pu\`o essere $0$, $1$ o $2$ indica il tipo di condizione, rispettivamente Dirichlet, Neumann o Robin sulla stessa riga il primo numero indica il valore della funzione, della derivata o della combinazione lineare, il terzo parametro viene solo utilizzata da Robin ed \`e il peso della funzione.
+L'ultima impostazione \`e l'energia che si vuole impostare per l'onda.
+
 Il file del potenziale:
 \lstinputlisting[frame = single,caption=Impostazioni potenziale]{../potenziale.set}
-\subsection{Lancio senza potenziale: errore}
+Il primo parametro imposta la forma del potenziale, che pu\`o essere una gaussiana, un ''bump'', un rettagolo oppure un salto.
+Nella riga successiva il primo parametro imposta l'altezza  del punto pi\`u alto del potenziale, se messo a 0 dice all'algoritmo di calcolare l'evoluzione in assenza di potenziale, il secondo parametro indica il centro della funzione se \`e pari, oppure la posizione del salto, l'ultimo parametro indica la larghezza o la deviazione standard del potenziale non viene utilizzato se la forma \`e il salto.
+\subsection{Lancio senza potenziale: errore}\label{sec:errore}
 Prima di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
 
 Ho bisogno di definire un ''errore'' per capire quanto la simulazione possa essere andata a buon fine:
@@ -23,7 +61,7 @@ Da questi lanci capisco che devo scartare l'idea di usare un passo temporale gra
 
 Dato che ho simulato onde con una energia di $10 udm$ mi aspetto che la velocit\`a sia:.....%%%%%
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 \begin{subfigure}[b]{0.49\textwidth}
 \includegraphics[width=\textwidth]{IMG/v_g1_0001}
@@ -44,7 +82,7 @@ Dato che ho simulato onde con una energia di $10 udm$ mi aspetto che la velocit\
 
 Poi ho quindi guardato l'errore di alcune simulazioni. Scarto a priori i passi pi\`u grandi di $0.01$.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[b]{0.49\textwidth}
 \includegraphics[width=\linewidth]{IMG/e_g1full}
@@ -59,7 +97,7 @@ Poi ho quindi guardato l'errore di alcune simulazioni. Scarto a priori i passi p
 
 A questo punto ho fatto una simulazione diminuendo il tempo a $6$ in modo da non avere a che fare con l'esplosione dell'errore dovuta al limite del dominio. e cosi` da poter osservare quale fosse il miglior passo spaziale. Ho fatto i lanci con due diverse condizioni al contorno (gaussiano con $\sigma$ $1$ e $2$). 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
 		\includegraphics[width=\textwidth]{IMG/eChoosy1}
@@ -75,7 +113,7 @@ A questo punto ho fatto una simulazione diminuendo il tempo a $6$ in modo da non
 
 Osservando \autoref{fig:SceltaErrori} utilizzare come passi spaziali e temporali valori compresi tra $0.01$ e $0.001$ ha un buon rapporto errore(il cui modulo \`e inferiore a $10^-7$)/peso sul calcolatore, in particolare si nota che il passo spaziale pesa di pi\`u sull'errore. Ho scelto di continuare con $dT = 0.01$ e $dS = 0.005$ in quanto hanno errore molto simile a $dS = 0.001$ (\autopageref{fig:sceltaPassi}) ma sono pi\`u rapidi nei calcoli (sulla mia macchina).
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.7\textwidth]{IMG/sceltaPassi}
 \caption[Scelta Passi]{Gli errori dei passi che ritengo pi\`u convenienti}\label{fig:sceltaPassi}
@@ -101,7 +139,7 @@ La terza idea equivale a utilizzare Dirichlet con il valore della funzione pari 
 \subsection{Dispersione e forme dei pacchetti d'onda}
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
@@ -144,7 +182,7 @@ E, chiamando $\sigma_0$ il valore assegnato nelle condizioni iniziali, mi aspett
 Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori di $\sigma$ iniziali, utilizzando come funzione da fittare \eqref{eq:sigmat}. E l'algoritmo sembra funzionare per quanto riguarda la dispersione,  come si pu\`o vede re in \autoref{fig:dispersioneFitSigma1}, in
 \autoref{fig:dispersioneFitSigma4} e \autoref{fig:dispersioneFitE} in dove la funzione ha energia diversa da 0
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 	\includegraphics[width=\linewidth]{IMG/dispersione_p}
@@ -163,7 +201,7 @@ Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori
  \caption{Alcuni fit dell'andamento della dispersione}\label{fig:dispersioneFitSigma1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{IMG/dispersione_m1s4}
@@ -182,7 +220,7 @@ Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori
 	\caption{Alcuni fit dell'andamento della dispersione}\label{fig:dispersioneFitSigma4}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{IMG/dispersione_m1s1e10}
@@ -235,9 +273,7 @@ e^{-\frac{1}{1-x^2}}&\text{per }\lr||{x}<1\\
 \begin{tikzpicture}
 \draw[->] (-2,0) -- (2,0) node[right] {$x$};
 \draw[->] (0,-0.2) -- (0,1) node[above] {$y$};
-%\draw[domain=-0.9:0.9,variable=\x,blue] plot[id = bump] ({\x},{exp(-1/(1-\x*\x))});
 \draw[domain=-2:2, samples =501,variable=\x,blue] plot[id=bump] function{x*x<1? exp(-1/(1-x*x)) :0};
-
 \end{tikzpicture}
 	\caption{La funzione bump}
 \end{figure}

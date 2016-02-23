@@ -4,7 +4,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 
-\usepackage{showlabels} % debug, togliere
+%\usepackage{showlabels} % debug, togliere
 
 \usepackage[italian]{babel}
 %\usepackage[latin1]{inputenc}
@@ -32,6 +32,8 @@
 \hypersetup{colorlinks=true,
 linkcolor=black}
 
+\pgfplotsset{compat=1.12}%imposta quale versione di gnuplot usare
+\usetikzlibrary{mindmap,positioning}
 %derivate
 \newcommand{\de}[2]{\ensuremath{\frac{\mathrm{d} #1}{\mathrm{d} #2}}}
 \newcommand{\lde}[2]{\ensuremath{{\mathrm{d} #1}/{\mathrm{d} #2}}}

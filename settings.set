@@ -4,7 +4,7 @@
 60
 #tmax
 10
-#Ndipende_da_int=0
+#Ndipende_da_intervallo=0
 0
 #Nl
 10000
@@ -17,6 +17,6 @@
 #timeskip
 100
 #spaceskip
-20
+1
 #precisione
 5e-3
