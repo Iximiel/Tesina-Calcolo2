@@ -53,7 +53,7 @@ namespace ROOT {
       ::Visual *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::Visual >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("Visual", ::Visual::Class_Version(), "visual.hpp", 17,
+         instance("Visual", ::Visual::Class_Version(), "visual.hpp", 18,
                   typeid(::Visual), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::Visual::Dictionary, isa_proxy, 4,
                   sizeof(::Visual) );

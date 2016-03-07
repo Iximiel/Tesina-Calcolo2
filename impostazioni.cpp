@@ -65,7 +65,7 @@ void impostazioni::potentialsetting(const char* potentialfile){
    */
   file >> dummy >> type;
   file >> dummy >> Vval;
-  file >> Vpos >> Vpar;//posizione parametro (per muro e` la discesa, per G e` la stdev)
+  file >> Vpos >> Vpar;//posizione parametro
   pot = nullptr;
   if(Vval == 0){
     pot = &zero;

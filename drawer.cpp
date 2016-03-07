@@ -19,16 +19,17 @@ int main(int argc, char** argv)
   TCanvas c1("c1","Confronto",1280,512);
   c1.Divide(2,1);
   
-  TGraph2D *g = new TGraph2D();
-  TGraph *gb = new TGraph();//before
-  TGraph *ga = new TGraph();//after
-  TGraph *gerrs = new TGraph();
-  TGraph *dummy = new TGraph();
+  preparedraw myData (argv[1],
+		      // preparedraw::doMax |
+		      preparedraw::doFh |
+		      preparedraw::doSh |
+		      preparedraw::doErr);
   
-  preparedraw(argv[1],g,gerrs,gb,ga,dummy);
-
-  dummy->Clear();
-  delete dummy;
+  TGraph2D *g = myData.data();
+  TGraph *gb = myData.firsthalf();//before
+  TGraph *ga = myData.secondhalf();//after
+  TGraph *gerrs = myData.errs();
+  //  TGraph *maxs = myData.maximum();
   
   c3.cd();
   g->GetXaxis()->SetTitle("X");

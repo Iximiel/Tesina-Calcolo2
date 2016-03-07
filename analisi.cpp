@@ -59,38 +59,44 @@ int main(int argc, char** argv)
     if(fname!=".dat"){
       cout <<"*\n"<< fname << ":" << endl;
 
-      TGraph *gb = new TGraph();//before
-      TGraph *ga = new TGraph();//after
-      TGraph *gerrs = new TGraph();
-      TGraph *maxs = new TGraph();
-	    
-      preparedraw(fname,gerrs,gb,ga,maxs);
+      TGraph *gb, *ga, *gerrs,*maxs;
+      int sets=0;
+      if(gv)
+	sets |= preparedraw::doMax;
+      if(fh);
+	sets |= preparedraw::doFh;      
+      if(sh)
+	sets |= preparedraw::doSh;
+      if(err)
+	sets |= preparedraw::doErr;
+      
+      preparedraw myData(fname,sets);
       
       //aggiungo i grafici ai multigraph e cancello oi grafici che pesano sulla memoria
       if(gv){
+	maxs = myData.maximum();
 	maxs->SetLineColor(colore);	
 	mm->Add(maxs);
-      }else
-	delete maxs;
-      
+      }      
       if(fh){
+	gb = myData.firsthalf();
 	gb->SetLineColor(colore);
 	mg->Add(gb);
-      }else
-	delete gb;
+      }
       
       if(sh){
+	ga = myData.secondhalf();
 	ga->SetLineColor(colore);
-	ga->SetLineStyle(3);
+	if(fh)
+	  ga->SetLineStyle(3);
 	mg->Add(ga);
-      }else
-	delete ga;
+      }
       
       if(err){
+	gerrs = myData.errs();
 	gerrs->SetLineColor(colore);
 	merr->Add(gerrs);
-      }else
-	delete gerrs;
+      }
      
       colore++;
     }
@@ -101,20 +107,22 @@ int main(int argc, char** argv)
   TCanvas*Int = nullptr;
   
   if(fh||sh){
-    Int = new TCanvas("Int","Integrale",800,600);
-    mg->Draw("apl");
+    Int = new TCanvas("Int","Coefficienti",800,600);
+    Int->cd();
+    Int->SetGridy(1);
+    mg->Draw("al");
     Int->BuildLegend(0.2,0.35,0.4,0.65);
   }
   if(err){
     E = new TCanvas("E","Errore",800,600);
     E->cd();
-    merr->Draw("apl");
+    merr->Draw("al");
     E->BuildLegend(0.5,0.875,0.125,0.675);
   }
   if(gv){
     PM = new TCanvas("PM","Posizione Massimi",800,600);
     PM->cd();
-    mm->Draw("apl");
+    mm->Draw("al");
     PM->BuildLegend(0.5,0.875,0.125,0.675);
   }
 #ifndef __CINT__

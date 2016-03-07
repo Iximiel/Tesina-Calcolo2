@@ -1,4 +1,4 @@
-CC	= g++
+aCC	= g++
 CC11	= g++ -std=c++11
 CFLAGS	= -g -Wall
 DIR	= Experiment
@@ -14,32 +14,38 @@ PIC	= -fPIC
 all:single drawer analisi experiment
 
 #https://root.cern.ch/interacting-shared-libraries-rootcint
-#risolve un'equazione di Schodinger: come primo argonento il file del potenziale
-#come secondo, opzionale, il file che indica le CI, di base e` gauss.set
+#il progama principale
 single: MainC.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
+#funziona come single, ma ripete l'esperimento per una lista di potenziali
+experiment: Experiments.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
 #disegna soluzione, errore e pesi dell'integrale del file di dati in argomento
 drawer:drawer.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
-#controlla i .dat letti in namelist.txt
-analisi:analisi.cpp preparedraw1D.o
+#controlla i .dat letti in namelist.txt, varie opzioni con --help
+analisi:analisi.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
-#si comporta come maincrankC, solo che carica i nomi dei file del potenziale da
-#namelist.txt, e come argomento opzionale ha il file delle CI
-experiment: Experiments.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
-#visualizza vari potenziali in diversi files.
+#visualizza vari potenziali in diversi files
 CVD: CVDrawer.cpp impostazioniC.o TridiagC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX $(LIBROOT) $(CFLAGSROOT)
-#una interfaccia grafica per impostare un esperimento alla volta
+#una interfaccia grafica per osservare un esperimento alla volta
 preview: preview.cpp visual.o libVisual.so
 	@echo Compilo $@ 
 	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
+
+pesi:pesi.cpp preparedraw.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
+
+pesiMuro:pesiMuro.cpp preparedraw.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 
 gui: main.cpp Schrody.o DefineCC.o TridiagC.o CrankSolverC.o libSchrody.so libCC.so
 	@echo Compilo $@
@@ -91,10 +97,6 @@ visual.o: visual.cpp
 preparedraw.o: preparedraw.cpp
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -c $^ $(CFLAGSROOT)
-
-preparedraw1D.o: preparedraw.cpp
-	@echo Compilo $@
-	@$(CC11) $(CFLAGS) -c -o $@ $^ $(CFLAGSROOT) -D_NO2D
 
 impostazioni.o: impostazioni.cpp
 	@echo Compilo $@

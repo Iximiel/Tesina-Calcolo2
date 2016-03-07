@@ -1,27 +1,13 @@
 #include "preparedraw.hpp"
-#include <vector>
-#include <complex>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
 
-typedef complex<double> Var;
-#ifdef _NO2D
-void preparedraw(string fname, TGraph *errs, TGraph *firsthalf, TGraph *secondhalf, TGraph *maximum){
-#else
-void preparedraw(string fname, TGraph2D* data, TGraph *errs, TGraph *firsthalf, TGraph *secondhalf, TGraph *maximum){
-  data->Clear();
-#endif  
-  errs->Clear();
-  firsthalf->Clear();
-  secondhalf->Clear();
-  maximum->Clear();
-  
+preparedraw::preparedraw(string fname, int whatToDo){
   cout<<"Carico i dati di "<<fname<<"!\n";
+  settings = whatToDo;
   ifstream f(fname);
-  int Nl, sskip, tskip;
-  double sstep,atstep,tstep;
   //carico le impostazioni
   f >> sskip >> Nl >> sstep >>tskip >> atstep;
   f >> tstep;//tstep tra le righe
@@ -29,63 +15,20 @@ void preparedraw(string fname, TGraph2D* data, TGraph *errs, TGraph *firsthalf, 
        << ", Passo spaziale:" << sstep <<endl;
   cout << "Salto temporale: "<< tskip << ", Passo temporale:" << atstep
        << "\nPasso temporale registrato: "<< tstep << endl;
-  //carico i dati
-  vector<double> Z;
-  //vector<Var> Z;
-  vector<double> X,T;
-  double integral = 0, fhalf=0,shalf=0;
+  size_t pospot = -1;
+  pospot = fname.find("_");
+  pot = fname.substr(0,pospot);
+  size_t posCI  = -1;
+  posCI = fname.find("-");
+  CI = fname.substr(pospot+1,posCI-pospot-1);
+
+  //carico i dati  
+  double integral = 0, fhalf=0, shalf=0;
   bool simP2 = true;
   double max = -999999;
   double pos = 0;
-  //primo passo in t
 
-  for(int i=0;i<Nl;i++){
-    Var z;
-    f >> z;
-    //integrale di simpson
-    if(i == 0||i== Nl-1){
-      integral += norm(z);
-      if(i<Nl/2)
-	fhalf += norm(z);
-      else
-	shalf += norm(z);
-    }else{
-      integral += norm(z)*2.*(1+simP2);    
-      if(i<Nl/2-1)
-	fhalf += norm(z)*2.*(1+simP2);
-      else if(i==Nl/2-1)
-	fhalf += norm(z);
-      else if(i==Nl/2)
-	shalf += norm(z);
-      else
-	shalf += norm(z)*2.*(1+simP2);
-      simP2 = !simP2;
-    }
-    Z.push_back(abs(z));
-    X.push_back(i*sskip*sstep);
-    T.push_back(0);
-    
-    if(Z.back()>max){
-      max = Z.back();
-      pos = X.back();
-    }
-  }
-
-  integral *= sstep*sskip/3.;
-  fhalf *= sstep*sskip/3.;
-  shalf *= sstep*sskip/3.;
-  integral = sqrt(integral);
-  fhalf = sqrt(fhalf);
-  shalf = sqrt(shalf);
-  double initial = integral;
-  vector<double> diffs, before,after,times;
-  vector<double> maxs;
-  maxs.push_back(pos);
-  diffs.push_back(initial-initial);
-  before.push_back(fhalf/initial);
-  after.push_back(shalf/initial);
-  times.push_back(T.back());
-  for(int j=1;f.good();j++){
+  for(int j=0;f.good();j++){
     integral = fhalf = shalf=0;
     simP2 = true;
     max = -999999;
@@ -95,83 +38,260 @@ void preparedraw(string fname, TGraph2D* data, TGraph *errs, TGraph *firsthalf, 
       f >> z;
       if(f.good()){
         //integrale di simpson
-	if(i == 0||i== Nl-1){
-	  integral += norm(z);
-	  if(i<Nl/2)
-	    fhalf += norm(z);
-	  else
-	    shalf += norm(z);
-	}else{
-	  integral += norm(z)*2.*(1+simP2);    
-	  if(i<Nl/2-1)
-	    fhalf += norm(z)*2.*(1+simP2);
-	  else if(i==Nl/2-1)
-	    fhalf += norm(z);
-	  else if(i==Nl/2)
-	    shalf += norm(z);
-	  else
-	    shalf += norm(z)*2.*(1+simP2);
-	  simP2 = !simP2;
+	if(settings&doErr){
+	  if(i == 0||i== Nl-1){
+	    integral += norm(z);
+	    if(i<Nl/2)
+	      fhalf += norm(z);
+	    else
+	      shalf += norm(z);
+	  }else{
+	    integral += norm(z)*2.*(1+simP2);    
+	    if(i<Nl/2-1)
+	      fhalf += norm(z)*2.*(1+simP2);
+	    else if(i==Nl/2-1)
+	      fhalf += norm(z);
+	    else if(i==Nl/2)
+	      shalf += norm(z);
+	    else
+	      shalf += norm(z)*2.*(1+simP2);
+	    simP2 = !simP2;
+	  }
 	}
-	Z.push_back(abs(z));
-	X.push_back(i*sskip*sstep);
-	T.push_back(j*tstep);
-	
-	if(Z.back()>max){
-	  max = Z.back();
-	  pos = X.back();
+	Z.push_back(z);
+	if(settings&doMax){
+	  double test = abs(Z.back());
+	  if(test>max){
+	    max = test;
+	    pos = i*sskip*sstep;
+	  }
 	}
       }
     }
-    integral *= sstep*sskip/3.;
-    fhalf *= sstep*sskip/3.;
-    shalf *= sstep*sskip/3.;
-    integral = sqrt(integral);
-    fhalf = sqrt(fhalf);
-    shalf = sqrt(shalf);
-    
     if(f.good()){
-      maxs.push_back(pos);      
-      diffs.push_back(initial-integral);
-      before.push_back(fhalf/integral);
-      after.push_back(shalf/integral);
-      times.push_back(T.back());
+      if(settings&doMax)
+	maxs.push_back(pos);
+      if(settings&doErr){      
+	integral *= sstep*sskip/3.;
+	if(settings&doFh){            
+	  fhalf *= sstep*sskip/3.;
+	  //fhalf = sqrt(fhalf);
+	  before.push_back(fhalf/integral);
+	}
+	if(settings&doSh){      
+	  shalf *= sstep*sskip/3.;
+	  //shalf = sqrt(shalf);
+	  after.push_back(shalf/integral);
+	}
+	integral = sqrt(integral);
+	integrals.push_back(integral);
+      }
+      times.push_back(j*tstep);
     } 
   }
-  //estraggo dal nome le info sulla funzione:
-  size_t pospot = -1;
-  pospot = fname.find("_");
-  string pot = fname.substr(0,pospot);
-  size_t posCI  = -1;
-  posCI = fname.find("-");
-  string CI = fname.substr(pospot+1,posCI-pospot-1);
-  /*
-    size_t posSet = -1;
-    posSet = fname.find(".dat");
-    string Set = fname.substr(posCI+1,posSet-posCI-1);
-  */
-  /*
-  string title = pot+", "+CI+", dT="+to_string(atstep)+", dS="+to_string(sstep);
-  string title2 = "dT="+to_string(atstep)+", dS="+to_string(sstep)+
-    ", in " + pot+", "+CI;
-*/
-  char title[50], title2[50];
-  sprintf(title,"%s, %s, dT=%g, dS=%g",pot.c_str(),CI.c_str(),atstep,sstep);
-  sprintf(title2,"dT=%g, dS=%g in %s %s",atstep,sstep,pot.c_str(),CI.c_str());
-  //to_string();
-#ifndef _NO2D
-  *data       = *(new TGraph2D(Z.size(),X.data(),T.data(),Z.data()));
-#endif
-  *firsthalf  = *(new TGraph(times.size(), times.data(), before.data()));
-  *secondhalf = *(new TGraph(times.size(), times.data(), after.data()));
-  *errs       = *(new TGraph(times.size(), times.data(), diffs.data()));
-  *maximum    = *(new TGraph(times.size(), times.data(), maxs.data()));
-  /*  firsthalf  -> SetTitle((title).c_str());
-  secondhalf -> SetTitle((title).c_str());
-  errs       -> SetTitle((title2).c_str());
-  maximum    -> SetTitle((title2).c_str());*/
-  firsthalf  -> SetTitle(title);
-  secondhalf -> SetTitle(title);
-  errs       -> SetTitle(title2);
-  maximum    -> SetTitle(title2);
+  Nt = times.size();
+}
+
+preparedraw::~preparedraw(){
+  Z.clear();
+  integrals.clear();
+  before.clear();
+  after.clear();
+  times.clear();
+  maxs.clear();
+}
+
+TGraph2D* preparedraw::data(){
+  TGraph2D *toreturn = new TGraph2D(Z.size());
+  for(int j=0;j<Nt;j++){
+    for(int i=0;i<Nl;i++)
+      toreturn->SetPoint(i+j*Nl,sstep*sskip*i,times.at(j),abs(Z.at(i+j*Nl)));
+  }
+  return toreturn;
+}
+
+TGraph* preparedraw::errs(){
+  controlErr();
+  TGraph* toreturn = new TGraph(Nt);
+  double initial = integrals.at(0);
+  for(int i=0;i<Nt;i++)
+    toreturn->SetPoint(i,times.at(i),initial-integrals.at(i));
+  
+  char title[50];
+  sprintf(title,"dT=%g, dS=%g in %s %s",atstep,sstep,pot.c_str(),CI.c_str());
+  toreturn -> SetTitle(title);
+  return toreturn;
+}
+
+TGraph* preparedraw::firsthalf(){
+  controlFh();
+  TGraph* toreturn = new TGraph(Nt, times.data(), before.data());
+
+  char title[50];
+  sprintf(title,"Prima meta` %s",pot.c_str());
+  toreturn -> SetTitle(title);
+  return toreturn;
+}
+
+TGraph* preparedraw::secondhalf(){
+  controlSh();
+  TGraph* toreturn = new TGraph(Nt, times.data(), after.data());
+
+  char title[50];
+  sprintf(title,"Seconda meta` %s",pot.c_str());
+  toreturn -> SetTitle(title);
+  return toreturn;
+}
+
+TGraph* preparedraw::maximum(){
+  controlMax();
+  TGraph* toreturn = new TGraph(Nt, times.data(), maxs.data());
+
+  char title[50];
+  sprintf(title,"dT=%g, dS=%g in %s %s",atstep,sstep,pot.c_str(),CI.c_str());
+  toreturn -> SetTitle(title);
+  return toreturn;
+}
+
+int preparedraw::NT(){return Nt;}
+
+double preparedraw::errs(int i){
+  controlErr();
+  return integrals.at(0) - integrals.at(i);
+}
+
+double preparedraw::integral(int i){
+  controlErr();
+  return integrals.at(i);
+}
+
+double preparedraw::firsthalf(int i){
+  controlFh();
+  return before.at(i);
+}
+
+double preparedraw::secondhalf(int i){
+  controlSh();
+  return after.at(i);
+}
+
+double preparedraw::maximum(int i){
+  controlMax();
+  return maxs.at(i);
+}
+
+void preparedraw::controlErr(){
+  if(!(doErr&settings)){
+    settings |= doErr;
+    cout << "La prossima vola imposta preparedraw::doErr nel costruttore"<<endl;
+    double integral = 0;
+    bool simP2 = true;
+    
+    for(int j=0;j<Nt;j++){
+      integral = norm(Z.at(Nl*j)) + norm(Z.at(Nl-1+Nl*j));
+      simP2 = true;
+      for(int i=0;i<Nl-1;i++){
+	//integrale di simpson
+	integral += norm(Z.at(i+Nl*j))*2.*(1+simP2);    
+	simP2 = !simP2;
+      }
+      integral *= sstep*sskip/3.;
+      integral = sqrt(integral);
+      integrals.push_back(integral);
+    }
+  }
+}
+
+void preparedraw::controlFh(){
+  controlErr();
+  if(!(doFh&settings)){
+    settings |= doFh;
+    cout << "La prossima vola imposta preparedraw::doFh nel costruttore"<<endl;
+    double integral = 0;
+    bool simP2 = true;
+    
+    for(int j=0;j<Nt;j++){
+      simP2 = true;
+      //integrale di simpson
+      integral = norm(Z.at(Nl*j))+norm(Z.at(Nl/2-1+Nl*j));
+      for(int i=1;i<Nl/2-1;i++){
+	integral += norm(Z.at(i+Nl*j))*2.*(1+simP2);    
+	simP2 = !simP2;
+      }
+      integral *= sstep*sskip/3.;
+      //integral = sqrt(integral);
+      double div = integrals.at(j);
+      div*=div;
+      before.push_back(integral/div);
+    }
+  }
+}
+
+
+void preparedraw::controlSh(){
+  controlErr();
+  if(!(doSh&settings)){
+    settings |= doSh;
+    cout << "La prossima vola imposta preparedraw::doSh nel costruttore"<<endl;
+    double integral = 0;
+    bool simP2 = true;
+
+    for(int j=0;j<Nt;j++){
+      simP2 = true;
+      //integrale di simpson
+      integral = norm(Z.at(Nl/2+Nl*j))+norm(Z.at(Nl-1+Nl*j));
+      for(int i=Nl/2;i<Nl;i++){
+	integral += norm(Z.at(i+Nl*j))*2.*(1+simP2);    
+	simP2 = !simP2;
+      }
+      integral *= sstep*sskip/3.;
+      //integral = sqrt(integral);
+      double div = integrals.at(j);
+      div*=div;
+      before.push_back(integral/div);
+    }
+  }
+}
+
+void preparedraw::controlMax(){
+  if(!(doMax&settings)){
+    settings |= doMax;
+    cout << "La prossima vola imposta preparedraw::doMax nel costruttore"<<endl;
+    double max = -999999;
+    double pos = 0;
+
+    for(int j=0;j<Nt;j++){
+      max = -999999;
+      pos = 0;
+      for(int i=0;i<Nl;i++){
+	double test = abs(Z.at(i+Nl*j));
+	if(test > max){
+	  max = test;
+	  pos = i*sskip*sstep;
+	}
+      }
+    }
+    maxs.push_back(pos);
+  } 
+}
+
+double preparedraw::limitedIntegral(int j, double start, double stop){
+  //integro da 'a' a 'b'
+  int a = start/(sstep*sskip);
+  int b = stop/(sstep*sskip);
+  if(a<0)
+    a=0;
+  if(b>Nl)
+    b = Nl-1;
+  //cout << a<< " "<< b;
+  double integral = norm(Z.at(Nl*j+a)) + norm(Z.at(b-1+Nl*j));
+  bool simP2 = true;
+  for(int i=0;i<b-1;i++){
+    //integrale di simpson
+    integral += norm(Z.at(i+Nl*j))*2.*(1+simP2);    
+    simP2 = !simP2;
+  }
+  integral *= sstep*sskip/3.;
+  integral = sqrt(integral);
+  return integral; 
 }

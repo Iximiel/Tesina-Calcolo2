@@ -12,8 +12,7 @@ public:
   Var getPoint(int x);
 private:
   void Stepper();
-  Var* CS_data_prec;//[Ns*Nt]
-  Var* CS_data;//[Ns*Nt]
+  Var* CS_data;
   int CS_ns;
   int CS_step;
   tridiag *CS_mat;

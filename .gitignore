@@ -12,6 +12,11 @@ todraw.txt
 *.nfo
 analisi
 namelist.txt
+pesi
+cosaa
+pesiMuro
+*.table
+*.gnuplot
 
 #dizionari bit
 *pcm

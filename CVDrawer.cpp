@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   TMultiGraph *mg = new TMultiGraph("potenziale","Potenziali");
   cout<<"Carico i dati\n";
   ifstream filenames("infonamelist.txt");
-  string filename = "gauss.set";
+  string filename = "settings.set";
   if(argc>1)
     filename  = argv[1];
   //carico il file di impostazioni, per ricompilare meno spesso
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     if(fname.find(".set")==string::npos)
       fname+=".set";
     if(fname!=".set"){
-      impostazioni info(filename.c_str(), fname.c_str(), "settings.set");
+      impostazioni info("gauss.set", fname.c_str(),filename.c_str());
       cout << fname << ":" << endl;
       int ns = info.NL(), skip = info.spaceSkip();
       double step = info.spaceStep();
