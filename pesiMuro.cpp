@@ -10,9 +10,9 @@ int main(int argc, char** argv)
 {
   cout<<"Carico i dati\n";
   //programma costruito ad hoc per analisisalto.sh
-  for(int Z=3;Z<4;Z++){
+  for(int Z=4;Z<5;Z++){
     char file[50];
-    sprintf(file,"pesiOscg%i.dat",Z);
+    sprintf(file,"pesiOscg%i.tdt",Z);
     ofstream of(file);
     //impostazioni
     int npot =11, Nlarg=2;
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
       of<< endl;
     }
     of.close();
-    delete []&pesif;
+    //delete []&pesif;
   }
 #ifndef __CINT__
   return 0;

@@ -17,8 +17,8 @@ Prima di tutto far\`o una piccola parentesi teorica sul risultato che mi aspetto
 Divido lo spazio in due porzioni ($x<0$ e $x>0$) in cui:
 \begin{equation}\label{eq:Ks}
 	\begin{array}{lr}
-	k_1 = \sqrt\frac{2m E}{\hbar}&x<0\\
-	k_2 = \sqrt\frac{2m \lrt{E-V_0}}{\hbar}&x>0
+	k_1 = \sqrt\frac{2m E}{\hbar^2}&x<0\\
+	k_2 = \sqrt\frac{2m \lrt{E-V_0}}{\hbar^2}&x>0
 	\end{array}
 \end{equation}
 Dato che il potenziale ha una discontinuit\`a finita in $0$, funzione e derivata devono essere continue. Se per esempio avessimo delle onde piane in ciascuna porzione dello spazio ne avrei una che si muove verso destra ($\psi_\to$) e una verso sinistra ($\psi_\from$) e quindi in 0 avrei, chiamando i coefficenti delle onde piane $A$ per il lato sinistro e $B$ quello destro:
@@ -103,13 +103,13 @@ $0.33$				&$1$			&$1$			&$1$			&$1$			&$1$			\\ \bottomrule
 	\centering
 	\begin{tikzpicture}
 	\begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
-	\addplot table[x=ev,y=fhS1] {Dati/pesi2.dat};%{Dati/Salto.dat};
+	\addplot table[x=ev,y=fhS1] {Dati/pesi2.tdt};%{Dati/Salto.tdt};
 	\addlegendentry{$\sigma=0.5$}
-	\addplot table[x=ev,y=fhS2] {Dati/pesi2.dat};
+	\addplot table[x=ev,y=fhS2] {Dati/pesi2.tdt};
 	\addlegendentry{$\sigma=1$}
-	\addplot table[x=ev,y=fhS3] {Dati/pesi2.dat};
+	\addplot table[x=ev,y=fhS3] {Dati/pesi2.tdt};
 	\addlegendentry{$\sigma=2$}
-	\addplot table[x=ev,y=fhS4] {Dati/pesi2.dat};
+	\addplot table[x=ev,y=fhS4] {Dati/pesi2.tdt};
 	\addlegendentry{$\sigma=4$}
 	\addplot[domain=0:10, samples =501, blue]	plot[id=Refl2]	function{x<1?1:(-1+sqrt(1-1/x))*(-1+sqrt(1-1/x))/((1+sqrt(1-1/x))*(1+sqrt(1-1/x)))};
 	\addlegendentry{teoria}
@@ -169,9 +169,19 @@ ma  a noi interessano:
 \begin{equation}
 \lr\{.{\begin{array}{l}
 	R = \lr||{r}^2 = \lr||{\frac{2e^{-i a k_1}k_1 k_2}{i\lrt{k_1+k_2}^2 \sin\lrt{a k_2}-2k_1 k_2 \cos\lrt{a k_2}}}^2=
-	\frac{4 k_1^2 k_2^2}{4 k_1^2 k_2^2 \cos^2\lrt{a k_2}+\lrt{k_1^2+k_2^2}^2\sin^2\lrt{(a k_2)}}\\
+	\frac{4 k_1^2 k_2^2}{4 k_1^2 k_2^2 \cos^2\lrt{a k_2}+\lrt{k_1^2+k_2^2}^2\sin^2\lrt{a k_2}}\\
 	T = \lr||{t}^2 = \lr||{\frac{\sin\lrt{a k_2}\lrt{k_1^2-k_2^2}}{\lrt{k_1+k_2}^2 \sin\lrt{a k_2}+2 i k_1 k_2 \cos\lrt{a k_2}}}^2=
-	\frac{\lrt{k_1^2-k_2^2}^2\sin^2\lrt{(a k_2)}}{4 k_1^2 k_2^2 \cos^2\lrt{a k_2}+\lrt{k_1^2+k_2^2}^2\sin^2\lrt{(a k_2)}}
+	\frac{\lrt{k_1^2-k_2^2}^2\sin^2\lrt{(a k_2)}}{4 k_1^2 k_2^2 \cos^2\lrt{a k_2}+\lrt{k_1^2+k_2^2}^2\sin^2\lrt{a k_2}}
+	\end{array}}
+\end{equation}
+
+Che messi in termini di $E$ e $V$ ed $m$:
+%k_1 = \sqrt{2m E}
+%k_2 = \sqrt{2m \lrt{E-V_0}}
+\begin{equation}
+\lr\{.{\begin{array}{l}
+	R = \frac{4 \lrt{2m E} \lrt{2m \lrt{E-V_0}}}{4 \lrt{2m E} \lrt{2m \lrt{E-V_0}} \cos^2\lrt{a \sqrt{2m \lrt{E-V_0}}}+2m \lrt{2 E-V_0}\sin^2\lrt{a \sqrt{2m \lrt{E-V_0}}}}%\\
+	%T = \frac{\lrt{k_1^2-k_2^2}^2\sin^2\lrt{(a k_2)}}{4 k_1^2 k_2^2 \cos^2\lrt{a k_2}+\lrt{k_1^2+k_2^2}^2\sin^2\lrt{a k_2}}
 	\end{array}}
 \end{equation}
 
@@ -179,19 +189,19 @@ ma  a noi interessano:
 	\centering
 	\begin{tikzpicture}
 	\begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
-	\addplot table[x=ev,y=L2] {Dati/pesiMurog1.dat};%{Dati/Salto.dat};
+	\addplot table[x=ev,y=L2] {Dati/pesiMurog1.tdt};%{Dati/Salto.tdt};
 	\addlegendentry{$2$}
-%	\addplot table[x=ev,y=L4] {Dati/pesiMurog1.dat};
+%	\addplot table[x=ev,y=L4] {Dati/pesiMurog1.tdt};
 %	\addlegendentry{$4$}
-	\addplot table[x=ev,y=L2] {Dati/pesiMurog2.dat};
+	\addplot table[x=ev,y=L2] {Dati/pesiMurog2.tdt};
 	\addlegendentry{$2$}
-	\addplot table[x=ev,y=L2] {Dati/pesiMurog3.dat};
+	\addplot table[x=ev,y=L2] {Dati/pesiMurog3.tdt};
 	\addlegendentry{$2$}
-	\addplot table[x=ev,y=L2] {Dati/pesiMurog4.dat};
+	\addplot table[x=ev,y=L2] {Dati/pesiMurog4.tdt};
 	\addlegendentry{$2$}
-%	\addplot table[x=ev,y=L2] {Dati/pesiMurog2.dat};
+%	\addplot table[x=ev,y=L2] {Dati/pesiMurog2.tdt};
 %	\addlegendentry{$4$}
-%	\addplot table[x=ev,y=L16] {Dati/pesiM.dat};
+%	\addplot table[x=ev,y=L16] {Dati/pesiM.tdt};
 %	\addlegendentry{$16$}
 %(2*sin(20*a*sqrt(5 - 5/x))*sin(20*a*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*a*sqrt(5 - 5/x)))
 	\addplot[domain=1.00000001:10, samples =501, blue]	plot[id=MRefl2]	function{(2*sin(20*2*sqrt(5 - 5/x))*sin(20*2*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*2*sqrt(5 - 5/x)))};
@@ -210,15 +220,15 @@ ma  a noi interessano:
 \begin{figure}[hbt]
 	\centering
 	\begin{tikzpicture}
-	\begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.1,ymax =0.2]
-	\addplot table[x=ev,y=L2] {Dati/pesiOscg1.dat};%{Dati/Salto.dat};
-	\addlegendentry{$2$}
-	\addplot table[x=ev,y=L2] {Dati/pesiOscg2.dat};
-	\addlegendentry{$2$}
-%	\addplot table[x=ev,y=L2] {Dati/pesiOscg3.dat};
-%	\addlegendentry{$2$}
-%	\addplot table[x=ev,y=L2] {Dati/pesiOscg4.dat};
-%	\addlegendentry{$2$}
+	\begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax =0.1]
+	\addplot table[x=ev,y=L2] {Dati/pesiOscg1.tdt};%{Dati/Salto.tdt};
+	\addlegendentry{$a=2$, $\sigma=0.5$}
+	\addplot table[x=ev,y=L2] {Dati/pesiOscg2.tdt};
+	\addlegendentry{$a=2$, $\sigma=1$}
+	\addplot table[x=ev,y=L2] {Dati/pesiOscg3.tdt};
+	\addlegendentry{$a=2$, $\sigma=2$}
+	\addplot table[x=ev,y=L2] {Dati/pesiOscg4.tdt};
+	\addlegendentry{$a=2$, $\sigma=4$}
 	\addplot[domain=2:4, samples =501, blue]	plot[id=MRefl2z]	function{(2*sin(20*2*sqrt(5 - 5/x))*sin(20*2*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*2*sqrt(5 - 5/x)))};
 	\addlegendentry{teoria 2 }
 	%	\addplot[domain=1.00000001:10, samples =501, green]	plot[id=MRefl2]	function{(2*sin(20*4*sqrt(5 - 5/x))*sin(20*4*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*4*sqrt(5 - 5/x)))};
