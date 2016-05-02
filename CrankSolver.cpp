@@ -14,6 +14,7 @@ CrankSolver::CrankSolver(tridiag *mat, int Ns){
 
 CrankSolver::~CrankSolver(){
   delete[] CS_data;
+  delete CS_mat;
 }
 
 void CrankSolver::SetInitialState(Var* initialVector){

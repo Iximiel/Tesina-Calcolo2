@@ -4,6 +4,10 @@ drawer
 experiment
 single
 CVD
+doSin
+getInt
+pesiOsc
+preview
 CCDict.cpp
 SchrodyDict.cpp
 *out.txt

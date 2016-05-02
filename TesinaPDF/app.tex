@@ -1,42 +1,41 @@
-\section{Applicazione}
+\section{Applicazioni}
 \subsection{Equazione del calore}
 Riprendiamo l'equazione del calore:
 \begin{equation}
-\pde T t(x,t) =k\pde{^2}{x^2}T(x,t)
+  \pde T t(x,t) =k\pde{^2}{x^2}T(x,t)
 \end{equation}
 
-Per rispettare la convenzione di prima $D_2 = k$ , $D_1 = U = V(x,t) = 0$. 
-
+Per rispettare la convenzione che ho scelto $D_2 = k$ , $D_1 = U = V(x,t) = 0$. 
 
 A questo punto posso sostituire, con $\eta = k\frac{\Delta t}{\Delta x^2}$:
 \begin{equation}\label{eq:pararametriHeat}
-\begin{array}{ll}
-a_i^j = -1            & ak_i^j =1\\
-d_i^j = \frac2\eta +2 & dk_i^j = \frac2\eta -2 \\
-c_i^j = -1             & ck_i^j =1\\
-e_i^j = 0             & ek_i^j =0
-\end{array}
+  \begin{array}{ll}
+    a_i^j = -1            & ak_i^j =1\\
+    d_i^j = \frac2\eta +2 & dk_i^j = \frac2\eta -2 \\
+    c_i^j = -1             & ck_i^j =1\\
+    e_i^j = 0             & ek_i^j =0
+  \end{array}
 \end{equation}
-e procedere con i calcoli.
+sostituire i parametri nella matrice, scegliere le condizioni al contorno e procedere con i calcoli.
+
 \subsection{Equazione di \Schrodinger}
 Lavoriamo con l'equazione di \Schrodinger  dipendente dal tempo:
 \begin{equation}
-i\hbar\pde \psi t(x,t) =\lrq{-\frac{\hbar^2}{2m}\pde{^2}{x^2}+V(x,t)} \psi(x,t)
+  i\hbar\pde \psi t(x,t) =\lrq{-\frac{\hbar^2}{2m}\pde{^2}{x^2}+V(x,t)} \psi(x,t)
 \end{equation}
 prima di tutto portiamola in una forma tale che non ci sia nulla a moltiplicare la derivata temporale:
 \begin{equation}
-\pde \psi t(x,t) =\lrq{i\frac{\hbar}{2m}\pde{^2}{x^2}+\frac{\varLambda(x,t)}{i\hbar}} {\psi(x,t)}
+  \pde \psi t(x,t) =\lrq{i\frac{\hbar}{2m}\pde{^2}{x^2}+\frac{\varLambda(x,t)}{i\hbar}} {\psi(x,t)}
 \end{equation} 
 
-Per rispettare la convenzione di prima $D_2 = i\frac{\hbar}{2m}$ , $D_1 = U = 0$ e $V(x,t) = \frac{\varLambda(x,t)}{i\hbar}$. Ho usato $\varLambda$ per indicare il potenziale in modo da evitare confusione.
+Ho usato $\varLambda$ per indicare il potenziale per rispettare la convenzione. $D_2 = i\frac{\hbar}{2m}$ , $D_1 = U = 0$ e $V(x,t) = \frac{\varLambda(x,t)}{i\hbar}$.
 
-
-A questo punto posso sostituire, con $\eta = i\frac{\hbar}{2m}\frac{\Delta t}{\Delta x^2}$:
+A questo punto, con $\eta = i\frac{\hbar}{2m}\frac{\Delta t}{\Delta x^2}$, posso sostituire, usando $k$ come indice spaziale:
 \begin{equation}\label{eq:pararametriSC}
-\begin{array}{ll}
-a_i^j = -1            & ak_i^j =1\\
-d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1}} +2 & dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j}} -2 \\
-c_i^j = -1             & ck_i^j =1\\
-e_i^j = 0             & ek_i^j =0
-\end{array}
+  \begin{array}{ll}
+    a_k^j = -1            & ak_k^j =1\\
+    d_k^j = \frac1\eta\lrt{2-\Delta t V_k^{j+1}} +2 & dk_k^j = \frac1\eta\lrt{2+\Delta tV_k^{j}} -2 \\
+    c_k^j = -1             & ck_k^j =1\\
+    e_k^j = 0             & ek_k^j =0
+  \end{array}
 \end{equation}

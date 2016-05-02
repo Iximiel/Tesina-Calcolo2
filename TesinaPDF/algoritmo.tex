@@ -1,179 +1,182 @@
 \section{Costruzione dell'algoritmo}
 \subsection{Ottenere il sistema}
-Ho fatto un esempio col l'equazione del calore. Prima di procedere alla spiegazione su come si semplifica e si risolve un sistema di equazioni riconducibile ad una matrice tridiagonale spiegher\`o come condurre la PDE pi\`u generale ad un sistema del genere.
+Ho fatto un esempio con l'equazione del calore. Prima di procedere alla spiegazione su come si semplifica e si risolve il sistema di equazioni riconducibile ad una matrice tridiagonale spiegher\`o come condurre la PDE pi\`u generale ad un sistema del genere.
 
-Partendo da una generica equazione di secondo ordine:
+Scrivo la pi\`u generica equazione risolvibile con questo metodo:
 \begin{equation}\label{eq:generica}
-\partial_t F = D_2 \partial^2_x F + D_1 \partial_x F + V(x,t) F + U(x,t)
+  \partial_t F = D_2 \partial^2_x F + D_1 \partial_x F + V(x,t) F + U(x,t)
 \end{equation}
 
-Il coefficiente della derivata temporale \`e ignorato perch\'e \`e incluso negli altri coefficienti, ovviamente $D_2$, il coefficiente della derivata seconda spaziale non deve essere mai uguale a zero!
-Inoltre preferisco lasciare $D_1$ e $D_2$ come costanti nel tempo e nello spazio, e lascio la dipendenza temporale e spaziale a $V$ e $U$, che possono essere costanti a loro volta.
+Il coefficiente della derivata temporale \`e ignorato perch\'e \`e incluso negli altri coefficienti e non deve essere diverso da 0, ovviamente $D_2$, il coefficiente della derivata seconda spaziale non deve essere mai uguale a zero!
+Inoltre preferisco lasciare $D_1$ e $D_2$ come costanti nel tempo e nello spazio, ma cambiare le costanti costa poco a livello di complessit\`a del calcolo, ma lascio per\`o la dipendenza temporale e spaziale a $V$ e $U$.
 
-In seguito indicher\`o la il passo nello spazio a pedice con $i$ e quello nel tempo in apice con $j$.
-Discretizzando l'equazione ottengo quindi (ho mantenuto la definizione di derivata centrale anche per quella prima spaziale in modo da mantenere la precisione).
+In seguito indicher\`o la il passo nello spazio a pedice con $_i$ e quello nel tempo in apice con $^j$.
+Discretizzo l'equazione, calcolando la derivata temporale in $j+1/2$ con passo $\Delta t/2$ e usando la definizione centrale, per quanto riguarda le derivate spaziali faccio la media tra quelle calcolate in $j$ e in $j+1$. I potenziali sono noti.
 
 \begin{equation}
-\begin{aligned}
-\frac{F_i^{j+1} - F_i^j}{\Delta t} = \frac 12&\lr(.{D_2\frac{F^j_{i+1}+F^{j}_{i-1}-2F_i^{j}}{\Delta x^2} + D_1\frac{F^j_{i+1}-F^{j}_{i-1}}{2\Delta x} + F_i^j V_i^{j+1/2} + U_i^{j+1/2}+}\\
-&\lr.){D_2\frac{F^{j+1}_{i+1}+F^{j+1}_{i-1}-2F_i^{j+1}}{\Delta x^2} + D_1\frac{F^{j+1}_{i+1}-F^{j+1}_{i-1}}{2\Delta x} + F_i^{j+1} V_i^{j+1/2} + U_i^{j+1/2}}
-\end{aligned}
+  \begin{aligned}
+    \frac{F_i^{j+1} - F_i^j}{\Delta t} = \frac 12&\lr(.{D_2\frac{F^j_{i+1}+F^{j}_{i-1}-2F_i^{j}}{\Delta x^2} + D_1\frac{F^j_{i+1}-F^{j+1}_{i-1}}{2\Delta x} + F_i^j V_i^{j+1} + U_i^{j+1/2}+}\\
+    &\lr.){D_2\frac{F^{j+1}_{i+1}+F^{j+1}_{i-1}-2F_i^{j+1}}{\Delta x^2} + D_1\frac{F^{j+1}_{i+1}-F^{j+1}_{i-1}}{2\Delta x} + F_i^{j} V_i^{j} + U_i^{j+1/2}}
+  \end{aligned}
 \end{equation}
+ho usato la definizione di derivata centrale anche per $\partial_x$ in modo da mantenere la precisione $\Delta x^2$.
 
-Ricordo che l'equazione \`e calcolata all'istante $j+1/2$ e che faccio le medie delle derivate spaziali e della funzione tra gli istanti $j$  e $j+1$, mentre le Funzioni esterne $V$ e $U$ le calcolo in $j+1/2$, dato che sono note.
-Salto i passaggi e indico con $\eta = \frac {D_2 \Delta t}{\Delta x^2}$, posso scrivere:
+Non mostro i passaggi che portano al risultato. Per comodit\`a indico $\eta = \frac {D_2 \Delta t}{\Delta x^2}$ e scrivo:
 \begin{equation}
-\begin{aligned}
-\lrt{-\eta+D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j+1} + \lrt{2 + 2\eta- \Delta t V_i^{j+1/2}} F^{j+1}_i + \lrt{-\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j+1} - \Delta t U_i^{j+1/2} = \\
-\lrt{\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j} + \lrt{2-2\eta+\Delta t V_i^{j+1/2}} F^{j}_i + \lrt{\eta +D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j} + \Delta t U_i^{j+1/2}
-\end{aligned}
+  \begin{aligned}
+    \lrt{-\eta+D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j+1} + \lrt{2 + 2\eta- \Delta t V_i^{j+1/2}} F^{j+1}_i + \lrt{-\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j+1} - \Delta t U_i^{j+1/2} = \\
+    \lrt{\eta-D_1\frac{\Delta t}{2\Delta x}}F_{i-1}^{j} + \lrt{2-2\eta+\Delta t V_i^{j+1/2}} F^{j}_i + \lrt{\eta +D_1\frac{\Delta t}{2\Delta x}}F_{i+1}^{j} + \Delta t U_i^{j+1/2}
+  \end{aligned}
 \end{equation}
 
 Per rendere pi\`u chiara spiegazione e risoluzione della matrice tridiagonale riassumo l'equazione precedente in:
 
 \begin{equation}
-a_i^j F_{i-1}^{j+1} + d_i^j F^{j+1}_i + c_i^j F_{i+1}^{j+1} + e_i^j = 
-ak_i^j F_{i-1}^{j} + dk_i^j F^{j}_i + ck_i^j F_{i+1}^{j} + ek_i^j
+  a_i^j F_{i-1}^{j+1} + d_i^j F^{j+1}_i + c_i^j F_{i+1}^{j+1} + e_i^j = 
+  ak_i^j F_{i-1}^{j} + dk_i^j F^{j}_i + ck_i^j F_{i+1}^{j} + ek_i^j
 \end{equation}
 con:
 \begin{equation}\label{eq:pararametri}
-\begin{array}{ll r}
-a_i^j = -1+\frac{D_1}{D_2}\frac{\Delta x}2             & ak_i^j =1-\frac{D_1}{D_2}\frac{\Delta x}2&\text{parametri dei }(F^*_{i-1})\\
-d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1/2}} +2 & dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j}+1/2} -2 &\text{parametri dei }(F^*_{i})\\
-c_i^j = -1-\frac{D_1}{D_2}\frac{\Delta x}2             & ck_i^j =1+\frac{D_1}{D_2}\frac{\Delta x}2&\text{parametri dei }(F^*_{i+1})\\
-e_i^j = -\frac{\Delta x^2}{D_2} U_i^{j+1/2}              & ek_i^j =\frac{\Delta x^2}{D_2} U_i^{j+1/2}&\text{funzioni esterne}
-\end{array}
+  \begin{array}{ll r}
+    a_i^j = -1+\frac{D_1}{D_2}\frac{\Delta x}2			& ak_i^j =1-\frac{D_1}{D_2}\frac{\Delta x}2			& \text{parametri dei }(F^*_{i-1})\\
+    d_i^j = \frac1\eta\lrt{2-\Delta t V_i^{j+1/2}} +2	& dk_i^j = \frac1\eta\lrt{2+\Delta tV_i^{j+1/2}} -2	& \text{parametri dei }(F^*_{i})\\
+    c_i^j = -1-\frac{D_1}{D_2}\frac{\Delta x}2			& ck_i^j =1+\frac{D_1}{D_2}\frac{\Delta x}2			& \text{parametri dei }(F^*_{i+1})\\
+    e_i^j = -\frac{\Delta x^2}{D_2} U_i^{j+1/2}			& ek_i^j =\frac{\Delta x^2}{D_2} U_i^{j+1/2}		& \text{funzioni esterne}
+  \end{array}
 \end{equation}
+In realt\`a i parametri $e_i^j$ e $ek_i^j$ dato che non moltiplicano la funzione possono essere accorpati. Ho preferito mantenerli separati perch\'e mi sembrava che in questo modo fosse pi\`u chiaro capirne la provenienza. Per lo stesso motivo ho preferito mantenere separati i valori che moltiplicano la funzione nota e quelli che moltiplicano il passo successivo.
+
+
 \subsection{La matrice Tridiagonale: soluzione}\label{section:soluzionetri}
-Per ogni istante di tempo $j$ ho un sistema di $N$ equazioni nella forma:
+D'ora in avanti ometto la dipendenza temporale delle componenti della matrice. Per ogni istante di tempo $j$ ho un sistema di $N$ equazioni nella forma:
 \begin{equation}
-a_{i} F_{i-1}^{j+1}+d_i F_{i}^{j+1} +c_{i}F_{i+1}^{j+1}  + e_i= 
-ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i
+  a_{i} F_{i-1}^{j+1}+d_i F_{i}^{j+1} +c_{i}F_{i+1}^{j+1}  + e_i= 
+  ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i
 \end{equation}
 
-Dove $j$ rappresenta l'istante di tempo che conosco e $j+1$ quello che sto calcolando. La prima cosa da fare \`e portare nel membro a destra tutte le cose che conosco, dando per scontato che l'unica incognita dell'equazione \`e la funzione:
-\begin{equation}
-a_{i} F_{i-1}^{j+1}+d_i F_{i}^{j+1} +c_{i}F_{i+1}^{j+1}= 
-ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i - e_i
+Dove $j$ rappresenta l'istante di tempo che conosco e $j+1$ quello che sto calcolando. La prima cosa da fare \`e portare nel membro a destra tutti i parametri noti, dando per scontato che l'unica incognita dell'equazione \`e la funzione:
+\begin{equation}\label{eq:step}
+  a_{i} F_{i-1}^{j+1}+d_i F_{i}^{j+1} +c_{i}F_{i+1}^{j+1}= 
+  ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i - e_i
 \end{equation}
 
 Per proseguire con la risoluzione \`e meglio passare alla rappresentazione matriciale del sistema (rappresento gli N punti rispettando le convenzioni del C, quindi $i=0\to N-1$):
 \begin{equation}
-\lrt{\begin{array}{cccccc}
-d_0&c_0&&&\\
-a_1&d_1&c_1&\\
-&&...&&&\\
-&&&a_{N-2}&d_{N-2}&c_{N-2}\\
-&&&&a_{N-1}&d_{N-1}\\
-\end{array}} F^{j+1} = 
-\lrt{\begin{array}{cccccc}
-dk_0&ck_0&&&&\\
-ak_1&dk_1&ck_1&&&\\
-&&...&&&\\
-&&&ak_{N-2}&dk_{N-2}&ck_{N-2}\\
-&&&&ak_{N-1}&dk_{N-1}\\
-\end{array}} F^{j} + 
-\lrt{\begin{array}{c}
-ek_0 - e_0\\
-ek_1 - e_1\\
-...\\
-ek_{N-2} - e_{N-2}\\
-ek_{N-1} - e_{N-1}\\
-\end{array}}
+  \lrt{\begin{array}{cccccc}
+      d_0&c_0&&&\\
+      a_1&d_1&c_1&\\
+      &&...&&&\\
+      &&&a_{N-2}&d_{N-2}&c_{N-2}\\
+      &&&&a_{N-1}&d_{N-1}\\
+  \end{array}}\vec  F^{j+1} = 
+  \lrt{\begin{array}{cccccc}
+      dk_0&ck_0&&&&\\
+      ak_1&dk_1&ck_1&&&\\
+      &&...&&&\\
+      &&&ak_{N-2}&dk_{N-2}&ck_{N-2}\\
+      &&&&ak_{N-1}&dk_{N-1}\\
+  \end{array}} \vec F^{j} + 
+  \lrt{\begin{array}{c}
+      ek_0 - e_0\\
+      ek_1 - e_1\\
+      ...\\
+      ek_{N-2} - e_{N-2}\\
+      ek_{N-1} - e_{N-1}\\
+  \end{array}}
 \end{equation}
 
-Per comodit\`a compatto il lato conosciuto in un vettore $B^j$ le cui componenti sono:
+Per comodit\`a compatto il lato conosciuto in un vettore $\vec{B}^j$ le cui componenti sono:
 \begin{equation}\label{eq:bi}
-b_i^j = ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i-e_i
+  b_i^j = ak_i F_{i-1}^{j}+ dk_i F_{i}^{j} + ck_i F_{i+1}^{j} + ek_i-e_i
 \end{equation}
 
 \begin{equation}
-\lrt{\begin{array}{cccccc}
-d_0&c_0&&&\\
-a_1&d_1&c_1&\\
-&&...&&&\\
-&&&...&&\\
-&&&a_{N-2}&d_{N-2}&c_{N-2}\\
-&&&&a_{N-1}&d_{N-1}\\
-\end{array}} F^{j+1} = 
-B^j
+  \lrt{\begin{array}{cccccc}
+      d_0&c_0&&&\\
+      a_1&d_1&c_1&\\
+      &&...&&&\\
+      &&&...&&\\
+      &&&a_{N-2}&d_{N-2}&c_{N-2}\\
+      &&&&a_{N-1}&d_{N-1}\\
+  \end{array}} \vec F^{j+1} = 
+  \vec{B}^j
 \end{equation}
-A questo punto procedo con il trasformare la matrice nella somma di una matrice identit\`a e di una matrice con valori non nulli solo nelle celle sopra alla diagonale, faccio vedere i primi passaggi:
+A questo punto procedo con il trasformare la matrice nella somma di una matrice identit\`a e di una matrice con valori non nulli solo nelle celle sopra alla diagonale. Svolgo i primi passaggi:
 \begin{equation}
-\lrt{\begin{array}{cccccc}
-d_0&c_0&0&...&0\\
-a_1&d_1&c_1&...&0\\
-&.&.&.&&\\
-\end{array}} F^{j+1} = \lrt{\begin{array}{c}
-b_0\\b_1\\...
-\end{array}}\to
-\lrt{\begin{array}{cccccc}
-1&\frac{c_0}{d_0}&0&...&0\\
-a_1&d_1&c_1&...&0\\
-&.&.&.&&\\
-\end{array}} F^{j+1} = \lrt{\begin{array}{c}
-\frac{b_0}{d_0}\\b_1\\...
-\end{array}}
+  \lrt{\begin{array}{cccccc}
+      d_0&c_0&0&...&0\\
+      a_1&d_1&c_1&...&0\\
+      &.&.&.&&\\
+  \end{array}} F^{j+1} = \lrt{\begin{array}{c}
+      b_0\\b_1\\...
+  \end{array}}\to
+  \lrt{\begin{array}{cccccc}
+      1&\frac{c_0}{d_0}&0&...&0\\
+      a_1&d_1&c_1&...&0\\
+      &.&.&.&&\\
+  \end{array}} F^{j+1} = \lrt{\begin{array}{c}
+      \frac{b_0}{d_0}\\b_1\\...
+  \end{array}}
 \end{equation}
 Proseguendo, chiamando $h_0 = \frac{c_0}{d_0}$ e $p_0 = \frac{b_0}{d_0}$, moltiplico la prima riga per $a_1$ e la sottraggo alla seconda, in modo da eliminare $a_1$ dalla seconda riga:
 \begin{equation}
-\lrt{\begin{array}{cccccc}
-1&h_0&0&...&0\\
-a_1-a_1 &d_1 -a_1 h_0&c_1&...&0\\
-&.&.&.&&\\
-\end{array}} F^{j+1} = \lrt{\begin{array}{c}
-p_0\\b_1-a_1p_0\\...
-\end{array}}\to
-\lrt{\begin{array}{cccccc}
-1&h_0&0&...&0\\
-0 &1&\frac{c_1}{d_1 -a_1 h_0}&...&0\\
-&.&.&.&&\\
-\end{array}} F^{j+1} = \lrt{\begin{array}{c}
-p_0\\\frac{b_1-a_1p_0}{d_1 -a_1 h_0}\\...
-\end{array}}
+  \lrt{\begin{array}{cccccc}
+      1&h_0&0&...&0\\
+      a_1-a_1 &d_1 -a_1 h_0&c_1&...&0\\
+      &.&.&.&&\\
+  \end{array}} F^{j+1} = \lrt{\begin{array}{c}
+      p_0\\b_1-a_1p_0\\...
+  \end{array}}\to
+  \lrt{\begin{array}{cccccc}
+      1&h_0&0&...&0\\
+      0 &1&\frac{c_1}{d_1 -a_1 h_0}&...&0\\
+      &.&.&.&&\\
+  \end{array}} F^{j+1} = \lrt{\begin{array}{c}
+      p_0\\\frac{b_1-a_1p_0}{d_1 -a_1 h_0}\\...
+  \end{array}}
 \end{equation}
 A questo punto chiamo $h_1 = \frac{c_1}{d_1 -a_1 h_0}$ e $p_1=\frac{b_1-a_1p_0}{d_1 -a_1 h_0}$ e ripeto il ragionamento precedente sottraendo la seconda riga alla terza:
 \begin{equation}
-\lrt{\begin{array}{cccccc}
-1&h_0&0&...&0\\
-0 &1&h_1&...&0\\
-0&a_3-a_3&d_3-a_3 h_1&c_3&...\\
-&.&.&.&&\\
-\end{array}} F^{j+1} = \lrt{\begin{array}{c}
-p_0\\p_1\\b_3 -a_3 p_1\\...
-\end{array}} \to
-\lrt{\begin{array}{cccccc}
-1&h_0&0&...&0\\
-0 &1&h_1&...&0\\
-0&0&1&\frac{c_3}{d_3-a_3 h_1}&...\\
-&.&.&.&&\\
-\end{array}} F^{j+1} = \lrt{\begin{array}{c}
-p_0\\p_1\\\frac{b_3 -a_3 p_1}{d_3-a_3 h_1}\\...
-\end{array}}
+  \lrt{\begin{array}{cccccc}
+      1&h_0&0&...&0\\
+      0 &1&h_1&...&0\\
+      0&a_3-a_3&d_3-a_3 h_1&c_3&...\\
+      &.&.&.&&\\
+  \end{array}} F^{j+1} = \lrt{\begin{array}{c}
+      p_0\\p_1\\b_3 -a_3 p_1\\...
+  \end{array}} \to
+  \lrt{\begin{array}{cccccc}
+      1&h_0&0&...&0\\
+      0 &1&h_1&...&0\\
+      0&0&1&\frac{c_3}{d_3-a_3 h_1}&...\\
+      &.&.&.&&\\
+  \end{array}} F^{j+1} = \lrt{\begin{array}{c}
+      p_0\\p_1\\\frac{b_3 -a_3 p_1}{d_3-a_3 h_1}\\...
+  \end{array}}
 \end{equation}
 A questo punto chiamo $h_3 = \frac{c_3}{d_3 -a_3 h_1}$ e $p_3=\frac{b_3-a_3p_1}{d_3 -a_3 h_1}$ e proseguo, ottengo cos\`i le regole:
 \begin{equation}\label{eq:hi}
-h_i = \frac{c_i}{d_i -a_i h_{i-1}}
+  h_i = \frac{c_i}{d_i -a_i h_{i-1}}
 \end{equation}
 e
 \begin{equation}\label{eq:pi}
-p_i=\frac{b_i-a_ip_{i-1}}{d_i -a_i h_{i-1}}
+  p_i=\frac{b_i-a_ip_{i-1}}{d_i -a_i h_{i-1}}
 \end{equation}
 
 A questo punto ho semplificato il sistema:
 \begin{equation}\end{equation}
 $$\lrt{\begin{array}{cccccc}
-1&h_0&&&\\
-&1&h_1&\\
-&&...&&&\\
-&&&...&&\\
-&&&&1&h_{N-2}\\
-&&&&&1
-\end{array}}F^{j+1} = P$$
+    1	&h_0&	&	&	&\\
+    &1	&h_1&	&	&\\
+    &	&\ddots	&	&	&\\
+    &	&	&\ddots	&	&\\
+    &	&	&	&1	&h_{N-2}\\
+    &	&	&	&	&1
+\end{array}} \vec F^{j+1} = \vec{P}$$
 \begin{equation}\end{equation}
 
-Per risolvere il sistema devo calcolare il vettore delle $P$ per poi ottenere i valori di $F^{j+1}$ a partire dall'ultimo $F_{N-1}^{j+1} = p_{N-1}$ con la formula:
+Per risolvere il sistema devo calcolare il vettore delle $\vec{P}$ per poi ottenere i valori di $F^{j+1}$ a partire dall'ultimo $F_{N-1}^{j+1} = p_{N-1}$ con la formula:
 \begin{equation}
-F_{i}^{j+1} = p_{i}+h_i F_{i+1}^{j+1}
+  F_{i}^{j+1} = p_{i}+h_i F_{i+1}^{j+1}
 \end{equation}
 A questo punto ho bisogno di conoscere come trattare le condizioni al contorno.

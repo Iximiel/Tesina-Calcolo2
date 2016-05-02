@@ -53,7 +53,7 @@ namespace ROOT {
       ::Visual *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::Visual >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("Visual", ::Visual::Class_Version(), "visual.hpp", 18,
+         instance("Visual", ::Visual::Class_Version(), "visual.hpp", 20,
                   typeid(::Visual), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::Visual::Dictionary, isa_proxy, 4,
                   sizeof(::Visual) );
@@ -132,67 +132,67 @@ namespace ROOT {
 } // end of namespace ROOT for class ::Visual
 
 namespace ROOT {
-   static TClass *vectorlEdoublegR_Dictionary();
-   static void vectorlEdoublegR_TClassManip(TClass*);
-   static void *new_vectorlEdoublegR(void *p = 0);
-   static void *newArray_vectorlEdoublegR(Long_t size, void *p);
-   static void delete_vectorlEdoublegR(void *p);
-   static void deleteArray_vectorlEdoublegR(void *p);
-   static void destruct_vectorlEdoublegR(void *p);
+   static TClass *vectorlEcomplexlEdoublegRsPgR_Dictionary();
+   static void vectorlEcomplexlEdoublegRsPgR_TClassManip(TClass*);
+   static void *new_vectorlEcomplexlEdoublegRsPgR(void *p = 0);
+   static void *newArray_vectorlEcomplexlEdoublegRsPgR(Long_t size, void *p);
+   static void delete_vectorlEcomplexlEdoublegRsPgR(void *p);
+   static void deleteArray_vectorlEcomplexlEdoublegRsPgR(void *p);
+   static void destruct_vectorlEcomplexlEdoublegRsPgR(void *p);
 
    // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<double>*)
+   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<complex<double> >*)
    {
-      vector<double> *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<double>));
+      vector<complex<double> > *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<complex<double> >));
       static ::ROOT::TGenericClassInfo 
-         instance("vector<double>", -2, "vector", 214,
-                  typeid(vector<double>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &vectorlEdoublegR_Dictionary, isa_proxy, 0,
-                  sizeof(vector<double>) );
-      instance.SetNew(&new_vectorlEdoublegR);
-      instance.SetNewArray(&newArray_vectorlEdoublegR);
-      instance.SetDelete(&delete_vectorlEdoublegR);
-      instance.SetDeleteArray(&deleteArray_vectorlEdoublegR);
-      instance.SetDestructor(&destruct_vectorlEdoublegR);
-      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<double> >()));
+         instance("vector<complex<double> >", -2, "vector", 214,
+                  typeid(vector<complex<double> >), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &vectorlEcomplexlEdoublegRsPgR_Dictionary, isa_proxy, 0,
+                  sizeof(vector<complex<double> >) );
+      instance.SetNew(&new_vectorlEcomplexlEdoublegRsPgR);
+      instance.SetNewArray(&newArray_vectorlEcomplexlEdoublegRsPgR);
+      instance.SetDelete(&delete_vectorlEcomplexlEdoublegRsPgR);
+      instance.SetDeleteArray(&deleteArray_vectorlEcomplexlEdoublegRsPgR);
+      instance.SetDestructor(&destruct_vectorlEcomplexlEdoublegRsPgR);
+      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<complex<double> > >()));
       return &instance;
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<double>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<complex<double> >*)0x0); R__UseDummy(_R__UNIQUE_(Init));
 
    // Dictionary for non-ClassDef classes
-   static TClass *vectorlEdoublegR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<double>*)0x0)->GetClass();
-      vectorlEdoublegR_TClassManip(theClass);
+   static TClass *vectorlEcomplexlEdoublegRsPgR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<complex<double> >*)0x0)->GetClass();
+      vectorlEcomplexlEdoublegRsPgR_TClassManip(theClass);
    return theClass;
    }
 
-   static void vectorlEdoublegR_TClassManip(TClass* ){
+   static void vectorlEcomplexlEdoublegRsPgR_TClassManip(TClass* ){
    }
 
 } // end of namespace ROOT
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_vectorlEdoublegR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<double> : new vector<double>;
+   static void *new_vectorlEcomplexlEdoublegRsPgR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<complex<double> > : new vector<complex<double> >;
    }
-   static void *newArray_vectorlEdoublegR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<double>[nElements] : new vector<double>[nElements];
+   static void *newArray_vectorlEcomplexlEdoublegRsPgR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<complex<double> >[nElements] : new vector<complex<double> >[nElements];
    }
    // Wrapper around operator delete
-   static void delete_vectorlEdoublegR(void *p) {
-      delete ((vector<double>*)p);
+   static void delete_vectorlEcomplexlEdoublegRsPgR(void *p) {
+      delete ((vector<complex<double> >*)p);
    }
-   static void deleteArray_vectorlEdoublegR(void *p) {
-      delete [] ((vector<double>*)p);
+   static void deleteArray_vectorlEcomplexlEdoublegRsPgR(void *p) {
+      delete [] ((vector<complex<double> >*)p);
    }
-   static void destruct_vectorlEdoublegR(void *p) {
-      typedef vector<double> current_t;
+   static void destruct_vectorlEcomplexlEdoublegRsPgR(void *p) {
+      typedef vector<complex<double> > current_t;
       ((current_t*)p)->~current_t();
    }
-} // end of namespace ROOT for class vector<double>
+} // end of namespace ROOT for class vector<complex<double> >
 
 namespace {
   void TriggerDictionaryInitialization_visualDict_Impl() {

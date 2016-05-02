@@ -1,4 +1,4 @@
-aCC	= g++
+CC	= g++
 CC11	= g++ -std=c++11
 CFLAGS	= -g -Wall
 DIR	= Experiment
@@ -39,11 +39,23 @@ preview: preview.cpp visual.o libVisual.so
 	@echo Compilo $@ 
 	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
 
+doSin: sinStudy.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
+
+getInt: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
+
 pesi:pesi.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 
 pesiMuro:pesiMuro.cpp preparedraw.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
+
+pesiOsc:pesiOsc.cpp preparedraw.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
 

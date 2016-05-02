@@ -14,6 +14,8 @@
 #include <TMultiGraph.h>
 //
 #include <vector>
+#include <complex>
+typedef std::complex<double> Var;
 
 class Visual : public TGMainFrame{
   ClassDef(Visual,1)
@@ -39,20 +41,25 @@ class Visual : public TGMainFrame{
   void callIntegral();
 private:
   //se il layout non mi piace spostare questi tre blocchi si rivlea estremamente veloce
-  void ready(bool);
-  std::vector<double> Z;
-  double tstep,sstep,maxpos;
-  double myNorm, myMid, mySigma;
-  TGraph *myCI,*myObs, *myPot;
-  TMultiGraph *myVisual;
-
   TGFrame* setButtons(const TGWindow *p);
   TGFrame* setSliders(const TGWindow *p);
   TGFrame* setCanvas(const TGWindow *p);
+  
+  void ready(bool);
+  //  std::vector<double> Z;
+  std::vector<Var> Z;
+  double tstep,sstep,maxpos;
+  double myNorm, myMid, mySigma;
+  TGraph *myCI,*myObs, *myPot;
+  TGraph *myIm,*myRe;
+  TMultiGraph *myVisual;
+  
   int Nl, Nt;//Nl passi spaziali, Nt temporali
+  bool Im,Re;
   TGComboBox *cbLine;
   TGHSlider *sliderT, *sliderLine;
   TGDoubleHSlider *sliderZoom;//per integrale
+  TGCheckButton *cbIm, *cbRe;
   TGTextButton *tbOpen, *tbPot, *tbIntegral, *tbSequence;
   TGTextButton *tbSave, *tbDoThing, *tbDoNoImg, *tbFit, *tbEaster;
   TGButtonGroup *bgSetSteps;

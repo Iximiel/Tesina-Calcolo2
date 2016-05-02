@@ -39,6 +39,11 @@ public:
   void potentialsetting(const char* potentialfile);
   void simulationsetting(const char* simulationfile);
   void plotSettings(const char*, double);
+  
+  void setNewVval(double val);
+  void setNewIstdev(double Nstdev);
+  void setE(double);
+  
   double eta();
   double potenziale(int i);
   double spaceStep();
@@ -53,6 +58,9 @@ public:
   double getweight0();
   double getweightN();
   double getCCN();
+  double getE();
+  double getM();
+  double getVheight();
   bool doNextStep(double error);
   tridiag* createTriMatrix();
   Var Initial(int i);

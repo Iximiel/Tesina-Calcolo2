@@ -3,13 +3,17 @@
 #include <string>
 #include <fstream>
 
-using namespace std;
+namespace myfuncs{
+  double zero(double /*x*/, double /*a*/, double /*b*/){return 0;}
+  double sin(double x, double /*a*/, double b){return std::sin(b*x);}
+  double errsin(double x, double a, double b){return std::sin(b*x)+0.01*std::sin((a*b)*x);}
+  double gauss(double x, double a, double b){return exp(-(x-a)*(x-a)/(2*b*b));}
+  double bump(double x, double a, double b){return (abs(x-a)<b)? M_E*exp(-b*b/(b*b-(x-a)*(x-a))):0;}
+  double H(double x, double a, double /*b*/){return (x > a)?1:0;}
+  double barrier (double x, double a, double b){return H(x,a,0) * H(b,x,0);}
+}
 
-double zero(double /*x*/, double /*a*/, double /*b*/){return 0;}
-double gauss(double x, double a, double b){return exp(-(x-a)*(x-a)/(2*b*b));}
-double bump(double x, double a, double b){return (abs(x-a)<b)? M_E*exp(-b*b/(b*b-(x-a)*(x-a))):0;}
-double H(double x, double a, double /*b*/){return (x > a)?1:0;}
-double barrier (double x, double a, double b){return H(x,a,0) * H(b,x,0);}
+using namespace std;
 
 impostazioni::impostazioni(const char* wavefile, const char* simulationfile){
   simulationsetting(simulationfile);
@@ -32,11 +36,21 @@ void impostazioni::wavesetting(const char* wavefile){
   switch(tipo){
   case 'B':
   case 'b':
-    ini = bump;
+    ini = myfuncs::bump;
     cout << "\t\"Bump\""<<endl;
     break;
+  case 'S':
+  case 's':
+    ini = myfuncs::sin;
+    cout << "\t\"Seno\""<<endl;
+    break;
+  case 'E':
+  case 'e':
+    ini = myfuncs::errsin;
+    cout << "\t\"Seno+ errore (sinusoidale)\""<<endl;
+    break;
   default:
-    ini = gauss;
+    ini = myfuncs::gauss;
     cout << "\tGaussiana"<<endl;
   }
   file >> dummy >> norm >> stdev;
@@ -50,7 +64,7 @@ void impostazioni::wavesetting(const char* wavefile){
   cout << "\tEnergia: " << E << endl;
   Ik = costanti::I * sqrt(E*2*m/(costanti::hbar*costanti::hbar));
   cout<< "\tPunto centrale: " << mid
-       << ", Larghezza:" << stdev << ", Parametro Ik" << Ik <<endl;
+      << ", Larghezza:" << stdev << ", Parametro Ik" << Ik <<endl;
 }
   
 void impostazioni::potentialsetting(const char* potentialfile){
@@ -68,7 +82,7 @@ void impostazioni::potentialsetting(const char* potentialfile){
   file >> Vpos >> Vpar;//posizione parametro
   pot = nullptr;
   if(Vval == 0){
-    pot = &zero;
+    pot = myfuncs::zero;
     cout << "Senza potenziale" <<endl;
   }else{
     cout << "Potenziale: " <<endl;
@@ -76,13 +90,13 @@ void impostazioni::potentialsetting(const char* potentialfile){
     switch(type){//gli switch non mi piacciono, ma non fanno dimenticare gli else
     case 'b':
     case 'B':
-      pot = &bump;
+      pot = myfuncs::bump;
       cout << "\tBump:\n\t\tpunto medio:" << Vpos << ", larghezza:" << Vpar <<endl;
       break;
     case 'g':
     case 'G':
       cout << "\tGaussiana\n\t\tpunto medio:" << Vpos << ", deviazione std:" << Vpar <<endl;
-      pot = &gauss;
+      pot = myfuncs::gauss;
       break;
     case 'm':
     case 'M':
@@ -90,11 +104,11 @@ void impostazioni::potentialsetting(const char* potentialfile){
       Vpos -= Vpar/2.;
       Vpar += Vpos;
       cout << "\tBarriera:\n\t\tsalita: " << Vpos <<", discesa "<< Vpar <<endl;  
-      pot = &barrier;
+      pot = myfuncs::barrier;
       break;
     default:
       cout << "\tSalto:\n\t\tposizione: " << Vpos <<endl;  
-      pot = &H;
+      pot = myfuncs::H;
     }
   }
 }
@@ -175,7 +189,7 @@ tridiag* impostazioni::createTriMatrix(){
   cout << "eta: "<<Eta<<"=Ih/(2m)*"
        <<timestep<<"/("<<spacestep<<"^2)" <<endl;
   //moltiplicatore del potenziale
-  Var perV =-(costanti::I*timestep)/(costanti::hbar*Eta);
+  Var perV =(timestep/Eta)*(-costanti::I/costanti::hbar);
   //imposto a d c di base
   Var a = -1., d = 2./Eta+2., c = -1.;
   Var ak = 1., dk = 2./Eta-2., ck = 1.;
@@ -188,14 +202,14 @@ tridiag* impostazioni::createTriMatrix(){
     mat->setKnown(0,0,1,0,0);
   }else if(infoCC[0]=='N'){
     mat->setUnknown(0,0,d - potenziale(0) * perV,a+c,
-		   (-2.) * a * spacestep * CC0);
+		    (-2.) * a * spacestep * CC0);
     mat->setKnown(0,0,dk + potenziale(0) * perV,ak+ck,
-		 (-2.) * ak * spacestep * CC0);
+		  (-2.) * ak * spacestep * CC0);
   }else{//Robin
     mat->setUnknown(0,0,d - potenziale(0) * perV + 2.*a*spacestep* weight0,a+c,
 		    (-2.) * a * spacestep * CC0);
     mat->setKnown(0,0,dk + potenziale(0) * perV + 2.*ak*spacestep*weight0,ak+ck,
-		 (-2.) * ak * spacestep * CC0);
+		  (-2.) * ak * spacestep * CC0);
   }
   
   for(int j = 1;j < Nl-1;j++){
@@ -217,12 +231,12 @@ tridiag* impostazioni::createTriMatrix(){
     mat->setUnknown(Nl-1,a+c,d - potenziale(Nl-1) * perV,0,
 		    (-2.) * c * spacestep * CCN);
     mat->setKnown(Nl-1,ak+ck,dk + potenziale(Nl-1) * perV,0,
-		 (-2.) * ck * spacestep * CCN);
+		  (-2.) * ck * spacestep * CCN);
   }else{//Robin
     mat->setUnknown(Nl-1,a+c,d - potenziale(Nl-1) * perV - 2.*c*spacestep*weightN,0,
-		   (-2.) * c * spacestep * CCN);
+		    (-2.) * c * spacestep * CCN);
     mat->setKnown(Nl-1,ak+ck,dk + potenziale(Nl-1) * perV -2.*ck*spacestep*weightN,0,
-		 (-2.) * ck * spacestep * CCN);
+		  (-2.) * ck * spacestep * CCN);
   }
   return mat;
 }
@@ -239,3 +253,19 @@ double impostazioni::getCC0(){return CC0;}
 double impostazioni::getweight0(){return weight0;}
 double impostazioni::getweightN(){return weightN;}
 double impostazioni::getCCN(){return CCN;}
+double impostazioni::getVheight(){return Vval;}
+double impostazioni::getE(){return E;}
+double impostazioni::getM(){return m;}
+void impostazioni::setE(double newE){
+  E = newE;
+  Ik = costanti::I * sqrt(E*2*m/(costanti::hbar*costanti::hbar));
+  cout <<"Nuovi parametri:\n";
+  cout << "\tEnergia: " << E << endl;
+  cout << "\tIk" << Ik <<endl;
+}
+void impostazioni::setNewVval(double val){Vval = val;}
+void impostazioni::setNewIstdev(double Nstdev){
+  stdev = Nstdev;
+  cout <<"Nuovi parametri:\n";
+  cout << "\tstdev: " << stdev << endl;
+}

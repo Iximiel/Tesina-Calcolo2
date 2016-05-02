@@ -8,12 +8,11 @@
 #include <TAxis.h>
 #include <TF1.h>
 
-#include <complex>
 #include <fstream>
 #include <iostream>
 using namespace std;
 
-typedef complex<double> Var;
+
 
 double gauss(double x, double a, double b){return exp(-(x-a)*(x-a)/(2*b*b));}
 double bump(double x, double a, double b){return (abs(x-a)<b)? M_E*exp(-b*b/(b*b-(x-a)*(x-a))):0;}
@@ -34,6 +33,8 @@ Visual::Visual(const TGWindow *p,int w,int h)
   tVBtFrame->AddFrame(setSliders(tVBtFrame),new TGLayoutHints(kLHintsExpandX | kLHintsCenterX,2,2,2,2));
 
   AddFrame(tVBtFrame,new TGLayoutHints(kLHintsExpandY|kLHintsExpandX | kLHintsCenterX,2,2,2,2));
+  myRe = nullptr;Re = false;
+  myIm = nullptr;Im = false;
   myCI = nullptr;
   myObs = nullptr;
   myVisual = nullptr; 
@@ -50,6 +51,7 @@ Visual::Visual(const TGWindow *p,int w,int h)
   MapWindow();
   Resize(800,600);
 }
+
 Visual::~Visual(){
   // ~TGMainFrame();
 }
@@ -94,6 +96,11 @@ TGFrame *Visual::setButtons(const TGWindow *p){
   tbIntegral = new TGTextButton(tMainFrame,"Integrale");
   tbIntegral->SetToolTipText("");
   tMainFrame->AddFrame(tbIntegral,btLayout);
+  //  TGCheckButton *cbIm, *cbRe;
+  cbRe = new TGCheckButton(tMainFrame,"Re(F)");
+  tMainFrame->AddFrame(cbRe,btLayout);
+  cbIm = new TGCheckButton(tMainFrame,"Im(F)");
+  tMainFrame->AddFrame(cbIm,btLayout);
   
   tbOpen    -> Connect("Clicked()","Visual",this,"OpenFile()");
   tbSave    -> Connect("Clicked()","Visual",this,"SaveFile()");
@@ -183,7 +190,8 @@ void Visual::OpenFile(){
   if(fi.fFilename == 0)
     cout << "File non aperto" << endl;
   else{
-    cout << "Apro il file: "<< fi.fFilename  <<endl;//<<"(dir: "<<fi.fIniDir<<")\n";
+    cout << "Apro il file: " << fi.fFilename  <<endl;
+    //<<"(dir: "<<fi.fIniDir<<")\n";
     loadFile(fi.fFilename);
   }
   // printf("Open file: %s (dir: %s)\n", fi.fFilename, fi.fIniDir);
@@ -259,7 +267,7 @@ void Visual::doSequence(){
       fname = fname.substr(0,fname.size()-4);
     }
     TGraph *TObs;
-    TMultiGraph *TVisual = new TMultiGraph("Sequenza",("Sequenza per "+fname).c_str());//non indirizzo cosi` so che viene disctrutto a d
+    TMultiGraph *TVisual = new TMultiGraph("Sequenza",""/* ("Sequenza per "+fname).c_str()*/);
     int C[10]={1,2,3,4,5,6,7,8,9,11};
     int step = Nt/10;
     for(int i=0;i<=10;i++){
@@ -268,7 +276,7 @@ void Visual::doSequence(){
 	T=Nt;
       TObs = new TGraph(Nl);
       for(int j=0;j<Nl;j++){
-	double z = Z.at(j+T*Nl);
+	double z = abs(Z.at(j+T*Nl));
 	TObs->SetPoint(j,j*sstep,z);
       }
       TObs->SetLineColor(C[i]);
@@ -420,7 +428,7 @@ void Visual::loadFile(string dat){
   nfo+="nfo";*
   */
   ready(false);
-  
+  Re=Im=false;
   ifstream f(dat);
   int sskip, tskip;
   double atstep;
@@ -435,7 +443,7 @@ void Visual::loadFile(string dat){
       Var z;
       f >> z;
       if(f.good()){
-	Z.push_back(abs(z));
+	Z.push_back(z);
       }
     }
   }
@@ -450,11 +458,17 @@ void Visual::loadFile(string dat){
   if(myVisual!=nullptr){
     myObs -> Clear();
     myCI  -> Clear();
+    if(myRe!=nullptr)
+      myRe -> Clear();
+    if(myIm!=nullptr)
+      myIm -> Clear();
     if(myPot!=nullptr)
       myPot -> Clear();
     delete myVisual;
     myObs = nullptr;
     myCI = nullptr;
+    myRe = nullptr;
+    myIm = nullptr;
     myPot = nullptr;
   }
   myVisual = new TMultiGraph("mG","");
@@ -475,12 +489,46 @@ void Visual::SetObs(int T){
     myObs = new TGraph(Nl);
     myVisual->Add(myObs);    
   }
-      
+  if(cbRe->IsOn()){
+    if(myRe==nullptr){
+      myRe = new TGraph(Nl);
+      myRe->SetLineColor(2);
+      myRe->SetMarkerColor(2);
+    }
+    if(!Re){
+      myVisual->Add(myRe);
+      Re = true;
+    }
+  }else if(Re){
+    Re = false;
+    myVisual->GetListOfGraphs()->Remove(myRe);
+  }
+  if(cbIm->IsOn()){
+    if(myIm==nullptr){
+      myIm = new TGraph(Nl);
+      myIm->SetLineColor(4);
+      myIm->SetMarkerColor(4);
+    }
+    if(!Im){
+      myVisual->Add(myIm);
+      Im = true;
+    }
+  }else if(Im){
+    Im = false;
+    myVisual->RecursiveRemove(myIm);
+  }
   for(int i=0;i<Nl;i++){
-    double z = Z.at(i+T*Nl);
-    myObs->SetPoint(i,i*sstep,z);
-    if(z>thismax){
-      thismax=z;
+    Var z = Z.at(i+T*Nl);
+    double zabs = abs(z);
+    myObs->SetPoint(i,i*sstep,zabs);
+    if(Re){
+      myRe->SetPoint(i,i*sstep,z.real());
+    }
+    if(Im){
+      myIm->SetPoint(i,i*sstep,z.imag());
+    }
+    if(zabs>thismax){
+      thismax=zabs;
       maxpos = i*sstep;
     }
   }
@@ -504,7 +552,7 @@ void Visual::SetCI(){
   }
   
   for(int i=0;i<Nl;i++)
-    myCI->SetPoint(i,i*sstep,Z.at(i));
+    myCI->SetPoint(i,i*sstep,abs(Z.at(i)));
   myCI->SetLineColor(3);
   myCI->SetMarkerColor(3);
 }

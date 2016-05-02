@@ -1,5 +1,10 @@
-\documentclass[]{article}
-\usepackage[cm]{fullpage}
+\documentclass[10pt,a4paper]{article}
+%\documentclass[10pt,twoside,a4paper]{article}
+
+\usepackage{geometry}
+\geometry{a4paper,top=3cm,bottom=3cm,left=1.5cm,right=3.5cm,heightrounded,bindingoffset=5mm}
+\usepackage{titling}%figotitoli
+
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -24,6 +29,16 @@
 \usepackage{ifthen}
 %\usepackage{tikz}
 \usepackage{pgfplots}
+%*****************floatbarrier***********
+\usepackage[section]{placeins}
+\makeatletter%mette il floatbarrier nelle subsection
+\AtBeginDocument{%
+	\expandafter\renewcommand\expandafter\subsection\expandafter{%
+		\expandafter\@fb@secFB\subsection
+	}%
+}
+%*****************floatbarrier***********
+\makeatother
 %\usepackage{pgfplotstable}
 %\usepackage{verbatim}
 \usepackage{multirow}
@@ -32,7 +47,7 @@
 \usepackage{hyperref}%deve essere l'ultimo package
 %http://www.tug.org/applications/hyperref/manual.html
 \hypersetup{colorlinks=true,
-linkcolor=black}
+  linkcolor=black}
 
 \pgfplotsset{compat=1.12}%imposta quale versione di gnuplot usare
 \usetikzlibrary{mindmap,positioning}
@@ -53,10 +68,12 @@ linkcolor=black}
 \newcommand{\lrt}[1]{\lr{(}{)}{#1}}
 \newcommand{\lrq}[1]{\lr{[}{]}{#1}}
 \newcommand{\lrg}[1]{\lr{\{}{\}}{#1}}
+\newcommand{\norm}[1]{\lr{\|}{\|}{#1}}
 \newcommand{\media}[1]{\lr{<}{>}{#1}}
 
 \newcommand{\infint}{\int\limits_{-\infty}^{+\infty}}
 \newcommand{\Schrodinger}{Schr\"{o}dinger }
+\renewcommand{\o}{\ensuremath{\omega}}
 \newcommand{\from}{\leftarrow}
 
 %vettori
@@ -65,17 +82,56 @@ linkcolor=black}
 \numberwithin{equation}{subsection}
 
 %opening
-\title{}
+\pretitle{%
+  \begin{center}
+    \LARGE
+    %LOGO\\[\bigskipamount]
+    \includegraphics[width=0.15\textwidth]{./Immagini/logo}\\[\bigskipamount]
+    \Large{\textbf{Universit\`a degli Studi di Genova}}\\
+    
+    \rule{12cm}{0.5pt}\\
+    \large
+    FACOLT\`A DI SCIENZE MATEMATICHE, FISICHE E NATURALI\\
+    \textsc{Corso di Laurea Magistrale in Fisica\\}
+  \end{center}
+  \begin{center}\LARGE
+    }
+\posttitle{%
+    \par\end{center}
+    \begin{center}\large Tesina per Fisica Computazionale 2\\
+      \vskip0.5em
+    \end{center}
+}
+
+\author{Alex Amato \and Daniele Rapetti}
+\postauthor{\end{tabular}\par\end{center}
+\vspace{3cm}
+\begin{abstract}
+	Ho sviluppato e generalizzato il metodo di Crank-Nicolson per adattarlo all'equazione di \Schrodinger. Ho quindi analizzato i risultati e provato l'evoluzione con un salto di potenziale e una barriera rettangolare.
+\end{abstract}
+}
+\predate{\begin{center}\large\vfill}
+	\date{Anno 2014-2015}
+	\postdate{\par\clearpage\end{center}}
+
+\title{Risoluzione dell'equazione di \Schrodinger mediante la simulazione di un pacchetto d'onda gaussiano}
 \author{Daniele Rapetti}
 \date{}
 
-%\makeindex
+\makeindex
 
 \begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\part{Teoria}
 \include{intro}
 \include{algoritmo}
 \include{CC}
 \include{app}
+\input{stab}
+\newpage
+\part{Simulazione}
 \include{programma}
 \include{dati}
 \end{document}

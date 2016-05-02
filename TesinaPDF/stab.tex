@@ -1,0 +1,78 @@
+subsection{Stabilit\`a}
+Per mostrare che lo schema proposto \`e stabile utilizzo il principio di Von Neumann:
+perch\'e un metodo si riveli stabile non deve propagare eventuali errori che nascono dal calcolo. Definiamo l'errore come:
+\begin{equation}
+  E_k^j = F_k^j-u_k^j
+\end{equation}
+Dove ho usato $k$ invece che $i$ per non creare confusione con l'unit\`a immaginaria. $F_k^j$ \`e il valore della soluzione calcolata con l'algoritmo mentre $u_k^j$ \`e il valore reale della funzione nel punto $(k,j)$.
+
+Si definisce il fattore  crescita:
+
+\begin{equation}\label{eq:vonNeumannCrescita}
+  G = \lr||{\frac{E^{j+1}_k}{E^j_k}}
+\end{equation}
+che serve come criterio per comprendere la stabilit\`a dello schema.
+Come vedremo pi\`u avanti \`e comodo studiare $G$ in funzione delle frequenze spaziali. Per ogni frequenza:
+\begin{itemize}
+\item $G<1$:	l'algoritmo \`e  stabile e gli errori vengono attenuati passo per passo.
+\item $G>1$:	l'algoritmo non \`e  stabile e gli errori vengono amplificati passo per passo.
+\item $G=1$:	gli errori non vengono n\`e amplificati n\`e ridotti dall'evoluzione, \`e stabile.
+\end{itemize}
+se $G<1$ per tutte le frequenze allora il l'algoritmo si considera incondizionatamente stabile.
+
+Per fare l'analisi in frequenza faccio la trasformata di Fourier spaziale dell'errore della funzione:
+\begin{equation}
+  E_k^j = \sum_{\o} \hat{\epsilon}^j_\o e^{i\o x}
+\end{equation}
+
+Della trasformata prendiamo un solo termine per una data $\o$. Mi aspetto che la propagazione dell'errore soddisfi la stessa equazione che sto simulando e quindi procedo sostituendo l'espressione nello schema ,
+a partire da \eqref{eq:step}, e ignorando per semplicit\`a i termini $e$ e $ek$ ottengo:
+\begin{equation}
+  \lrt{a_{k} e^{i\o (k- 1) \Delta x}+d_k e^{i\o k \Delta x} +c_{k}e^{i\o (k+1) \Delta x}} \hat{\epsilon}^{j+1}_\o= 
+  \lrt{ak_i e^{i\o (k-1) \Delta x}+ dk_i e^{i\o k \Delta x} + ck_ke^{i\o (k+1) \Delta x}} \hat{\epsilon}^j_\o
+\end{equation}
+abbiamo:
+\begin{equation}
+  \frac{\hat{\epsilon}^{j+1}}{\hat{\epsilon}^j}= 
+  \frac{ak_i e^{-i\o \Delta x}+ dk_i+ ck_ke^{i\o \Delta x}}{a_{k} e^{-i\o \Delta x}+d_k  +c_{k}e^{i\o\Delta x}}
+\end{equation}
+dalla \eqref{eq:pararametri} deduco:
+
+\begin{equation*}
+  \begin{array}{l}
+    a_k^j = - ak_k^j \\
+    c_k^j = - ck_k^j \\
+    c_k^j = -a_k^j -2
+  \end{array}
+\end{equation*}
+e sostituisco nell'uguaglianza:
+\begin{equation}
+  \frac{\hat{\epsilon}^{j+1}_\o}{\hat{\epsilon}^j_\o}= -\lrt{1 -
+    \frac{d+dk}{d-2 \cos\lrt{\o \Delta x}-2 i\lrt{1+a}\sin\lrt{\o \Delta x}}}
+\end{equation}
+
+da cui ricavo $G$:
+
+\begin{equation}
+  G = \lr||{1 -
+    \frac{d+dk}{d-2 \cos\lrt{\o \Delta x}-2 i\lrt{1+a}\sin\lrt{\o \Delta x}}}
+  %G = \sqrt{
+  %	\frac{\lrt{dk+2\cos\lrt{\o \Delta x}}^2 + 4 \lrt{\lrt{1+a}\sin\lrt{\o \Delta x}}^2}
+  %	{\lrt{d-2\cos\lrt{\o \Delta x}}^2 + 4 \lrt{\lrt{1+a}\sin\lrt{\o \Delta x}}^2}}
+\end{equation}
+
+Non posso pi\`u essere generale. Per fare il valore assoluto devo conoscere se $a$, $d$ e $dk$ sono reali o complessi.
+Per esempio, sostituendo i valori che trovo in \eqref{eq:pararametriHeat} per l'equazione del calore, dopo le sostituzioni e varie semplificazioni trovo che:
+
+\begin{equation}
+  G = \frac{\lr||{\Delta x^2 - \Delta t k \lrt{1-\cos\lrt{\o \Delta t}}}}{\Delta x^2 + \Delta t k \lrt{1-\cos\lrt{\o \Delta t}}}
+\end{equation}
+
+In cui si vede che $G<1$ per tutte le frequenze diverse dai multipli di $\o = 2\pi/\Delta x$, in quei casi $G=1$ e quindi tenderanno a rimanere delle oscillazioni nella soluzione.
+
+Mentre usando i valori di \eqref{eq:pararametriSC} che uso per la risoluzione dell'equazione di \Schrodinger, utilizzando le stesse notazioni ottengo:
+\begin{equation}
+  G = \lr||{\frac{\lrt{\Delta x^2 \varLambda m - \hbar^2\lrt{1-\cos\lrt{\o \Delta x}}}\Delta t+2 i \Delta x^2 \hbar m}
+    {\lrt{\Delta x^2 \varLambda m - \hbar^2\lrt{1-\cos\lrt{\o \Delta x}}}\Delta t-2 i \Delta x^2 \hbar m}}
+\end{equation}
+Si nota facilmente che $G=1$ per tutte le frequenze; vuol dire l'algoritmo propagher\`a gli errori, ma senza amplificarli.
