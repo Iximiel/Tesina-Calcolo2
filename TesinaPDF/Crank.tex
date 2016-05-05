@@ -2,7 +2,7 @@
 %\documentclass[10pt,twoside,a4paper]{article}
 
 \usepackage{geometry}
-\geometry{a4paper,top=3cm,bottom=3cm,left=1.5cm,right=3.5cm,heightrounded,bindingoffset=5mm}
+\geometry{a4paper,top=2.5cm,bottom=3cm,left=1.5cm,right=2.5cm,heightrounded,bindingoffset=5mm}
 \usepackage{titling}%figotitoli
 
 \usepackage{amsmath}
@@ -80,6 +80,8 @@
 \renewcommand{\vec}[1]{\boldsymbol{#1}}
 
 \numberwithin{equation}{subsection}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
 
 %opening
 \pretitle{%
@@ -134,4 +136,8 @@
 \part{Simulazione}
 \include{programma}
 \include{dati}
+%\newpage
+\part{Appendice}
+\appendix
+\include{tabelle}
 \end{document}

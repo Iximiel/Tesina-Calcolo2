@@ -39,6 +39,10 @@ preview: preview.cpp visual.o libVisual.so
 	@echo Compilo $@ 
 	@$(CC11) $(CFLAGS) -o $@ -DSTANDALONE $^ $(LIBROOT) $(CFLAGSROOT)
 
+getVel:getVel.cpp preparedraw.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^ $(LIBROOT) $(CFLAGSROOT)
+
 doSin: sinStudy.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX

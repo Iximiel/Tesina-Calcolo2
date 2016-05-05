@@ -46,12 +46,12 @@ Il programma pi\`u semplice, compilabile con \lstinline|$> make single| carica i
 
 Il file generale delle impostazioni:
 \lstinputlisting[frame = single,caption=Impostazioni principali]{../settings.set}\label{lst:settings}
-In questo file fornisco i parametri principali della simulazione, quelli che ho previsto che avrei cambiato pi\`u di rado durante la simulazione. La massa, la lunghezza sono ovvi, tmax \`e il tempo a cui si ferma la simulazione. L'opzione ``\textit{\#Ndipende\_da\_intervallo=0}'' se impostata uguale a $0$ fa s\`i che il numero di passi (spaziali e temporali) venga calcolato conoscendo la lunghezza totale e il passo, se impostata diversa da $0$ invece fa s\`i che il programma calcoli il passo a partire dalla lunghezza totale e il numero di punti voluti. Le opzioni ``\textit{\#timeskip}'' e ``\textit{\#spaceskip}'' servono nel momento di salvare i risultati: il primo imposta ogni quanti passi temporali esportare il vettore di punti, che vengono salvati ad intervalli decisi dal secondo parametro. Il parametro ``\textit{\#precisione}'' invece blocca la simulazione prima del tempo massimo se l'errore (vedi \autoref{sec:errore}) supera il valore impostato, se lo si imposta a 0 salta il controllo.
+In questo file fornisco i parametri principali della simulazione, quelli che ho previsto che avrei cambiato pi\`u di rado durante la simulazione. ``\textit{\#massa} e ``\textit{\#lunghezza}'' sono ovvi, ``\textit{\#tmax}'' \`e il tempo a cui si ferma la simulazione. L'opzione ``\textit{\#Ndipende\_da\_intervallo=0}'' se impostata uguale a $0$ fa s\`i che il numero di passi (spaziali e temporali) venga calcolato conoscendo la lunghezza totale e il passo, se impostata diversa da $0$ invece fa s\`i che il programma calcoli il passo a partire dalla lunghezza totale e il numero di punti voluti. Le opzioni ``\textit{\#timeskip}'' e ``\textit{\#spaceskip}'' servono nel momento di salvare i risultati: il primo imposta ogni quanti passi temporali esportare il vettore di punti, che vengono salvati ad intervalli decisi dal secondo parametro. Il parametro ``\textit{\#precisione}'' invece blocca la simulazione prima del tempo massimo se l'errore (vedi \autoref{sec:errore}) supera il valore impostato, se lo si imposta a 0 salta il controllo.
 
 Il file delle condizioni iniziali:
 \lstinputlisting[frame = single,caption=Impostazioni CI]{../gauss.set}
-Il primo parametro deve essere una lettera e serve a indicare al programma la forma del pacchetto d'onda nelle condizioni iniziali, se viene scritto ``\textit{b}'' il programma disegner\`a la funzione ``bump'' con parametri presi dalla riga successiva, nell'ordine ``altezza del massimo'', ``larghezza'' e ``punto del massimo''; negli altri casi una gaussiana con i parametri ``altezza'', ``deviazione standard'' e ``punto medio''. I due set successivi alle impostazioni dell'onda riguardano le condizioni al contorno, la prima che pu\`o essere $0$, $1$ o $2$ indica il tipo di condizione, rispettivamente Dirichlet, Neumann o Robin sulla stessa riga il primo numero indica il valore della funzione, della derivata o della combinazione lineare, il terzo parametro viene solo utilizzata da Robin ed \`e il peso della funzione.
-L'ultima impostazione \`e l'energia che si vuole impostare per l'onda.
+Il primo parametro deve essere una lettera e serve a indicare al programma la forma del pacchetto d'onda nelle condizioni iniziali, se viene scritto ``\textit{b}'' il programma disegner\`a la funzione ``bump'' con parametri presi dalla riga successiva, nell'ordine ``altezza del massimo'', ``larghezza'' e ``punto del massimo''; negli altri casi una gaussiana con i parametri ``altezza'', ``deviazione standard'' e ``punto medio''. I due set successivi alle impostazioni dell'onda riguardano le condizioni al contorno, la prima che pu\`o essere $0$, $1$ o $2$ indica il tipo di condizione, rispettivamente Dirichlet, Neumann o Robin sulla stessa riga il primo numero indica il valore della funzione, della derivata o della combinazione lineare, il terzo parametro viene solo utilizzata da Robin ed \`e il peso della funzione\footnote{Per Dirichlet $f(\bar x) = var$, per Neumann $\lr.|{\de{f}x}_{\bar x} = var$ e per Robin $\lr.|{\de{f}x}_{\bar x} + (pesorobin) f(\bar x) = var$}
+L'ultima impostazione \`e l'energia con cui si vuole lanciare l'onda.
 
 Il file del potenziale:
 \lstinputlisting[frame = single,caption=Impostazioni potenziale]{../potenziale.set}
@@ -63,12 +63,12 @@ La mia idea \`e di simulare l'evoluzione di un pacchetto di onde piane quindi ne
 \begin{equation}
   \Psi(x,t) = \psi(x,t)e^{ik_0x-\omega t} \to \Psi(x,0) = \psi(x,0)e^{ik_0x}
 \end{equation}
-O, pi\`u correttamente:
+O, meglio:
 \begin{equation}
-  \Psi(x,t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{+\infty} A(k) e^{ikx-\omega t}\df k
+  \Psi(x,t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{+\infty} F(k) e^{ikx-\omega t}\df k
 \end{equation}
-Dato che utilizzer\`o una forma gaussiana per il pacchetto, nel programma non far\`o mai l'integrale in quanto la trasformata di Fourier di una gaussiana \`e una gaussiana.
-Ovvero avr\`o:
+Dato che utilizzer\`o un pacchetto  di forma gaussiana, nel programma non far\`o mai l'integrale in quanto la trasformata di Fourier di una gaussiana \`e una gaussiana.
+Avr\`o:
 \begin{equation}
   \Psi(x,0) = Ae^{-\frac{\lrt{x-x_0}^2}{2\sigma}}e^{ikx}
 \end{equation}
@@ -132,18 +132,22 @@ Nella simulazione blocco il calcolo se la norma della funzione si discosta tropp
 \end{figure}
 
 Per capire come impostare i parametri delle simulazioni ho effettuato diversi lanci con varie combinazioni di passo temporale e passo spaziale. Riporto i vari grafici degli errori.
-Da questi lanci capisco che devo scartare l'idea di usare un passo temporale grande in quanto ho notato che le funzioni d'onda vengono ``rallentate'', come si pu\`o vedere in \autoref{fig:velocita}. Dalle figure noto che le simulazioni devono avere come massimo passo temporale $0.01$. Il punto in cui gli andamenti perdono l'andamento lineare e` dovuto al fatto che il pacchetto sta impattando contro il bordo del dominio e quindi inizia a rimbalzare.
+Da questi lanci capisco che devo scartare l'idea di usare un passo temporale grande in quanto ho notato che le funzioni d'onda vengono ``rallentate'', come si pu\`o vedere in \autoref{fig:velocita}. Dalle figure noto che le simulazioni devono avere un passo temporale non pi\`u grande di $0.01$. Il punto in cui gli andamenti perdono l'andamento lineare e` dovuto al fatto che il pacchetto sta impattando contro il bordo del dominio e quindi inizia a rimbalzare e si iniziano a vedere le figure di interferenza.
 %rifare tutto per verificare teoria!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+%http://www.colorado.edu/physics/phys2170/phys2170_sp07/downloads/Gaussian.pdf
 Mi aspetto che la simulazione ritorni:
 \begin{equation}
-\Psi(x,t) = Ae^{-\frac{\lrt{x-x_0-\o t}^2}{2\sigma}}e^{ik\lrt{x-\o t}}
+%\Psi(x,t) = A(t)e^{-\frac{\lrt{x-x_0-\o t}^2}{2\sigma^2}}e^{ik\lrt{x-\o t}}
+\Psi(x,t) = A(t)e^{-\frac{\lrt{x-x_0- v t}^2}{2\sigma(t)^2}}e^{ikx-\o t}
 \end{equation}
-e quindi che i massimi delle onde da me simulate si spostino nel tempo seguendo la legge:
+dove $\o = \frac E\hbar$  e $v = \frac{p}{m} =\frac{\sqrt{2m E}}{m} $, ricordando che stiamo lavorando con pacchetti di onde piane monocromatici.
+Quindi che i massimi delle onde da me simulate si spostino nel tempo seguendo la legge:
 \begin{equation}
-x_0(t) = x_0(0)+\o t
+x_0(t) = x_0(0)+\sqrt{2\frac{E}{m}} t
 \end{equation}
-
-Poi ho quindi guardato l'errore di alcune simulazioni, scartando a priori i passi pi\`u grandi di $0.01$, \autoref{fig:fullErr} e \ref{fig:fullErrzoom}.
+%%%%%%%%%%%%%%%%%%
+%%non rispetta questo ma va confrontato con il fatto che invece rispetta la dispersione
+Poi ho guardato l'errore di alcune simulazioni, scartando a priori i passi pi\`u grandi di $0.01$, \autoref{fig:fullErr} e \ref{fig:fullErrzoom}.
 
 \begin{figure}[hbt]
   \centering
@@ -183,60 +187,6 @@ Osservando \autoref{fig:SceltaErrori} utilizzare come passi spaziali e temporali
   \caption[Scelta Passi]{Gli errori dei passi che ritengo pi\`u convenienti}\label{fig:sceltaPassi}
 \end{figure}
 
-\subsection{La forma delle condizioni iniziali}
-I test sull'errore li ho effettuati utilizzando come condizione iniziale un pacchetto d'onda gaussiano. Per effetto della dispersione \`e un pacchetto deltiforme che nel tempo si \`e disperso allargandosi in una gaussiana.
-
-Ho provato  ad utilizzare una forma differente per il pacchetto: la funzione ``bump'':
-\begin{figure}[hbt]
-	\centering
-	\begin{tikzpicture}[scale=0.5]
-	\begin{axis}[axis x line = center, axis y line = center, xmin = -0.1, xmax = 4.1, ymin=-0.1,ymax =1.5]
-	\addplot[domain=-0.1:4.1, samples =501, red]	plot[id=bumpl1]	function{(abs(x-1)<1)? exp(1)*exp(-1/(1-(x-1)*(x-1))):0};
-	\addlegendentry{$a=1$, $b=1$}
-	\addplot[domain=-0.1:4.1, samples =501, blue]	plot[id=bumpl1]	function{(abs(x-1)<2)? exp(1)*exp(-4/(4-(x-1)*(x-1))):0};
-	\addlegendentry{$a=1$, $b=2$}
-	\addplot[domain=-0.1:4.1, samples =501, green]	plot[id=bumpl1]	function{(abs(x-3)<1)? exp(-1/(1-(x-3)*(x-3))):0};
-	\addlegendentry{$a=3$, $b=1$ non moltiplicata per $e$}
-	\end{axis}
-	\end{tikzpicture}
-	\caption{Alcuni esempi della funzione bump}\label{fig:bump}
-\end{figure}
-
-\begin{equation}
-bump = \lrt{x} = \lr\{.{\begin{array}{lr}
-	e^{-\frac{b^2}{b^2-\lrt{x-a}^2}}&\text{per }\lr||{x-a}<b\\
-	0&\text{altrove}
-	\end{array}}
-\end{equation}
-
-Che \`e una funzione di test quindi \`e definita differente da 0 solo in un intervallo aperto, ed ha la caratteristica di avere tutte le derivate continue, questo mi permetterebbe di ignorare completamente le condizioni al contorno quando la funzione si trova lontano dai bordi della simulazione.
-Inoltre moltiplico il risultato per $e$ per avere un pacchetto con il massimo alto $1$, vedi \autoref{fig:bump}.
-
-\begin{figure}[hbt]
-  \centering
-  \includegraphics[width=0.5\linewidth]{IMG/testbump}
-  \caption[Errore Bump]{l'evoluzione dell'errore del ``bump'' confrontata con quella di un pacchetto gaussiano}\label{fig:testBump}
-\end{figure}
-
-A questo punto simulo il pacchetto e confronto l'errore con uno gaussiano. Come si pu\`o vedere dalla \autoref{fig:testBump} non \`e una buona idea.
-
-L'errore cresce molto verso la fine della simulazione, questo potrebbe essere dovuto al fatto che sta impattando contro i limiti del dominio, inoltre se si osserva l'evoluzione della funzione si vede che perde praticamente subito la forma iniziale e quindi anche i vantaggi di avere le code pari a 0.
-\begin{figure}[htb]
-  \centering
-  \begin{subfigure}[b]{0.49\textwidth}
-    \includegraphics[width=\textwidth]{IMG/bumpDisp1.png}
-    \caption{larghezza 1}
-  \end{subfigure}
-  ~
-  \begin{subfigure}[b]{0.49\textwidth}
-    \includegraphics[width=\textwidth]{IMG/bumpDisp2.png}
-    \caption{larghezza 2}
-  \end{subfigure}
-  \caption{L'evoluzione del ``bump'', le ``increspature'' sull'onda che si vedono ai lati sono le interferenze dovute alla riflessione}
-\end{figure}
-
-A questo punto l'idea migliore per il pacchetto d'onda sembra essere la gaussiana.
-
 \subsection{Dispersione dei pacchetti d'onda}
 %pacchetti di Airy non disperdono-> provare
 \begin{figure}[htb]
@@ -251,7 +201,7 @@ A questo punto l'idea migliore per il pacchetto d'onda sembra essere la gaussian
   \caption{La dispersione delle gaussiana a $\sigma =1$, in verde le condizioni iniziali}\label{fig:dispersione}
 \end{figure}
 
-La prima cosa che si pu\`o osservare nelle simulazioni (e in particolare in \autoref{fig:dispersione}) \`e la dispersione dell'onda, ovvero il pacchetto si allarga nel tempo. Questa \`e una caratteristica dell'equazione di \Schrodinger, in quanto la sua forma \`e appunto quella di una qualsiasi equazione che descriva la dispersione.
+La prima cosa che si pu\`o osservare nelle simulazioni (e in particolare in \autoref{fig:dispersione}) \`e la dispersione dell'onda, ovvero il pacchetto si allarga nel tempo. Questa \`e una caratteristica dell'equazione di Schr\"{o}dinger, in quanto la sua forma \`e appunto quella di una qualsiasi equazione che descriva la dispersione.
 
 Voglio calcolare la teoria di questo fenomeno per poterlo confrontare con i risultati che ho ottenuto nelle prime simulazioni.
 Per ottenere la soluzione dell'equazione con condizioni iniziali $\psi\lrt{x,0}=e^{-\frac{x^2}{2\sigma^2}}$ si passa dalla trasformata di Fourier spaziale $\hat\psi\lrt{x,0}=\sqrt{2\pi\sigma^2} e^{-\frac{k^2 \sigma^2}2}$, che porta ad avere la funzione, con dipendenza temporale:
@@ -277,7 +227,7 @@ E, chiamando $\sigma_0$ il valore assegnato nelle condizioni iniziali, mi aspett
   \sigma(t) = \sqrt{\frac{\sigma_0^4+\lrt{\frac\hbar m t}^2}{\sigma_0^2}}
 \end{equation}
 
-Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori di $\sigma$ iniziali, utilizzando come funzione da fittare \eqref{eq:sigmat}. L'algoritmo sembra rispettare la dispersione,  come si pu\`o vede re in \autoref{fig:dispersioneFitSigma1}, in
+Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori di $\sigma$ iniziali, utilizzando come funzione da fittare \eqref{eq:sigmat}. L'algoritmo sembra rispettare la dispersione,  come si pu\`o vedere in \autoref{fig:dispersioneFitSigma1}, in
 \autoref{fig:dispersioneFitSigma4} e in \autoref{fig:dispersioneFitE} dove la funzione ha energia diversa da 0
 
 \begin{figure}[htb]
@@ -337,30 +287,65 @@ Ho fatto diversi fit, sul parametro $\sigma$, con diverse masse e diversi valori
   \caption{Alcuni fit dell'andamento della dispersione}\label{fig:dispersioneFitE}
 \end{figure}
 
-\begin{table}
-  \centering
-  \begin{tabular}{cccc|cccc}
-    \toprule
-    t	&$\alpha$	&$\bar x$& $\sigma$ &	t	&	$\alpha$	&$\bar x$& $\sigma$\\ \toprule
-    0   & 1        & 40 & 1       & 5.5 & 0.422955 & 40 & 5.59001 \\ \midrule
-    0.5 & 0.94574  & 40 & 1.11803 & 6   & 0.405467 & 40 & 6.08259 \\ \midrule
-    1   & 0.840898 & 40 & 1.4142  & 6.5 & 0.389951 & 40 & 6.57628 \\ \midrule
-    1.5 & 0.744796 & 40 & 1.80272 & 7   & 0.376066 & 40 & 7.07086 \\ \midrule
-    2   & 0.668766 & 40 & 2.23596 & 7.5 & 0.363549 & 40 & 7.56615 \\ \midrule
-    2.5 & 0.609451 & 40 & 2.69242 & 8   & 0.352191 & 40 & 8.06202 \\ \midrule
-    3   & 0.562349 & 40 & 3.16219 & 8.5 & 0.341825 & 40 & 8.55837 \\ \midrule
-    3.5 & 0.524146 & 40 & 3.63995 & 9   & 0.332317 & 40 & 9.05512 \\ \midrule
-    4   & 0.492486 & 40 & 4.12299 & 9.5 & 0.323555 & 40 & 9.55221 \\ \midrule
-    4.5 & 0.465765 & 40 & 4.60964 & 10  & 0.315447 & 40 & 10.0496 \\ \midrule
-    5   & 0.442856 & 40 & 5.09887 &     &          &    &         \\ \bottomrule
-  \end{tabular}
-  \caption{I dati di una simulazione, con $\alpha = 1$, $\sigma=1$ e $m=1$ }\label{table:dispersioneg1}
-\end{table}
+\subsection{La forma delle condizioni iniziali}
+Ho effettuato i test precedenti utilizzando come condizione iniziale un pacchetto d'onda gaussiano. Per effetto della dispersione \`e un pacchetto deltiforme che nel tempo si \`e disperso allargandosi in una gaussiana.
+
+Ho provato  ad utilizzare una forma differente per il pacchetto: la funzione ``bump'':
+\begin{figure}[hbt]
+	\centering
+	\begin{tikzpicture}[scale=0.5]
+	\begin{axis}[axis x line = center, axis y line = center, xmin = -0.1, xmax = 4.1, ymin=-0.1,ymax =1.5]
+	\addplot[domain=-0.1:4.1, samples =501, red]	plot[id=bumpl1]	function{(abs(x-1)<1)? exp(1)*exp(-1/(1-(x-1)*(x-1))):0};
+	\addlegendentry{$a=1$, $b=1$}
+	\addplot[domain=-0.1:4.1, samples =501, blue]	plot[id=bumpl1]	function{(abs(x-1)<2)? exp(1)*exp(-4/(4-(x-1)*(x-1))):0};
+	\addlegendentry{$a=1$, $b=2$}
+	\addplot[domain=-0.1:4.1, samples =501, green]	plot[id=bumpl1]	function{(abs(x-3)<1)? exp(-1/(1-(x-3)*(x-3))):0};
+	\addlegendentry{$a=3$, $b=1$ non moltiplicata per $e$}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Alcuni esempi della funzione bump}\label{fig:bump}
+\end{figure}
+
+\begin{equation}
+bump = \lrt{x} = \lr\{.{\begin{array}{lr}
+	e^{-\frac{b^2}{b^2-\lrt{x-a}^2}}&\text{per }\lr||{x-a}<b\\
+	0&\text{altrove}
+	\end{array}}
+\end{equation}
+
+Il ''bump`` \`e una funzione di test quindi \`e definita differente da 0 solo in un intervallo aperto, ed ha la caratteristica di avere tutte le derivate continue, questo mi permetterebbe di ignorare completamente le condizioni al contorno quando la funzione si trova lontano dai bordi della simulazione.
+Inoltre moltiplico il risultato per $e$ per avere un pacchetto con il massimo alto $1$, vedi \autoref{fig:bump}.
+
+\begin{figure}[hbt]
+	\centering
+	\includegraphics[width=0.5\linewidth]{IMG/testbump}
+	\caption[Errore Bump]{l'evoluzione dell'errore del ``bump'' confrontata con quella di un pacchetto gaussiano}\label{fig:testBump}
+\end{figure}
+
+A questo punto simulo il pacchetto e confronto l'errore con uno gaussiano. Come si pu\`o vedere dalla \autoref{fig:testBump} non \`e una buona idea.
+
+L'errore cresce molto verso la fine della simulazione, questo potrebbe essere dovuto al fatto che sta impattando contro i limiti del dominio, inoltre se si osserva l'evoluzione della funzione si vede che perde praticamente subito la forma iniziale e quindi anche i vantaggi di avere le code pari a 0.
+\begin{figure}[htb]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{IMG/bumpDisp1.png}
+		\caption{larghezza 1}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{IMG/bumpDisp2.png}
+		\caption{larghezza 2}
+	\end{subfigure}
+	\caption{L'evoluzione del ``bump'', le ``increspature'' sull'onda che si vedono ai lati sono le figure di interferenza dovute alla riflessione}
+\end{figure}
+
+A questo punto l'idea migliore per il pacchetto d'onda sembra essere la gaussiana.
+
 
 \subsection{Condizioni al contorno}
 Quello che vorrei simulare \`e un pacchetto d'onda che sia partito da $-\infty$ e arrivi nel ``punto interessante'', l'area che osservo nella simulazione, e poi prosegua fino all'infinito (o venga eventualmente riflesso).
 
-Per quanto riguarda le condizioni al contorno ho avuto idee:
+Per quanto riguarda le condizioni al contorno ho avuto le seguenti idee:
 \begin{itemize}
 \item Non tengo conto delle condizioni al contorno, faccio in modo di usare pacchetti d'onda ristretti e blocco la simulazione quando questa va ad  avvicinarsi troppo ai bordi.
 \item Uso una forma d'onda tale per cui conosco la funzione e la sua derivata in ogni punto
@@ -368,9 +353,9 @@ Per quanto riguarda le condizioni al contorno ho avuto idee:
 \end{itemize}
 La prima ipotesi \`e stata quella che ho usato in tutte le prove che ho effettuato prima di iniziare a raccogliere dati, considerando 0 il valore della funzione negli estremi.
 
-Per la seconda ipotesi dovrei usare come condizione iniziale una funzione e calcolarne la derivata per ogni passo negli estremi a priori il discorso non si applica ma i pacccheti d'onda hanno una dispersione tendono ad allargarsi, per cui se  per esempio avessi un pacchetto d'onda generico ($\Psi(x,t) = e^{ikx} \psi(x,t)$)la relazione dovrebbe essere $\partial_x \Psi(x,t) = ik \Psi(x,t) + e^{ikx}\partial_x\psi(x,t)$ e potrei quindi utilizzare le CC di Robin in caso conoscessi come la funzione si disperde nel tempo potrei ricalcolare ad ogni passo le condizioni al contorno ed applicarle. Questo per\`o mi porterebbe a svariati problemi quali l'incertezza che la simulazione e la teoria siano esattamente parallele sulla dispersione 
+Per la seconda ipotesi dovrei usare come condizione iniziale una funzione e calcolarne la derivata per ogni passo negli estremi. Ma pacchetti d'onda si disperdono e tendono ad allargarsi, per cui se,  per esempio avessi un pacchetto d'onda generico ($\Psi(x,t) = e^{ikx} \psi(x,t)$), la relazione dovrebbe essere $\partial_x \Psi(x,t) = ik \Psi(x,t) + e^{ikx}\partial_x\psi(x,t)$ e potrei quindi utilizzare le CC di Robin. Ma doveri conoscere come la funzione si disperde nel tempo e ricalcolare quindi  ad ogni passo le condizioni al contorno ed applicarle. Questo per\`o mi porterebbe a svariati problemi quali l'incertezza che la simulazione e la teoria siano esattamente parallele sulla dispersione, il che porterebbe ad altri errori, ed il fatto che molto probabilmente sarebbe poco efficiente dal punto di vista della performance del calcolo.
 
-La terza idea equivale a utilizzare Dirichlet con il valore della funzione pari a 0 nei bordi. Devo mostrare che l'errore non cresce per quest'ipotesi
+La terza idea equivale a utilizzare Dirichlet con il valore della funzione pari a 0 nei bordi questo simula un pozzo con pareti di potenziale infinito.
 
 %Per cui ho deciso di ricercare un'idea che simulasse l'assenza di vincoli: ho trovato le cosiddette condizioni al contorno trasparenti.
 %Ma ho lasciato perdere data la loro complessit\`a e il poco tempo a mia disposizione, in quanto utilizza la trasformazione Z
@@ -379,14 +364,14 @@ La terza idea equivale a utilizzare Dirichlet con il valore della funzione pari 
 Dopo i primi esperimenti sono arrivato a queste conclusioni:
 \begin{itemize}
 \item Far\`o le simulazioni utilizzando una gaussiana come forma del pacchetto d'onda, perch\'e mantiene la propria forma.
-\item Per controllare la dispersione dell'onda, vista la forma di \eqref{eq:sigmat} posso scegliere di utilizzare un $\sigma_0$ grande oppure una massa grande
+\item Per contenere la dispersione dell'onda, vista la forma di \eqref{eq:sigmat} posso scegliere di utilizzare un $\sigma_0$ grande oppure una massa grande
   \begin{itemize}
   \item con una massa grande per avere la stessa velocit\`a di gruppo devo aumentare l'energia, ma in compenso posso utilizzare dei $\sigma_0$ piuttosto piccoli e quindi questo mi rende pi\`u semplice il compito di fare confronti tra due parti di spazio limitate per analizzare la trasmissivit\`a delle barriere di potenziale
   \item con $\sigma_0$ grande il pacchetto d'onda  non ha bisogno di una grande energia per muoversi, ma il fatto che esso sia esteso pu\`o comportare problemi per esempio quando si riflette contro un potenziale o quando lo attraversa o nel momento di definire le condizioni iniziali, perch\'e rischio di sovrapporre l'onda al potenziale.
   \end{itemize}
 \item Come condizioni al contorno simuler\`o la scatola chiusa con pareti infinite, sebbene una prima idea fosse quella di utilizzare le condizioni ``trasparenti'', ma questo oltre ad appesantire il programma farebbe uscire il pacchetto d'onda dalla mia ``zona d'osservazione'' e quindi non sarei pi\`u in grado di fare l'integrale di tutto il pacchetto (comprese le sue riflessioni e i pezzi in cui si \`e diviso).
 \item Per ritardare il pi\`u possibile l'interazione con le condizioni al contorno devo aumentare l'intervallo spaziale se aumento il tempo della simulazione
+\item %dire ch eme ne frego del fatto che la velocita` non collima con la teoria
 \end{itemize}
 
-Con queste conclusioni in mano mi appresto a simulare le situazioni per cui ho progettato questo algoritmo e inizialmente confrontarle con qualche caso reale.
-%appunto per l'energia: i sample spaziali devono essere tali da far si` che e^ik sia ancora un seno+coseno e non robe strane dovute all'aliasing
+Con queste conclusioni in mano mi appresto a simulare le situazioni per cui ho progettato questo algoritmo e confrontarle con la teoria.

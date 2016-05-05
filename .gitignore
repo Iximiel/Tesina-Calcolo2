@@ -6,6 +6,7 @@ single
 CVD
 doSin
 getInt
+getVel
 pesiOsc
 preview
 CCDict.cpp

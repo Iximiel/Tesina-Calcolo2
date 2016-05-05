@@ -63,7 +63,7 @@ Anche in questo caso non approfondisco, l'approccio \`e simile al metodo di Cran
 \subsection{Un esempio di come ricavare il metodo di Crank Nicolson: l'equazione del calore}
 Innanzitutto utilizziamo la definizione centrale della derivata prima in modo da avere una precisione di $\Delta t^2$ anche per quanto riguarda il tempo, ma  calcolandola in $t+\Delta t/2$ con incremento $\Delta t/2$:
 \begin{equation}
-  \pde{T}t(x,t+\Delta t/2) \simeq \frac{T(x,t+\Delta t/2+\Delta t/2)-T(x,t-\Delta t/2+\Delta t/2)}{2*\Delta t/2} = \frac{T(x,t+\Delta t)-T(x,t)}{\Delta t}
+  \pde{T}t(x,t+\Delta t/2) \simeq \frac{T(x,t+\Delta t/2+\Delta t/2)-T(x,t-\Delta t/2+\Delta t/2)}{2 \Delta t/2} = \frac{T(x,t+\Delta t)-T(x,t)}{\Delta t}
 \end{equation}
 Per lo spazio utilizziamo le derivate calcolate negli esempi precedenti.
 A questo punto abbiamo $\pde{T}t(x,t+\Delta t/2)$, $\pde{^2T}{x^2}(x,t)$ e $\pde{^2T}{x^2}(x,t+\Delta t)$ per calcolare l'equazione facciamo la media delle due derivate spaziali ai tempi $t$ e $t+\Delta t$.

@@ -159,11 +159,11 @@ void impostazioni::plotSettings(const char* file, double myTmax){
   ofstream ofile(file);
   ofile << spacestep << " " << timestep << " " << precision << endl;
   ofile << lenght << " " << tmax  << " " << myTmax << endl;
-  ofile << E <<endl;
-  ofile << norm << " " << mid << " " << stdev;
-  ofile << Vval << " " << Vpos << " " << Vpar;
-  ofile << infoCC[0] << " " << CC0 << " " << weight0;
-  ofile << infoCC[1] << " " << CCN << " " << weightN;
+  ofile << E << " " << m <<endl;
+  ofile << norm << " " << mid << " " << stdev <<endl;
+  ofile << Vval << " " << Vpos << " " << Vpar <<endl;
+  ofile << infoCC[0] << " " << CC0 << " " << weight0 <<endl;
+  ofile << infoCC[1] << " " << CCN << " " << weightN <<endl;
   ofile.close();
 }
   

@@ -1,7 +1,7 @@
 \section{Dati e analisi}
 Con le impostazioni che ho ricavato nella sezione precedente ho quindi proceduto con la simulazione del comportamento delle onde in presenza di vari potenziali.
 \subsection{Il salto di potenziale}
-Il primo potenziale che analizzo \`e il salto di potenziale, posiziono un gradino a met\`a del dominio e, con varie altezze e ne calcolo il coefficiente di trasmissivit\`a.
+Il primo potenziale che analizzo \`e il salto di potenziale, posiziono un gradino a met\`a del dominio e variandone l'altezza ne calcolo il coefficiente di trasmissivit\`a.
 
 \begin{equation}
   \lr\{.{\begin{array}{lr}
@@ -55,7 +55,7 @@ Quelli che mi interessano sono per\`o il coefficiente di riflessione e trasmissi
   \end{array}}
 \end{equation}
 
-\begin{figure}[hbt]
+\begin{figure}[h]
   \centering
   \begin{tikzpicture}
     \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={above}, xmin = -0.1, xmax = 3.1, ymin=-0.1,ymax =1.1,legend style={at={(1,0.5)},anchor=east}]
@@ -70,8 +70,8 @@ Quelli che mi interessano sono per\`o il coefficiente di riflessione e trasmissi
 
 Quindi proseguiamo ed eseguiamo delle simulazioni.
 
-Nelle simulazioni i lanci sono stati fatti con pacchetti gaussiani inizialmente con $\sigma=0.5$, energia $100$ e massa $10$. Il potenziale \`e stato impostato perch\'e il salto fosse al centro del dominio e con altezza diversa per ogni lancio e ne ho analizzato l'andamento temporale del rapporto tra l'integrale su tutto il dominio e quello fatto nella prima met\`a, ricavando cos\`i il coefficiente di riflessione nel tempo.
-Il coefficiente di riflessione possiamo dire che \`e il valore del peso dell'integrale quando si \`e stabilizzato.
+Nelle simulazioni i lanci sono stati fatti con pacchetti gaussiani inizialmente con $\sigma=0.5$, energia $100$ e massa $10$. Il potenziale \`e stato impostato perch\'e il salto fosse al centro del dominio e con altezza diversa per ogni lancio e ho analizzato l'andamento temporale del rapporto tra l'integrale su tutto il dominio e quello fatto nella prima met\`a.
+Ho deciso di usare come coefficiente di riflessione il valore del peso dell'integrale quando questo si \`e stabilizzato.
 Dall'andamento nel tempo si pu\`o vedere un piccolo abbassamento quando l'onda impatta il potenziale per le barriere pi\`u alte, prima di venire riflessa all'indietro penetra leggermente nell'area classicamente vietata.
 
 \begin{figure}[htb]
@@ -80,33 +80,12 @@ Dall'andamento nel tempo si pu\`o vedere un piccolo abbassamento quando l'onda i
   \caption{I pesi dell'integrale della prima met\`a del dominio per $\sigma=0.5$}\label{fig:SaltoR}
 \end{figure}
 
-Come si pu\`o notare dalla \autoref{tab:SaltoDati} sebbene stia simulando un pacchetto d'onda in movimento e non un un'onda piana il peso dei coefficienti ricalca abbastanza bene i coefficienti teorici, e sembra avvicinarli di pi\`u man mano che allargo il pacchetto. Notare che la simulazione si allontana dalla teoria per le onde piane man mano che si avvicini al regime in cui il potenziale \`e maggiore dell'energia dell'onda.
-
-\begin{table}[hbt]
-  \centering
-  \begin{tabular}{cccccc}
-    \toprule
-    \multirow{2}{*}{E/V} &           \multicolumn{4}{c}{simulazione $\sigma$}            & \multirow{2}{*}{teoria} \\
-    \cmidrule(lr){2-5}  &     $0.5$     &      $1$      &      $2$      &      $4$      &  \\ \midrule
-    $10$         & $0.000724389$ & $0.000718394$ & $0.000716913$ & $0.000716543$ &      $0.000693482$      \\ \midrule
-    $4$          & $0.00539149$  & $0.00533663$  & $0.00532312$  & $0.00531976$  &      $0.00515478$       \\ \midrule
-    $2$          &  $0.0309848$  &  $0.0304801$  &  $0.0303576$  &  $0.0303272$  &       $0.0294373$       \\ \midrule
-    $1.66$        &  $0.0536892$  &  $0.0525454$  &  $0.0522718$  &  $0.0522041$  &       $0.0506914$       \\ \midrule
-    $1.33$        &  $0.120552$   &   $0.1158$    &  $0.114741$   &  $0.114483$   &       $0.111112$        \\ \midrule
-    $1.11$        &  $0.344071$   &  $0.291725$   &  $0.281975$   &  $0.279959$   &       $0.269876$        \\ \midrule
-    $1$          &  $0.751078$   &  $0.815668$   &   $0.8777$    &  $0.934287$   &           $1$           \\ \midrule
-    $0.9090$       &  $0.978315$   &  $0.999843$   &      $1$      &      $1$      &           $1$           \\ \midrule
-    $0.8$         &  $0.999979$   &      $1$      &      $1$      &      $1$      &           $1$           \\ \midrule
-    $0.5$         &      $1$      &      $1$      &      $1$      &      $1$      &           $1$           \\ \midrule
-    $0.33$        &      $1$      &      $1$      &      $1$      &      $1$      &           $1$           \\ \bottomrule
-  \end{tabular}
-  \caption{Alcuni dati delle simulazioni per il salto di potenziale}\label{tab:SaltoDati}
-\end{table}
+Come si pu\`o notare dalla \autoref{tab:SaltoDati} sebbene stia simulando un pacchetto d'onda in movimento e non un un'onda piana il peso dei coefficienti ricalca abbastanza bene i coefficienti teorici, e sembra avvicinarli di pi\`u man mano che allargo il pacchetto. Notare che la simulazione si allontana dalla teoria per le onde piane pi\`u si \`e vicini al regime in cui il potenziale \`e maggiore dell'energia dell'onda.
 
 \begin{figure}[hbt]
   \centering
   \begin{tikzpicture}
-    \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
+    \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
       \addplot table[x=ev,y=fhS1] {Dati/pesi2.tdt};%{Dati/Salto.tdt};
       \addlegendentry{$\sigma=0.5$}
       \addplot table[x=ev,y=fhS2] {Dati/pesi2.tdt};
@@ -195,24 +174,24 @@ Che messi in termini di $E$ e $V$ ed $m$:
   \centering
   \begin{tikzpicture}
     \def \a {2}
-    \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
+    \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
       \addplot table[x=ev,y=L2] {Dati/pesiMurog1.tdt};%{Dati/Salto.tdt};
-      \addlegendentry{$2$}
+      \addlegendentry{$a=2,~\sigma = 0.5$}
       %	\addplot table[x=ev,y=L4] {Dati/pesiMurog1.tdt};
       %	\addlegendentry{$4$}
       \addplot table[x=ev,y=L2] {Dati/pesiMurog2.tdt};
-      \addlegendentry{$2$}
+      \addlegendentry{$a=2,~\sigma = 1$}
       \addplot table[x=ev,y=L2] {Dati/pesiMurog3.tdt};
-      \addlegendentry{$2$}
+      \addlegendentry{$a=2,~\sigma = 2$}
       \addplot table[x=ev,y=L2] {Dati/pesiMurog4.tdt};
-      \addlegendentry{$2$}
+      \addlegendentry{$a=2,~\sigma = 4$}
       %	\addplot table[x=ev,y=L2] {Dati/pesiMurog2.tdt};
       %	\addlegendentry{$4$}
       %	\addplot table[x=ev,y=L16] {Dati/pesiM.tdt};
       %	\addlegendentry{$16$}
       %(2*sin(20*a*sqrt(5 - 5/x))*sin(20*a*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*a*sqrt(5 - 5/x)))
       \addplot[domain=1.00000001:10, samples =501, blue]	plot[id=MRefl2]	function{(2*sin(20*\a*sqrt(5 - 5/x))*sin(20*\a*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*\a*sqrt(5 - 5/x)))};
-      \addlegendentry{teoria 2 }
+      \addlegendentry{teoria $a=2$ }
       %	\addplot[domain=1.00000001:10, samples =501, green]	plot[id=MRefl2]	function{(2*sin(20*4*sqrt(5 - 5/x))*sin(20*4*sqrt(5 - 5/x)))/(1 - 8*x + 8*x*x - cos(40*4*sqrt(5 - 5/x)))};
       %	\addlegendentry{teoria 4 }
       %	\addplot[domain=0:10, samples =501, red]	plot[id=MRefl2]	function{(-2*sin(4*sqrt(-1 + x))*sin(4*sqrt(-1 + x)))/(-1 + 8*x - 8*x*x + cos(2*4*sqrt(-1 + x)))};
@@ -229,7 +208,7 @@ Che messi in termini di $E$ e $V$ ed $m$:
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{tikzpicture}
       \def \a {2}
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax =0.1]
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax = 0.11]
 	\addplot table[x=ev,y=S05] {Dati/DataOsc2.tdt};
 	\addlegendentry{$a=2$, $\sigma=0.5$};
 	\foreach \s in {1,2,3}{
@@ -244,11 +223,11 @@ Che messi in termini di $E$ e $V$ ed $m$:
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
-  ~
+  ~~
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{tikzpicture}
       \def \a {2}
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax =0.1]
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax = 0.11]
 	\foreach \s in {4,5,6,7}{
 	  \addplot table[x=ev,y=S\s] {Dati/DataOsc2.tdt};
 	  \edef\temp{\noexpand\addlegendentry{$a=2$, $\sigma=\s$}}
@@ -268,7 +247,7 @@ Che messi in termini di $E$ e $V$ ed $m$:
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{tikzpicture}
       \def \a {4}
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax =0.1]
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax = 0.11]
 	\addplot table[x=ev,y=S05] {Dati/DataOsc4.tdt};
 	\addlegendentry{$a=4$, $\sigma=0.5$};
 	\foreach \s in {1,2,3}{
@@ -283,11 +262,11 @@ Che messi in termini di $E$ e $V$ ed $m$:
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
-  ~
+  ~~
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{tikzpicture}
       \def \a {4}
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax =0.1]
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax = 0.11]
 	\foreach \s in {4,5,6,7}{
 	  \addplot table[x=ev,y=S\s] {Dati/DataOsc4.tdt};
 	  \edef\temp{\noexpand\addlegendentry{$a=4$, $\sigma=\s$}}
@@ -308,17 +287,17 @@ Che messi in termini di $E$ e $V$ ed $m$:
       \def \a {0.1};
       \def \m {5};
       
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\addplot table[x=ev,y=E25] {Dati/datatunnelm5.tdt};
-	\addlegendentry{$25$}
-	\addplot table[x=ev,y=E75] {Dati/datatunnelm5.tdt};
-	\addlegendentry{$75$}
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
 	\def \En {25};
+	\addplot table[x=ev,y=E25] {Dati/datatunnelm5.tdt};
+	\addlegendentry{S: $E=25$}
 	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 25}
+	\addlegendentry{T: $E=25$}
 	\def \En {75};
+	\addplot table[x=ev,y=E75] {Dati/datatunnelm5.tdt};
+	\addlegendentry{S: $E=75$}
 	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 75}
+	\addlegendentry{T: $E=75$}
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
@@ -328,21 +307,21 @@ Che messi in termini di $E$ e $V$ ed $m$:
       \def \a {0.1};
       \def \m {5};
       
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+	\def \En {50};
 	\addplot table[x=ev,y=E50] {Dati/datatunnelm5.tdt};
-	\addlegendentry{$50$}
+	\addlegendentry{S: $E=50$}
+	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
+	\addlegendentry{T: $E=50$}
+	\def \En {100};
 	\addplot table[x=ev,y=E100] {Dati/datatunnelm5.tdt};
-	\addlegendentry{$100$}
-	\def \En {50};
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 50}
-	\def \En {100};
+	\addlegendentry{S: $E=100$}
 	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 100}
+	\addlegendentry{T: $E=100$}
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
-  \caption{La visualizzazione dei dati e il confronto con la teoria, con massa 5}
+  \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 5 e spessore della barriera $a=0.1$}
 \end{figure}
 
 \begin{figure}[hbt]
@@ -352,17 +331,17 @@ Che messi in termini di $E$ e $V$ ed $m$:
       \def \a {0.1};
       \def \m {10};
       
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+	\def \En {25};
 	\addplot table[x=ev,y=E25] {Dati/datatunnelm10.tdt};
-	\addlegendentry{$25$}
-	\addplot table[x=ev,y=E75] {Dati/datatunnelm10.tdt};
-	\addlegendentry{$75$}
-	\def \En {25};
+	\addlegendentry{S: $E=25$}
 	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 25}
+	\addlegendentry{T: $E=25$}
 	\def \En {75};
+	\addplot table[x=ev,y=E75] {Dati/datatunnelm10.tdt};
+	\addlegendentry{S: $E=75$}
 	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 75}
+	\addlegendentry{T: $E=75$}
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
@@ -372,24 +351,24 @@ Che messi in termini di $E$ e $V$ ed $m$:
       \def \a {0.1};
       \def \m {10};
       
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\addplot table[x=ev,y=E50] {Dati/datatunnelm10.tdt};
-	\addlegendentry{$50$}
-	\addplot table[x=ev,y=E100] {Dati/datatunnelm10.tdt};
-	\addlegendentry{$100$}
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
 	\def \En {50};
+	\addplot table[x=ev,y=E50] {Dati/datatunnelm10.tdt};
+	\addlegendentry{S: $E=50$}
 	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 50}
+	\addlegendentry{T: $E=50$}
 	\def \En {100};
+	\addplot table[x=ev,y=E100] {Dati/datatunnelm10.tdt};
+	\addlegendentry{S: $E=100$}
 	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 100}
+	\addlegendentry{T: $E=100$}
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
-  \caption{La visualizzazione dei dati e il confronto con la teoria, con massa 10}
+  \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 10 e spessore della barriera $a=0.1$}
 \end{figure}
 
-Dai dati sembra che se la barriera \`e pi\`u grande della larghezza del treno la simulazione non rispetta la teoria
+Dai dati sembra che pi\`u la barriera \`e  grande rispetto alla larghezza del treno pi\`u la simulazione si allontana dalla teoria per le onde piane. Probabilmente questo \`e dovuto al fatto che con una barriera pi\`u grande del pacchetto questo si comporti con essa come se fosse in presenza di un salto di potenziale.
 
 
 \begin{figure}[hbt]
@@ -399,17 +378,17 @@ Dai dati sembra che se la barriera \`e pi\`u grande della larghezza del treno la
       \def \a {0.1};
       \def \m {15};
       
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\addplot table[x=ev,y=E25] {Dati/datatunnelm15.tdt};
-	\addlegendentry{$25$}
-	\addplot table[x=ev,y=E75] {Dati/datatunnelm15.tdt};
-	\addlegendentry{$75$}
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
 	\def \En {25};
+	\addplot table[x=ev,y=E25] {Dati/datatunnelm15.tdt};
+	\addlegendentry{S: $E=25$}
 	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 25}
+	\addlegendentry{T: $E=25$}
+	\addplot table[x=ev,y=E75] {Dati/datatunnelm15.tdt};
+	\addlegendentry{S: $E=75$}
 	\def \En {75};
 	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 75}
+	\addlegendentry{T: $E=75$}
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
@@ -419,19 +398,31 @@ Dai dati sembra che se la barriera \`e pi\`u grande della larghezza del treno la
       \def \a {0.1};
       \def \m {15};
       
-      \begin{axis}[axis x line = center, axis y line = center, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\addplot table[x=ev,y=E50] {Dati/datatunnelm15.tdt};
-	\addlegendentry{$50$}
-	\addplot table[x=ev,y=E100] {Dati/datatunnelm15.tdt};
-	\addlegendentry{$100$}
+      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
 	\def \En {50};
+	\addplot table[x=ev,y=E50] {Dati/datatunnelm15.tdt};
+	\addlegendentry{S: $E=50$}
 	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 50}
+	\addlegendentry{T: $E=50$}
 	\def \En {100};
+	\addplot table[x=ev,y=E100] {Dati/datatunnelm15.tdt};
+	\addlegendentry{S: $E=100$}
 	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{teoria 100}
+	\addlegendentry{T: $E=100$}
       \end{axis}
     \end{tikzpicture}
   \end{subfigure}
-  \caption{La visualizzazione dei dati e il confronto con la teoria, con massa 15}
+  \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 15 e spessore della barriera $a=0.1$}
 \end{figure}
+
+
+\begin{tikzpicture}
+\def \m {10};
+
+\begin{axis}[axis x line = center, axis y line = center, ylabel=v, ylabel style={left}, xlabel=E, xlabel style={below right}, xmin = 0, xmax = 210, ymin=-0.1,ymax =7]
+
+	\addplot[domain=5:205, samples =501, orange]	plot[id=provaV]	function{sqrt(2*x/\m)};
+	\addplot table[x=E,y=m10] {Dati/vel.tdt};
+
+\end{axis}
+\end{tikzpicture}
