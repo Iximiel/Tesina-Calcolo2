@@ -9,12 +9,14 @@ preparedraw::preparedraw(string fname, int whatToDo){
   settings = whatToDo;
   ifstream f(fname);
   //carico le impostazioni
-  f >> sskip >> Nl >> sstep >>tskip >> atstep;
+  int NOrig;
+  f >> sskip >> NOrig >> sstep >>tskip >> atstep;
   f >> tstep;//tstep tra le righe
-  cout << "Salto spaziale: "<< sskip << ", Passi spaziali:" << Nl
+  cout << "Salto spaziale: "<< sskip << ", Passi spaziali:" << NOrig
        << ", Passo spaziale:" << sstep <<endl;
   cout << "Salto temporale: "<< tskip << ", Passo temporale:" << atstep
        << "\nPasso temporale registrato: "<< tstep << endl;
+  Nl = NOrig/sskip;
   size_t pospot = -1;
   pospot = fname.find("_");
   pot = fname.substr(0,pospot);

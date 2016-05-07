@@ -434,6 +434,7 @@ void Visual::loadFile(string dat){
   double atstep;
   f >> sskip >> Nl >> sstep >> tskip >> atstep;
   f >> tstep;//tstep tra le righe
+  Nl/=sskip;
   sstep*=sskip;
   Z.clear();
   cout << "Carico l'onda" << endl;

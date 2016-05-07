@@ -370,7 +370,6 @@ Che messi in termini di $E$ e $V$ ed $m$:
 
 Dai dati sembra che pi\`u la barriera \`e  grande rispetto alla larghezza del treno pi\`u la simulazione si allontana dalla teoria per le onde piane. Probabilmente questo \`e dovuto al fatto che con una barriera pi\`u grande del pacchetto questo si comporti con essa come se fosse in presenza di un salto di potenziale.
 
-
 \begin{figure}[hbt]
   \centering
   \begin{subfigure}[b]{0.49\textwidth}
@@ -414,15 +413,3 @@ Dai dati sembra che pi\`u la barriera \`e  grande rispetto alla larghezza del tr
   \end{subfigure}
   \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 15 e spessore della barriera $a=0.1$}
 \end{figure}
-
-
-\begin{tikzpicture}
-\def \m {10};
-
-\begin{axis}[axis x line = center, axis y line = center, ylabel=v, ylabel style={left}, xlabel=E, xlabel style={below right}, xmin = 0, xmax = 210, ymin=-0.1,ymax =7]
-
-	\addplot[domain=5:205, samples =501, orange]	plot[id=provaV]	function{sqrt(2*x/\m)};
-	\addplot table[x=E,y=m10] {Dati/vel.tdt};
-
-\end{axis}
-\end{tikzpicture}
