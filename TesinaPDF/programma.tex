@@ -103,14 +103,8 @@ La discretizzazione delle condizioni iniziali, gaussiane:
   CI\lrq{j}= Ae^{-\frac{\lrt{j*\df x-x_0}^2}{2\sigma}+i k j*\df x}
 \end{equation}
 
-\subsection{Lancio senza potenziale: errore}\label{sec:errore}
-Prima di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
-
-Ho bisogno di definire un ``errore'' per capire quanto la simulazione possa essere andata a buon fine:
-la mia scelta \`e stata di utilizzare la norma della funzione, ricordando che le funzioni d'onda sono $L^2$ e quindi la loro norma \`e  $\lr||f^2=\int_X\lr||f^2d\mu$.
-Ho utilizzato la definizione dell'integrale discreto di Simpson, il che mi limita a poter fare solo simulazioni con un numero di passi pari (e in particolare multipli di 4 per aver un integrale preciso anche quando calcolo l'integrale solo nella prima o seconda met\`a del dominio) nello spazio.
-
-Nella simulazione blocco il calcolo se la norma della funzione si discosta troppo dalla norma delle condizioni iniziali, il limite viene scelto nel file delle impostazioni.
+\subsection{Lancio senza potenziale: velocit\`a ed errore}\label{sec:errore}
+La di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
 
 \begin{figure}[hbt]
 	\centering
@@ -131,8 +125,8 @@ Nella simulazione blocco il calcolo se la norma della funzione si discosta tropp
 	\caption{Le posizioni dei massimi nel tempo della simulazione a vari passi temporali  e spaziali}\label{fig:velocita}
 \end{figure}
 
-Per capire come impostare i parametri delle simulazioni ho effettuato diversi lanci con varie combinazioni di passo temporale e passo spaziale. Riporto i vari grafici degli errori.
-Da questi lanci capisco che devo scartare l'idea di usare un passo temporale grande in quanto ho notato che le funzioni d'onda vengono ``rallentate'', come si pu\`o vedere in \autoref{fig:velocita}. Dalle figure noto che le simulazioni devono avere un passo temporale non pi\`u grande di $0.01$. Il punto in cui gli andamenti perdono l'andamento lineare e` dovuto al fatto che il pacchetto sta impattando contro il bordo del dominio e quindi inizia a rimbalzare e si iniziano a vedere le figure di interferenza.
+Prima di tutto effettuo diversi lanci per vedere come si comporta la simulazione al variare dei parametri.
+Dai primi lanci capisco che devo scartare l'idea di usare un passo temporale grande in quanto ho notato che le funzioni d'onda vengono ``rallentate'', come si pu\`o vedere in \autoref{fig:velocita} le simulazioni con un passo temporale pi\`u grande di $0.01$ sono da scartare. Il punto in cui gli andamenti perdono l'andamento lineare e` dovuto al fatto che il pacchetto sta impattando contro il bordo del dominio e quindi inizia a rimbalzare e si iniziano a vedere le figure di interferenza.
 %rifare tutto per verificare teoria!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %http://www.colorado.edu/physics/phys2170/phys2170_sp07/downloads/Gaussian.pdf
 Mi aspetto che la simulazione ritorni:
@@ -149,49 +143,57 @@ x_0(t) = x_0(0)+\sqrt{2\frac{E}{m}} t
 %%non rispetta questo ma va confrontato con il fatto che invece rispetta la dispersione
 \begin{figure}[hbt]
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
-		\begin{tikzpicture}
-		\def \a {0.1};
-		\def \m {15};
-		
-		\begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-		\def \En {25};
-		\addplot table[x=ev,y=E25] {Dati/datatunnelm15.tdt};
-		\addlegendentry{S: $E=25$}
-		\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-		\addlegendentry{T: $E=25$}
-		\addplot table[x=ev,y=E75] {Dati/datatunnelm15.tdt};
-		\addlegendentry{S: $E=75$}
-		\def \En {75};
-		\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-		\addlegendentry{T: $E=75$}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\begin{tikzpicture}[scale =0.66]
+		\def \m {5};
+		\begin{axis}[axis x line = center, axis y line = center, ylabel=v, ylabel style={left}, xlabel=E, xlabel style={below right}, xmin = 0, xmax = 208, ymin=-0.1,ymax =8.2, legend style={at={(1,0.1)},anchor=south east}]
+		\addplot[domain=8:208, samples =501, orange]	plot[id=velm20]	function{sqrt(2*x/\m)};
+		\addlegendentry{Teoria $m=5$}
+		\addplot table[x=E,y=m5] {Dati/vel.tdt};
+		\addlegendentry{$\Delta x =0.005$, $\Delta t = 0.01$}
+		\addplot table[x=E,y=m5] {Dati/velprec.tdt};
+		\addlegendentry{$\Delta x =0.001$, $\Delta t = 0.005$}
 		\end{axis}
 		\end{tikzpicture}
 	\end{subfigure}
 	~
-	\begin{subfigure}[b]{0.49\textwidth}
-		\begin{tikzpicture}
-		\def \a {0.1};
-		\def \m {15};
-		
-		\begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-		\def \En {50};
-		\addplot table[x=ev,y=E50] {Dati/datatunnelm15.tdt};
-		\addlegendentry{S: $E=50$}
-		\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-		\addlegendentry{T: $E=50$}
-		\def \En {100};
-		\addplot table[x=ev,y=E100] {Dati/datatunnelm15.tdt};
-		\addlegendentry{S: $E=100$}
-		\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-		\addlegendentry{T: $E=100$}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\begin{tikzpicture}[scale =0.66]
+		\def \m {10};
+		\begin{axis}[axis x line = center, axis y line = center, ylabel=v, ylabel style={left}, xlabel=E, xlabel style={below right}, xmin = 0, xmax = 208, ymin=-0.1,ymax =6.2, legend style={at={(1,0.1)},anchor=south east}]
+		\addplot[domain=8:208, samples =501, orange]	plot[id=velm20]	function{sqrt(2*x/\m)};
+		\addlegendentry{Teoria $m=10$}
+		\addplot table[x=E,y=m10] {Dati/vel.tdt};
+		\addlegendentry{$\Delta x =0.005$, $\Delta t = 0.01$}
+		\addplot table[x=E,y=m10] {Dati/velprec.tdt};
+		\addlegendentry{$\Delta x =0.001$, $\Delta t = 0.005$}
 		\end{axis}
 		\end{tikzpicture}
 	\end{subfigure}
-	\caption{}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\begin{tikzpicture}[scale =0.66]
+		\def \m {20};
+		\begin{axis}[axis x line = center, axis y line = center, ylabel=v, ylabel style={left}, xlabel=E, xlabel style={below right}, xmin = 0, xmax = 208, ymin=-0.1,ymax =5.2, legend style={at={(1,0.1)},anchor=south east}]
+		\addplot[domain=8:208, samples =501, orange]	plot[id=velm20]	function{sqrt(2*x/\m)};
+		\addlegendentry{Teoria $m=20$}
+		\addplot table[x=E,y=m20] {Dati/vel.tdt};
+		\addlegendentry{$\Delta x =0.005$, $\Delta t = 0.01$}
+		\addplot table[x=E,y=m20] {Dati/velprec.tdt};
+		\addlegendentry{$\Delta x =0.001$, $\Delta t = 0.005$}
+		\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Studio velocit\`a: si pu\`o osservare che con basse energie la simulazione tende a essere pi\`u fedele alla teoria.}\label{fig:simvel}
 \end{figure}
+Come si pu\`o osservare da \eqref{fig:simvel} la simulazione tende a essere pi\`u vicina alla teoria solo a basse energie o ad alte precisioni. Ma dato che intendo simulare con precisione di $\Delta x =0.005$ e $\Delta t = 0.01$, a causa della potenza di calcolo della mia macchina mi limiter\`o a simulare con massimi $E=25$.
 
-Poi ho guardato l'errore di alcune simulazioni, scartando a priori i passi pi\`u grandi di $0.01$, \autoref{fig:fullErr} e \ref{fig:fullErrzoom}.
+A questo punto ho ho guardato l'errore delle simulazioni, scartando a priori i passi temporali pi\`u grandi di $0.01$, \autoref{fig:fullErr} e \ref{fig:fullErrzoom}.
+
+Ho deciso di definire un ``errore'' per capire quanto la simulazione possa essere andata a buon fine utilizzando la norma della funzione, ricordando che le funzioni d'onda sono $L^2$ e quindi la loro norma \`e  $\lr||f^2=\int_X\lr||f^2d\mu$.
+Per calcolarlo ho utilizzato la definizione dell'integrale discreto di Simpson, il che mi limita a poter fare solo simulazioni con un numero di passi pari (e in particolare multipli di 4 per aver un integrale preciso anche quando calcolo l'integrale solo nella prima o seconda met\`a del dominio) nello spazio.
+
+Nella simulazione blocco il calcolo se la norma della funzione si discosta troppo dalla norma delle condizioni iniziali, il limite viene scelto nel file delle impostazioni.
 
 \begin{figure}[hbt]
   \centering

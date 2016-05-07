@@ -3,7 +3,7 @@
 #lunghezza
 120
 #tmax
-20
+8
 #Ndipende_da_int=0
 0
 #Nl
@@ -15,7 +15,7 @@
 #timestep
 0.01
 #timeskip
-20
+10
 #spaceskip
 1
 #precisione
