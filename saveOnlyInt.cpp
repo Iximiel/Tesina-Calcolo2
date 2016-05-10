@@ -18,7 +18,7 @@ int main(int argc, char** argv){
       settings.erase(num);
   }
   
-  ifstream file("Tunnel.set");
+  ifstream file("Potenziale.set");
   string dummy;
   file >> dummy >> dummy;
   file >> dummy >> dummy;
@@ -27,22 +27,35 @@ int main(int argc, char** argv){
   file.close();
   Vpos -= Vpar/2.;
   int nE = 4;
-  double En[nE] = {25,50,75,100};
-  impostazioni *info = new impostazioni("initial.set", "Tunnel.set", settings.c_str());
+  double En[nE] = {10, 15, 20, 25};
+  impostazioni *info = new impostazioni("initial.set", "Potenziale.set", settings.c_str());
   for(int j=0;j<nE;j++){
     info->setE(En[j]);
     char fname[50];
-    sprintf(fname,"tunnel%i.tdt",(int)En[j]);
+    sprintf(fname,"Esperimento_%i.tdt",j);
     ofstream fout(fname);
     fout <<"ev\tE"<<En[j]<<"\n";
     
-    int N=40;
+    int N;
+#ifdef REGULAR
+    //incrementi regolari
+    N=40;
     double a = 0.1, b=1.75;
     double incr = (b-a)/N; //andare da a a b in N passi (N+1 perche` b lo voglio compreso)
+#else
+    N=10;
+    //punti decisi
+    double div[N+1] = {1./3.,0.5,0.8,9./10.,1,11./10.,4./3.,5./3.,2,4,10};
+#endif
     double V[N+1];
     //  creo la lista dei potnziali:
-    for(int i=0;i<N+1;i++)
+    for(int i=0;i<N+1;i++){
+#ifdef REGULAR
       V[i] = En[j]/(a+incr*i);
+#else
+      V[i] = En[j]/(div[i]);
+#endif
+    }
     for(int i=0;i<N+1;i++){
       cout <<"\n** Valore potenziale:"<< V[i] <<"\n";
       info->setNewVval(V[i]);

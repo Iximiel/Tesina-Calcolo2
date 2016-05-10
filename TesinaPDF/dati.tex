@@ -83,21 +83,38 @@ Dall'andamento nel tempo si pu\`o vedere un piccolo abbassamento quando l'onda i
 Come si pu\`o notare dalla \autoref{tab:SaltoDati} sebbene stia simulando un pacchetto d'onda in movimento e non un un'onda piana il peso dei coefficienti ricalca abbastanza bene i coefficienti teorici, e sembra avvicinarli di pi\`u man mano che allargo il pacchetto. Notare che la simulazione si allontana dalla teoria per le onde piane pi\`u si \`e vicini al regime in cui il potenziale \`e maggiore dell'energia dell'onda.
 
 \begin{figure}[hbt]
-  \centering
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
   \begin{tikzpicture}
-    \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
-      \addplot table[x=ev,y=fhS1] {Dati/pesi2.tdt};%{Dati/Salto.tdt};
-      \addlegendentry{$\sigma=0.5$}
-      \addplot table[x=ev,y=fhS2] {Dati/pesi2.tdt};
-      \addlegendentry{$\sigma=1$}
-      \addplot table[x=ev,y=fhS3] {Dati/pesi2.tdt};
-      \addlegendentry{$\sigma=2$}
-      \addplot table[x=ev,y=fhS4] {Dati/pesi2.tdt};
-      \addlegendentry{$\sigma=4$}
-      \addplot[domain=0:10, samples =501, green]	plot[id=Refl2]	function{x<1?1:1-(4*sqrt(x-1)*sqrt(x))/((sqrt(-1+x)+sqrt(x))*(sqrt(-1+x)+sqrt(x)))};
-      \addlegendentry{teoria}
-    \end{axis}
+  \def \En {10};
+  \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
+  \addplot table[x=ev,y=E\En] {Dati/saltos05.tdt};%{Dati/Salto.tdt};
+  \addlegendentry{$\sigma=0.5$}
+  	\foreach \sig in {1,2,4}{
+  		\addplot table[x=ev,y=E\En] {Dati/saltos\sig.tdt};
+  		\edef\temp{\noexpand\addlegendentry{$\sigma = \sig$}}
+  		\temp
+  	}
+  \addplot[domain=0:10, samples =501, green]	plot[id=Refl2]	function{x<1?1:1-(4*sqrt(x-1)*sqrt(x))/((sqrt(-1+x)+sqrt(x))*(sqrt(-1+x)+sqrt(x)))};
+  \addlegendentry{teoria}
+  \end{axis}
   \end{tikzpicture}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.49\textwidth}
+  \begin{tikzpicture}
+  \def \sig {2};
+  \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = -0.1, xmax = 10.1, ymin=-0.1,ymax =1.1]
+  	\foreach \E in {10,15,20,25}{
+		\addplot table[x=ev,y=E\E] {Dati/saltos\sig.tdt};
+		\edef\temp{\noexpand\addlegendentry{$E=\E$}}
+		\temp
+	}
+  \addplot[domain=0:10, samples =501, green]	plot[id=Refl2]	function{x<1?1:1-(4*sqrt(x-1)*sqrt(x))/((sqrt(-1+x)+sqrt(x))*(sqrt(-1+x)+sqrt(x)))};
+  \addlegendentry{teoria}
+  \end{axis}
+  \end{tikzpicture}
+	\end{subfigure}
   \caption{La visualizzazione dei dati e il confronto con la teoria}
 \end{figure}
 

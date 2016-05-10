@@ -47,9 +47,15 @@ doSin: sinStudy.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
 
-getInt: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+getIntD: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX
+
+getIntR: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX -DREGULAR
+#compila entrambi i getInt
+getInt: getIntR getIntD
 
 pesi:pesi.cpp preparedraw.o
 	@echo Compilo $@

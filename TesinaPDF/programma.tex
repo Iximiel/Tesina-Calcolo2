@@ -103,8 +103,8 @@ La discretizzazione delle condizioni iniziali, gaussiane:
   CI\lrq{j}= Ae^{-\frac{\lrt{j*\df x-x_0}^2}{2\sigma}+i k j*\df x}
 \end{equation}
 
-\subsection{Lancio senza potenziale: velocit\`a ed errore}\label{sec:errore}
-La di tutto voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
+\subsection{Lancio senza potenziale: velocit\`a}\label{sec:velocita}
+Voglio effettuare qualche simulazione senza potenziale per poter osservare come si comporta l'onda.
 
 \begin{figure}[hbt]
 	\centering
@@ -127,9 +127,10 @@ La di tutto voglio effettuare qualche simulazione senza potenziale per poter oss
 
 Prima di tutto effettuo diversi lanci per vedere come si comporta la simulazione al variare dei parametri.
 Dai primi lanci capisco che devo scartare l'idea di usare un passo temporale grande in quanto ho notato che le funzioni d'onda vengono ``rallentate'', come si pu\`o vedere in \autoref{fig:velocita} le simulazioni con un passo temporale pi\`u grande di $0.01$ sono da scartare. Il punto in cui gli andamenti perdono l'andamento lineare e` dovuto al fatto che il pacchetto sta impattando contro il bordo del dominio e quindi inizia a rimbalzare e si iniziano a vedere le figure di interferenza.
+
 %rifare tutto per verificare teoria!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %http://www.colorado.edu/physics/phys2170/phys2170_sp07/downloads/Gaussian.pdf
-Mi aspetto che la simulazione ritorni:
+Analizzando meglio l'equazione svolgo i calcoli e mi aspetto che la simulazione ritorni:
 \begin{equation}
 %\Psi(x,t) = A(t)e^{-\frac{\lrt{x-x_0-\o t}^2}{2\sigma^2}}e^{ik\lrt{x-\o t}}
 \Psi(x,t) = A(t)e^{-\frac{\lrt{x-x_0- v t}^2}{2\sigma(t)^2}}e^{ikx-\o t}
@@ -186,14 +187,15 @@ x_0(t) = x_0(0)+\sqrt{2\frac{E}{m}} t
 	\end{subfigure}
 	\caption{Studio velocit\`a: si pu\`o osservare che con basse energie la simulazione tende a essere pi\`u fedele alla teoria.}\label{fig:simvel}
 \end{figure}
-Come si pu\`o osservare da \eqref{fig:simvel} la simulazione tende a essere pi\`u vicina alla teoria solo a basse energie o ad alte precisioni. Ma dato che intendo simulare con precisione di $\Delta x =0.005$ e $\Delta t = 0.01$, a causa della potenza di calcolo della mia macchina mi limiter\`o a simulare con massimi $E=25$.
+Ho quindi verificato che la relazione funzionasse ma come si pu\`o osservare da \eqref{fig:simvel} la simulazione tende a essere pi\`u vicina alla teoria solo a basse energie o ad avvicinarsi di pi\`u aumentando la precisione.
 
-A questo punto ho ho guardato l'errore delle simulazioni, scartando a priori i passi temporali pi\`u grandi di $0.01$, \autoref{fig:fullErr} e \ref{fig:fullErrzoom}.
-
+\subsection{Lancio senza potenziale: errore}\label{sec:errore}
 Ho deciso di definire un ``errore'' per capire quanto la simulazione possa essere andata a buon fine utilizzando la norma della funzione, ricordando che le funzioni d'onda sono $L^2$ e quindi la loro norma \`e  $\lr||f^2=\int_X\lr||f^2d\mu$.
 Per calcolarlo ho utilizzato la definizione dell'integrale discreto di Simpson, il che mi limita a poter fare solo simulazioni con un numero di passi pari (e in particolare multipli di 4 per aver un integrale preciso anche quando calcolo l'integrale solo nella prima o seconda met\`a del dominio) nello spazio.
 
 Nella simulazione blocco il calcolo se la norma della funzione si discosta troppo dalla norma delle condizioni iniziali, il limite viene scelto nel file delle impostazioni.
+
+A questo punto ho  guardato l'errore nelle simulazioni, scartando a priori i passi temporali pi\`u grandi di $0.01$, \autoref{fig:fullErr} e \ref{fig:fullErrzoom}.
 
 \begin{figure}[hbt]
   \centering
@@ -209,7 +211,7 @@ Nella simulazione blocco il calcolo se la norma della funzione si discosta tropp
   \caption[Errori completo]{Il grafico degli errori, si vede anche quanto la riflessione influisca sul modulo della funzione.}\label{fig:Err}
 \end{figure}
 
-A questo punto ho fatto una simulazione diminuendo il tempo massimo a $6$ in modo da non avere a che fare con l'esplosione dell'errore dovuta al limite del dominio. e cosi` da poter osservare quale fosse il miglior passo spaziale. Ho fatto i lanci con due diverse condizioni iniziali (gaussiana con $\sigma$ $1$ e $2$). 
+Quindi ho fatto una simulazione diminuendo il tempo massimo a $6$ in modo da non avere a che fare con l'esplosione dell'errore dovuta al limite del dominio. e cosi` da poter osservare quale fosse il miglior passo spaziale. Ho fatto i lanci con due diverse condizioni iniziali (gaussiana con $\sigma$ $1$ e $2$). 
 
 \begin{figure}[htb]
   \centering
@@ -417,7 +419,7 @@ Dopo i primi esperimenti sono arrivato a queste conclusioni:
   \end{itemize}
 \item Come condizioni al contorno simuler\`o la scatola chiusa con pareti infinite, sebbene una prima idea fosse quella di utilizzare le condizioni ``trasparenti'', ma questo oltre ad appesantire il programma farebbe uscire il pacchetto d'onda dalla mia ``zona d'osservazione'' e quindi non sarei pi\`u in grado di fare l'integrale di tutto il pacchetto (comprese le sue riflessioni e i pezzi in cui si \`e diviso).
 \item Per ritardare il pi\`u possibile l'interazione con le condizioni al contorno devo aumentare l'intervallo spaziale se aumento il tempo della simulazione
-\item %dire ch eme ne frego del fatto che la velocita` non collima con la teoria
+\item Guardando i risultati che ho osservato con guardando la velocit\`a devo limitare l'energia dei pacchetti d'onda al di sotto di $E=25$
 \end{itemize}
 
 Con queste conclusioni in mano mi appresto a simulare le situazioni per cui ho progettato questo algoritmo e confrontarle con la teoria.

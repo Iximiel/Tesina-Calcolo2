@@ -8,5 +8,5 @@ do
     awk '{getline f1 <"tmp1.tmp";print f1,$2}' $f > tmp2.tmp
     cat tmp2.tmp > tmp1.tmp
 done
-cat  tmp1.tmp > datatunnel.tdt
+cat  tmp1.tmp > saltos.tdt
 rm tmp1.tmp tmp2.tmp
