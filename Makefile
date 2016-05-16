@@ -54,8 +54,16 @@ getIntD: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 getIntR: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX -DREGULAR
-#compila entrambi i getInt
-getInt: getIntR getIntD
+
+getIntS: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX -DSIGMA
+
+getIntSR: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.o
+	@echo Compilo $@
+	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX -DREGULAR -DSIGMA
+#compila i getInt
+getInt: getIntR getIntD getIntS getIntSR
 
 pesi:pesi.cpp preparedraw.o
 	@echo Compilo $@

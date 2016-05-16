@@ -28,6 +28,7 @@
 \usepackage{booktabs}
 \usepackage{ifthen}
 %\usepackage{tikz}
+\usepackage{xcolor}
 \usepackage{pgfplots}
 %*****************floatbarrier***********
 \usepackage[section]{placeins}
@@ -82,6 +83,22 @@
 \numberwithin{equation}{subsection}
 \numberwithin{figure}{section}
 \numberwithin{table}{section}
+
+%dichiaro qualche funzione
+
+\def\Rjump(#1){(#1>1)?
+	((2 *#1 -1 -2 * sqrt(#1*(#1-1) ) )/ (2*#1 -1 +2 *sqrt(#1*(#1-1) ) )):1
+}%#1=x = E/V
+
+\def\Tjump(#1){(#1>1)?
+	((4 * sqrt(#1*(#1-1) ) )/ (2*#1 -1 +2 *sqrt(#1*(#1-1) ) )):0
+}%#1=x = E/V
+
+\def\Rbarrier(#1,#2,#3,#4){(#1>1)?
+	(1 + 4 * (#1^2 - #1) / ( ( sin(#4 * sqrt(2*#2*#3*(1-1/#1) ) ) )^2 ) )^(-1) :
+	( (#1==1)? (1 + 2/(#2 * #3 * (#4^2)) )^(-1):
+	(1 + 4 * (#1-#1^2) / ( (sinh(#4 * sqrt(2*#2*#3*(1/#1-1) ) ) )^2) )^(-1) )
+}%#1=x = E/V,#2=m,#3=E, #4=a
 
 %opening
 \pretitle{%
@@ -140,4 +157,5 @@
 \part{Appendice}
 \appendix
 \include{tabelle}
+\include{varie}
 \end{document}

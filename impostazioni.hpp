@@ -41,7 +41,7 @@ public:
   void plotSettings(const char*, double);
   
   void setNewVval(double val);
-  void setNewIstdev(double Nstdev);
+  void setNewIstdev(double Nstdev);//dev dell condizioni iniziali
   void setE(double);
   
   double eta();
