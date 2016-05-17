@@ -12,7 +12,7 @@ PIC	= -fPIC
 #su lubuntu 15.10 64bit non metterla non fa compilare le .so
 #potrebbe servire scrivere -fpic, oppure ometterla del tutto
 #####Position-Indipendent-Code
-all:single drawer analisi experiment getInt
+all:single drawer analisi experiment getInt preview
 
 #https://root.cern.ch/interacting-shared-libraries-rootcint
 #il progamma principale --help per aiuto
@@ -70,6 +70,7 @@ getIntSR: saveOnlyInt.cpp TridiagC.o CrankSolverC.o impostazioniC.o experimentC.
 	@echo Compilo $@
 	@$(CC11) $(CFLAGS) -o $@ $^  -DUSECOMPLEX -DREGULAR -DSIGMA
 
+#se ci sono problemi con visualDict_rdict.pcm ripetere questo passaggio
 visualDict.cpp: visual.hpp visualLinkDef.h
 	@echo Chiamo rootcint per compilare la libreria $@
 	@rootcint -f $@ -c $^

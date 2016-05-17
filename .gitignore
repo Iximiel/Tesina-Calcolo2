@@ -9,8 +9,7 @@ getInt*
 getVel
 pesiOsc
 preview
-CCDict.cpp
-SchrodyDict.cpp
+VisualDict.cpp
 *out.txt
 todraw.txt
 *.dat
