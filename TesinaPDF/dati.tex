@@ -225,142 +225,146 @@ R\lrt{m,E,x} = \lr\{.{\begin{array}{lr}
   \caption{I dati tra 2 e 4 per una barriera larga 4, con $E=15$}\label{fig:Osc4}
 \end{figure}
 
+\begin{figure}[hbt]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\begin{tikzpicture}
+		\def \m {10};
+		\def \En {15};
+		\begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax = 0.11]
+		\foreach \a/\mycol in {2/red}{
+			\addplot table[x=ev,y=a\a] {Dati/Barrieras15E15.tdt};
+			\edef\temp{
+				\noexpand\addlegendentry{$a=\a$}
+				\noexpand\addplot[domain=2:4, samples =501, \mycol]	plot[id=big\a]	function{\Rbarrier (x,\m,\En,\a)};
+				\noexpand\addlegendentry{teoria: $a=\a$}
+			}
+			\temp
+		}
+		\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.49\textwidth}
+		\begin{tikzpicture}
+		\def \m {10};
+		\def \En {15};
+		\begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 1.9, xmax = 4.1, ymin=-0.001,ymax = 0.11]
+		\foreach \a/\mycol in {4/red}{
+			\addplot table[x=ev,y=a\a] {Dati/Barrieras15E15.tdt};
+			\edef\temp{
+				\noexpand\addlegendentry{$a=\a$}
+				\noexpand\addplot[domain=2:4, samples =501, \mycol]	plot[id=big\a]	function{\Rbarrier (x,\m,\En,\a)};
+				\noexpand\addlegendentry{teoria: $a=\a$}
+			}
+			\temp
+		}
+		\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Onde con $m=10$, $\sigma=15\gg a$ e $E=15$}\label{fig:Osc15}\label{fig:biggersig}
+\end{figure}
+
+
 Voglio provare a replicare le oscillazioni che si notano in \autoref{fig:Barriera}.
-Faccio simulazioni pi\`u ''fitte`` in un intervallo del rapporto di $E/V$ p\`u piccolo e con $E=15$.
-La prima cosa che si pu\`o osservare dai dati \`e che pi\`u la barriera \`e  grande rispetto alla larghezza del pacchetto pi\`u la simulazione si allontana dalla teoria per le onde piane.
-Probabilmente questo \`e dovuto al fatto che se il pacchetto incontra una barriera pi\`u ''larga`` delle sue dimensioni questo tenda a comportarsi similmente a come se fosse in presenza di un salto di potenziale ma da \autoref{fig:Osc2} e \autoref{fig:Osc4} si nota che questa mia idea non \`e del tutto corretta: l'andamento \`e simile ma la barriera riflette di p\`u rispetto al salto singolo questo probabilmente \`e dovuto al fatto che  anche quando un potenziale cala si presentano riflessioni e questo contribuisce a far crescere il coefficiente di riflessione.
+Faccio simulazioni pi\`u ``fitte'' in un intervallo del rapporto di $E/V$ pi\`u piccolo e con $E=15$.
 
+La prima cosa che si pu\`o osservare dai dati \`e che pi\`u la barriera \`e  grande rispetto alla larghezza del pacchetto pi\`u la simulazione si allontana dalla teoria per le onde piane, dalla \autoref{fig:biggersig} si pu\`o notare che questa supposizione sembra corretta.
+
+Probabilmente questo \`e dovuto al fatto che se il pacchetto incontra una barriera pi\`u ``larga'' delle sue dimensioni questo tenda a comportarsi similmente a come se fosse in presenza di un salto di potenziale ma da \autoref{fig:Osc2} e \autoref{fig:Osc4} si nota che questa mia idea non \`e del tutto corretta: l'andamento \`e simile ma la barriera riflette di p\`u rispetto al salto singolo questo probabilmente \`e dovuto al fatto che  anche quando un potenziale cala si presentano riflessioni e questo contribuisce a far crescere il coefficiente di riflessione.
 
 \begin{figure}[hbt]
-  \centering
-  \begin{subfigure}[b]{0.49\textwidth}
-    \begin{tikzpicture}
-      \def \a {0.1};
-      \def \m {5};
-      
-      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\def \En {25};
-	\addplot table[x=ev,y=E25] {Dati/datatunnelm5.tdt};
-	\addlegendentry{S: $E=25$}
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{(\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=25$}
-	\def \En {75};
-	\addplot table[x=ev,y=E75] {Dati/datatunnelm5.tdt};
-	\addlegendentry{S: $E=75$}
-	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=75$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{subfigure}
-  ~
-  \begin{subfigure}[b]{0.49\textwidth}
-    \begin{tikzpicture}
-      \def \a {0.1};
-      \def \m {5};
-      
-      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\def \En {50};
-	\addplot table[x=ev,y=E50] {Dati/datatunnelm5.tdt};
-	\addlegendentry{S: $E=50$}
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=50$}
-	\def \En {100};
-	\addplot table[x=ev,y=E100] {Dati/datatunnelm5.tdt};
-	\addlegendentry{S: $E=100$}
-	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=100$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{subfigure}
-  \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 5 e spessore della barriera $a=0.1$}
+\centering
+\def \a {0.1}
+\begin{subfigure}[b]{0.49\textwidth}
+\begin{tikzpicture}
+	\def \En {10};
+	\begin{axis}[ymajorgrids, axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+	\foreach \m in {5,10,15}{
+		\addplot table[x=ev,y=E\En] {Dati/Tunnelm\m.tdt};
+		\edef\temp{
+			\noexpand\addlegendentry{{S: $m=\m$}}
+		}\temp
+	}
+	\foreach \m/\mycol in {5/green,10/blue,15/red}{
+		\edef\temp{
+			\noexpand\addplot[domain=0.25:1.75, samples =501, \mycol]	plot[id=Tunnelm\m\En]	function{\Rbarrier (x,\m,\En,\a)};
+			\noexpand\addlegendentry{{T: $m=\m$}}
+		}\temp
+	}
+\end{axis}
+\end{tikzpicture}
+\caption{$E=10$}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.49\textwidth}
+\begin{tikzpicture}
+\def \En {15};
+\begin{axis}[ymajorgrids, axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+	\foreach \m in {5,10,15}{
+		\addplot table[x=ev,y=E\En] {Dati/Tunnelm\m.tdt};
+		\edef\temp{
+			\noexpand\addlegendentry{{S: $m=\m$}}
+		}\temp
+	}
+	\foreach \m/\mycol in {5/green,10/blue,15/red}{
+		\edef\temp{
+			\noexpand\addplot[domain=0.25:1.75, samples =501, \mycol]	plot[id=Tunnelm\m\En]	function{\Rbarrier (x,\m,\En,\a)};
+			\noexpand\addlegendentry{{T: $m=\m$}}
+		}\temp
+	}
+\end{axis}
+\end{tikzpicture}
+\caption{$E=15$}
+\end{subfigure}
+	\caption{Per $E/V<1$ si nota l'effetto tunnel. Pacchetto con $\sigma = 4$ e spessore della barriera $a=0.1$}
 \end{figure}
 
 \begin{figure}[hbt]
-  \centering
-  \begin{subfigure}[b]{0.49\textwidth}
-    \begin{tikzpicture}
-      \def \a {0.1};
-      \def \m {10};
-      
-      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\def \En {25};
-	\addplot table[x=ev,y=E25] {Dati/datatunnelm10.tdt};
-	\addlegendentry{S: $E=25$}
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=25$}
-	\def \En {75};
-	\addplot table[x=ev,y=E75] {Dati/datatunnelm10.tdt};
-	\addlegendentry{S: $E=75$}
-	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=75$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{subfigure}
-  ~
-  \begin{subfigure}[b]{0.49\textwidth}
-    \begin{tikzpicture}
-      \def \a {0.1};
-      \def \m {10};
-      
-      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\def \En {50};
-	\addplot table[x=ev,y=E50] {Dati/datatunnelm10.tdt};
-	\addlegendentry{S: $E=50$}
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=50$}
-	\def \En {100};
-	\addplot table[x=ev,y=E100] {Dati/datatunnelm10.tdt};
-	\addlegendentry{S: $E=100$}
-	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{\Rbarrier (x,\m,\En,\a)};
-	\addlegendentry{T: $E=100$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{subfigure}
-  \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 10 e spessore della barriera $a=0.1$}
-\end{figure}
-
-\begin{figure}[hbt]
-  \centering
-  \begin{subfigure}[b]{0.49\textwidth}
-    \begin{tikzpicture}
-      \def \a {0.1};
-      \def \m {15};
-      
-      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\def \En {25};
-	\addplot table[x=ev,y=E25] {Dati/datatunnelm15.tdt};
-	\addlegendentry{S: $E=25$}
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel525]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{T: $E=25$}
-	\addplot table[x=ev,y=E75] {Dati/datatunnelm15.tdt};
-	\addlegendentry{S: $E=75$}
-	\def \En {75};
-	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel575]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{T: $E=75$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{subfigure}
-  ~
-  \begin{subfigure}[b]{0.49\textwidth}
-    \begin{tikzpicture}
-      \def \a {0.1};
-      \def \m {15};
-      
-      \begin{axis}[axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
-	\def \En {50};
-	\addplot table[x=ev,y=E50] {Dati/datatunnelm15.tdt};
-	\addlegendentry{S: $E=50$}
-	\addplot[domain=0.25:1.75, samples =501, orange]	plot[id=MTunnel550]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{T: $E=50$}
-	\def \En {100};
-	\addplot table[x=ev,y=E100] {Dati/datatunnelm15.tdt};
-	\addlegendentry{S: $E=100$}
-	\addplot[domain=0.25:1.75, samples =501, green]	plot[id=MTunnel5100]	function{(x==1)?1-2/(2+\a*\a*\En*\m):1+(8*(x-1)*x)/(cos(2*\a*sqrt(2*\m*\En*(x-1)))-1-8*x*(x-1))};
-	\addlegendentry{T: $E=100$}
-      \end{axis}
-    \end{tikzpicture}
-  \end{subfigure}
-  \caption{Provo a simulare l'effetto tunnel, impiegando un pacchetto con $\sigma = 4$, con massa delle particelle 15 e spessore della barriera $a=0.1$}
+	\centering
+	\def \a {0.1}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\begin{tikzpicture}
+		\def \En {20};
+		\begin{axis}[ymajorgrids, axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+		\foreach \m in {5,10,15}{
+			\addplot table[x=ev,y=E\En] {Dati/Tunnelm\m.tdt};
+			\edef\temp{
+				\noexpand\addlegendentry{{S: $m=\m$}}
+			}\temp
+		}
+		\foreach \m/\mycol in {5/green,10/blue,15/red}{
+			\edef\temp{
+				\noexpand\addplot[domain=0.25:1.75, samples =501, \mycol]	plot[id=Tunnelm\m\En]	function{\Rbarrier (x,\m,\En,\a)};
+				\noexpand\addlegendentry{{T: $m=\m$}}
+			}\temp
+		}
+		\end{axis}
+		\end{tikzpicture}
+		\caption{$E=20$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.49\textwidth}
+		\begin{tikzpicture}
+		\def \En {25};
+		\begin{axis}[ymajorgrids, axis x line = center, axis y line = center, ylabel=R, ylabel style={left}, xlabel=E/V, xlabel style={below right}, xmin = 0.25, xmax = 1.75, ymin=-0.1,ymax =1.1]
+		\foreach \m in {5,10,15}{
+			\addplot table[x=ev,y=E\En] {Dati/Tunnelm\m.tdt};
+			\edef\temp{
+				\noexpand\addlegendentry{{S: $m=\m$}}
+			}\temp
+		}
+		\foreach \m/\mycol in {5/green,10/blue,15/red}{
+			\edef\temp{
+				\noexpand\addplot[domain=0.25:1.75, samples =501, \mycol]	plot[id=Tunnelm\m\En]	function{\Rbarrier (x,\m,\En,\a)};
+				\noexpand\addlegendentry{{T: $m=\m$}}
+			}\temp
+		}
+		\end{axis}
+		\end{tikzpicture}
+		\caption{$E=25$}
+	\end{subfigure}
+	\caption{Per $E/V<1$ si nota l'effetto tunnel. Pacchetto con $\sigma = 4$ e spessore della barriera $a=0.1$}
 \end{figure}
 
 A questo punto provo a diminuire le dimensioni della barriera per provare l'effetto tunnel: guardo quanto cala il coefficiente di riflessione quando il rapporto tra $E/V$ \`e inferiore a 1. Vario la massa del pacchetto

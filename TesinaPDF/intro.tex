@@ -6,7 +6,7 @@ La derivata prima (in avanti) \`e:
 \begin{equation}
   \pde{F}x(a) \simeq \frac{F(a+h)-F(a)}{h} + O(h)
 \end{equation}
-Ma la sua precisione \`e al primo ordine, per cui si pu\`o utilizzare la cosiddetta definizione ``centrale'':
+Ma \`e al primo ordine, per una maggiore precisione si pu\`o utilizzare la cosiddetta definizione ``centrale'':
 \begin{equation}
   \pde{F}x(a) \simeq \frac{F(a+h)-F(a-h)}{2*h} + O(h^2)
 \end{equation}
@@ -20,7 +20,7 @@ Per la derivata seconda il discorso \`e simile ma in entrambi i casi la precisio
   \pde{^2F}{x^2}(a) \simeq  \frac{F(a+h)+F(a-h)-2F(a)}{h^2} + O(h^2)
 \end{equation}
 
-Definito come si calcolano le derivate si pu\`o iniziare a pensare di risolvere delle equazioni differenziali in maniera numerica.
+Definito come si calcolano le derivate che ci interessano posso mostrare come utilizzarle per risolvere numericamente equazioni differenziali.
 
 \subsection{Equazione del calore}
 Il metodo che voglio illustrare inizialmente \`e stato concepito per la risoluzione di equazioni differenziali iperboliche, come quella del calore:
@@ -58,7 +58,7 @@ proseguo:
   T(x,t+\Delta t)- k \frac{\Delta t}{\Delta x^2}\lrt{T(x+\Delta x,t+\Delta t)+T(x-\Delta x,t+\Delta t)-2T(x,t+\Delta t)} = T(x,t)
 \end{equation}
 
-Anche in questo caso non approfondisco, l'approccio \`e simile al metodo di Crank-Nicolson, ma preferisco parlarne direttamente di quest'ultimo per poi generalizzarlo e descriverne l'algoritmo utilizzato per la risoluzione dell'equazione di \Schrodinger
+Anche in questo caso non approfondisco, l'approccio per la soluzione \`e simile al metodo di Crank-Nicolson, ma preferisco parlarne direttamente di quest'ultimo per poi generalizzarlo e descriverne l'algoritmo utilizzato per la risoluzione dell'equazione di \Schrodinger
 
 \subsection{Un esempio di come ricavare il metodo di Crank Nicolson: l'equazione del calore}
 Innanzitutto utilizziamo la definizione centrale della derivata prima in modo da avere una precisione di $\Delta t^2$ anche per quanto riguarda il tempo, ma  calcolandola in $t+\Delta t/2$ con incremento $\Delta t/2$:
@@ -74,8 +74,10 @@ A questo punto abbiamo $\pde{T}t(x,t+\Delta t/2)$, $\pde{^2T}{x^2}(x,t)$ e $\pde
   \end{aligned}
 \end{equation}
 
-In pochi passaggi si arriva a separare le parti a tempo differente, con $\eta = K\frac{\Delta t}{\Delta x^2}$:
+In pochi passaggi si arriva a separare le parti a tempo differente:
 \begin{equation}
   \lrt{\frac 2\eta +2}T(x,t+\Delta t) -T(x+\Delta x,t+\Delta t)-T(x-\Delta x,t+\Delta t) = \lrt{\frac 2\eta -2}T(x,t)+T(x+\Delta x,t)+T(x-\Delta x,t)
 \end{equation}
+ dove $\eta = K\frac{\Delta t}{\Delta x^2}$.
+
 Per ogni istante di tempo ho una matrice tridiagonale per il passo temporale che conosco e una per quello successivo. In \autoref{section:soluzionetri} descriver\`o come si risolve una di queste matrici.

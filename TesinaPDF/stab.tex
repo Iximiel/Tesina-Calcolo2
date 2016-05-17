@@ -1,4 +1,4 @@
-\subsection{Stabilit\`a}
+\section{Stabilit\`a}
 Per mostrare che lo schema proposto \`e stabile utilizzo il principio di Von Neumann:
 perch\'e un metodo si riveli stabile non deve propagare eventuali errori che nascono dal calcolo. Definiamo l'errore come:
 \begin{equation}
@@ -49,7 +49,7 @@ e sostituisco nell'uguaglianza:
 \begin{equation}
   \frac{\hat{\epsilon}^{j+1}_\o}{\hat{\epsilon}^j_\o}= -\lrt{1 -
     \frac{d+dk}{d-2 \cos\lrt{\o \Delta x}-2 i\lrt{1+a}\sin\lrt{\o \Delta x}}}
-\end{equation}
+\end{equation}`
 
 da cui ricavo $G$:
 
@@ -65,7 +65,7 @@ Non posso pi\`u essere generale. Per fare il valore assoluto devo conoscere se $
 Per esempio, sostituendo i valori che trovo in \eqref{eq:pararametriHeat} per l'equazione del calore, dopo le sostituzioni e varie semplificazioni trovo che:
 
 \begin{equation}
-  G = \frac{\lr||{\Delta x^2 - \Delta t k \lrt{1-\cos\lrt{\o \Delta t}}}}{\Delta x^2 + \Delta t k \lrt{1-\cos\lrt{\o \Delta t}}}
+  G = \frac{\lr||{\Delta x^2 - \Delta t K \lrt{1-\cos\lrt{\o \Delta t}}}}{\Delta x^2 + \Delta t K \lrt{1-\cos\lrt{\o \Delta t}}}
 \end{equation}
 
 In cui si vede che $G<1$ per tutte le frequenze diverse dai multipli di $\o = 2\pi/\Delta x$, in quei casi $G=1$ e quindi tenderanno a rimanere delle oscillazioni nella soluzione.

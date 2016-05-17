@@ -41,8 +41,8 @@ int main(int argc, char** argv){
     info->setNewIstdev(Par[j]);
 #else
     disc = 'E';
-    int nP = 4;
-    double Par[nP] = {10, 15, 20, 25};
+    int nP = 1;
+    double Par[nP] = {15};//{10, 15, 20, 25};
     for(int j=0;j<nP;j++){
       info->setE(Par[j]);
 #endif
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
 #ifdef REGULAR
       //incrementi regolari
       N=40;
-      double a = 0.25, b=1.75;
+      double a = 2, b=4;
       double incr = (b-a)/N; //andare da a a b in N passi (N+1 perche` b lo voglio compreso)
 #else
       N=11;

@@ -55,7 +55,7 @@ Conosco il valore della derivata negli estremi del dominio.
 \begin{equation}
   \pde Fx(x,t) = f(x,t) \forall x \in \partial D
 \end{equation}
-La spiegazione e l'esempio per questa risoluzione lo fornisco nel paragrafo dedicato a Robin.
+Essendo molto simile alle condizioni di Robin svolger\`o solo i calcoli per l'esempio pi\`u generale.
 
 \subsection{Robin}
 Conosco una combinazione lineare tra la derivata e il valore della funzione negli estremi del dominio.
@@ -63,11 +63,11 @@ Conosco una combinazione lineare tra la derivata e il valore della funzione negl
   \pde Fx(x,t) +r(x,t) F(x,t) = g(x,t) \forall x \in \partial D
 \end{equation}
 
-Come prima, per mantenere la precisione del metodo ($\Delta x^2$) non posso usare la definizione  centrale,  ho quindi bisogno di inventarmi un ''nodo fantasma'' $F_{-1}^{j+1}$ (o $F_{N}^{j+1}$ se fosse la condizione nell'ultimo punto del dominio):
+Come prima, per mantenere la precisione del metodo ($\Delta x^2$) non posso usare la definizione  centrale,  ho quindi bisogno di inventarmi un ``nodo fantasma'' $F_{-1}^{j+1}$ (o $F_{N}^{j+1}$ se fosse la condizione nell'ultimo punto del dominio):
 \begin{equation}
   \pde Fx(x(i=0),t(j=j+1)) = \frac{F_{1}^{j+1}-F_{-1}^{j+1}}{2\Delta x}
 \end{equation}
-Sostituisco nella \eqref{eq:Robin} per $i=0$ e al tempo geerico $j=n$:
+Sostituisco nella \eqref{eq:Robin} per $i=0$ e ottengo $F_{-1}^{n}$ al tempo generico $j=n$ ho:
 \begin{equation}
   \frac{F_{1}^{n}-F_{-1}^{n}}{2\Delta x} + R_0^nF_{0}^{n} = g_0^n  \to 
   F_{-1}^{n} = F_{1}^{n} + 2\Delta x \lrt{R_0^nF_{0}^{n}-g^n_0}
@@ -136,10 +136,10 @@ Che equivale a scrivere:
   \end{array}
 \end{equation}
 
-e di conseguenza $F_{N-1}^{j+1} = p_{N-1}'$, anche perch\`e \`e il primo punto da cui si parte per calcolare il valore della funzione in $j+1$.
+e di conseguenza $F_{N-1}^{j+1} = p_{N-1}'$, che \`e il primo punto da cui si parte per calcolare il valore della funzione in $j+1$.
 
 Se faccio in modo di eliminare il coefficiente che moltiplica il valore della funzione (gli $R$) ottengo le condizioni a  contorno di Neuman.
 \subsection{Osservazione}
-Il modo in cui ho trattato i parametri per quanto riguarda le condizioni al contorno di Dirichlet nei punti $0$ e $N-1$, non \`e matematicamente corretto infatti i parametri andrebbero messi tutti a 0 in quanto quei punti non fanno parte dell'algoritmo.
+Il modo in cui ho trattato i parametri per quanto riguarda le condizioni al contorno di Dirichlet nei punti $0$ e $N-1$, non \`e matematicamente corretto: infatti i parametri andrebbero messi tutti a 0 in quanto quei punti non fanno parte dell'algoritmo.
 
-Ho impostato i valori  per avere un algoritmo che possa svolgere il calcolo rispettando le condizioni al contorno senza sapere quali siano, mettendo nelle mani dell'utente, che si occuper\`a di impostare i corretti parametri della matrice, la gestione delle condizioni.
+Ho impostato i valori in questo modo per avere un algoritmo che possa svolgere il calcolo rispettando le condizioni al contorno senza sapere quali siano, mettendo nelle mani dell'utente, che si occuper\`a di impostare i corretti parametri della matrice, la gestione delle condizioni.

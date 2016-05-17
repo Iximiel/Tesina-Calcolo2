@@ -1,28 +1,26 @@
 \section{Varie}
 
-\pgfplotscreateplotcyclelist{mylist}{%
-	{green},{red},{orange},{blue}
-} 
-
-\begin{figure}
+\begin{figure}[hbt]
 	\centering
 	\begin{tikzpicture}
 	\def \mya {2};
 	\def \mys {2};
 	\def \myx {2};
-	\def \mycol {black};
-	\begin{axis}[axis x line = center, axis y line = center, xmin = -0.1, xmax = 10, ymin=-0.1,ymax =1.1, cycle list name=mylist]
+	\begin{axis}[axis x line = center, axis y line = center, xmin = -0.1, xmax = 10, ymin=-0.1,ymax =1.1]
 		\addplot[domain=0:10, samples =501, black]	plot[id=barrdemo]	function{(x>\mya?1:0)*(x<(\mya+\mys)?1:0)};
-		\foreach \mys in {0.5,1,2,4}{
-			\expandafter\addplot[domain=0:10, samples =501]	plot[id=gauss]	function{exp(-(x-\myx)*(x-\myx)/(2*\mys^2))};
+		\edef\temp{\noexpand\addlegendentry{$a=\mys$}}\temp
+		\foreach \mys/\mycol in {0.5/orange,1/blue,2/red,4/green}{
+			\edef\temp{\noexpand\addplot[\mycol,domain=0:10, samples =501]	plot[id=gauss]	function{exp(-(x-\myx)*(x-\myx)/(2*\mys^2))};
+			\noexpand\addlegendentry{$\sigma=\mys$}
+			}\temp
 		}
 	\end{axis}
 \end{tikzpicture}
-	\caption{In questa figura mostro il confronto tra una barriera del tipo \eqref{eq:Barriera} con $a=2$ e una diverse gaussiane}
+	\caption{In questa figura mostro il confronto tra una barriera del tipo \eqref{eq:Barriera} con $a=2$ e diverse gaussiane}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\section{Calcoli}
 \subsection{Calcoli Salto}\label{sec:Salto}
 Procedo con il risolvere l'equazione di \Schrodinger con un potenziale del tipo \eqref{eq:Barriera}.
 Prendiamo un dominio infinito con in 0 il salto di potenziale, l'equazione, indipendente dal tempo, avr\`a la forma:
@@ -101,6 +99,24 @@ Metto i risultati in termini di $E$ e $V$
 	\end{axis}
 	\end{tikzpicture}
 	\caption{Coefficienti di trasmissione e riflessione}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\def \step {1.7}
+	\begin{tikzpicture}
+	\def \ku {sqrt(2*(5))}
+	\def \kd {sqrt(2*(5-3))}
+	\begin{axis}[axis x line = center, axis y line = center, xmin = -4, xmax = 6, ymin=-2.1,ymax =2.1]%,legend style={at={(1,0.5)},anchor=east}]
+	\addplot[domain=-4:6, samples =501, red]		plot[id=IStepPass]	function{(x<\step)?sin(\ku*x)+sin(\ku*(2*\step-x))*(\ku-\kd)/(\ku+\kd) : sin(\kd*x+\step*(\ku-\kd))*(2*\ku)/(\ku+\kd)};%(2*sqrt(\ku*\kd))/(\ku+\kd)};
+	\addplot[domain=-4:6, samples =501, blue]		plot[id=IStepPass]	function{(x<\step)?cos(\ku*x)+cos(\ku*(2*\step-x))*(\ku-\kd)/(\ku+\kd) : cos(\kd*x+\step*(\ku-\kd))*(2*\ku)/(\ku+\kd)};%(2*sqrt(\ku*\kd))/(\ku+\kd)};
+	\addplot[domain=-4:6, samples =501, green]		plot[id=Step]	function{2*((x<\step)?0:1)-1};
+	%\addlegendentry{$E>V$}
+	\addplot[domain=-5:5, samples =501, orange]		plot[id=StepPass]	function{(x<1)?sin(\ku*x)+sin(-\ku*x+2*1*\ku)*(\ku-\kd)/(\ku+\kd) : sin(\kd*x+1*(\ku-\kd))*(2*sqrt(\ku*\kd))/(\ku+\kd)};
+%	\addlegendentry{$E<V$}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Onde piane}
 \end{figure}
 
 \subsection{Calcoli Barriera}\label{sec:BarrieraCalc}

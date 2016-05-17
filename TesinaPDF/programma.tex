@@ -1,7 +1,7 @@
 \section{Il programma: descrizione e scelta dei parametri}
 Per semplicit\`a e alleggerire i calcoli ho impostato $\hbar=1$, 
 Gli eseguibili compilabili dal Makefile sono i seguenti, nei commenti \`e spiegato come eseguirli:
-\lstinputlisting[language=make, firstline = 17, lastline = 40,frame = single]{../Makefile}
+\lstinputlisting[language=make, firstline = 18, lastline = 50]{../Makefile}
 \begin{itemize}
 \item Il programma pi\`u semplice (\textit{single}) \`e composto da un blocco \textit{impostazioni} che carica i file con le informazioni sulla simulazione, crea la trimatrice e le condizioni iniziali ,e un blocco \textit{CrankSolver} che si occupa di svolgere risolvere il sistema passo per passo (nel nostro caso non avendo potenziali che dipendono dal tempo la riduzione della trimatrice viene fatta solo una volta, nella costruzione del \textit{CrankSolver}).
   Ho scelto di impostare il \textit{CrankSolver} in modo che contenga solo i punti del passo attuale perch\'e l'elevato numero di punti rischia di intasare la memoria del sistema piuttosto in fretta: i punti calcolati vengono salvati su un file in una cartella ``./results'', che deve essere creata prima di lanciare l'eseguibile, il numero di punti e la frequenza di essi viene deciso nei file di impostazione.
@@ -13,6 +13,7 @@ Gli eseguibili compilabili dal Makefile sono i seguenti, nei commenti \`e spiega
   \item \textit{CVD} mostra i vari potenziali il cui elenco \`e contenuto nel file \textit{infonamelist.txt}, carica le impostazioni del dominio da un file \textit{settings.set} dato.
   \item \textit{preview} deve essere lanciato con \textit{./runscript.sh} (che imposta \lstinline[language = bash]|export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./|) \`e una piccola interfaccia grafica che permette di fare qualche analisi sui risultati della simulazione.
   \end{itemize}
+  \item la famiglia \textit{getInt} svolge una serie di simulazioni e salva su file i rapporti tra l'integrale nella prima parte del dominio e l'integrale totale della funzione nell'ultimo punto temporale richiesto. Usa ``Potenziale.set'' come nome del file potenziale e ``initial.set'' per le condizioni iniziali, il file delle impostazioni \`e dichiarabile come argomento oppure utilizza ``setting.set''
 \end{itemize}
 \begin{figure}[htb]
   \centering
@@ -57,6 +58,13 @@ Il file del potenziale:
 \lstinputlisting[frame = single,caption=Impostazioni potenziale]{../potenziale.set}
 Il primo parametro imposta la forma del potenziale, che pu\`o essere una gaussiana, un ``bump'', un rettagolo oppure un salto.
 Nella riga successiva il primo parametro imposta l'altezza  del punto pi\`u alto del potenziale, se messo a 0 dice all'algoritmo di calcolare l'evoluzione in assenza di potenziale, il secondo parametro indica il centro della funzione se \`e pari, oppure la posizione del salto, l'ultimo parametro indica la larghezza o la deviazione standard del potenziale non viene utilizzato se la forma \`e il salto.
+
+\subsection{Come ho utilizzato i programmi}
+Dove serviva avere molte variazioni di condizioni iniziali o nel potenziale ho utilizzato degli script in python per scrivere pi\`u voltei vari files.
+
+Per i primi dati, mi serviva avere a disposizione l'evoluzione dell'onda nel tempo: sono stati raccolti utilizzando uno script sh per lanciare pi\`u volte ``single'' con opzioni differenti per i file di impostazioni o per le condizioni iniziali, Dove avevo bisogno di cambiare pi\`u volte il potenziale, senza modificare le CI e le impostazioni ho utilizzato ``experiment''. Per questi dati le analisi sono state fatte spostandosi nella cartella ``results'' e utilizzando il programma ``analisi'', con le opzioni volute (esplorabili con ``\textit{-- help}'') oppure accedendo alle opzioni di analisi tramite l'interfaccia grafica, chiamabile tramite ``runscript.sh''.
+
+Nella seconda parte, in cui mi interessava non l'andamento temporale della funzione, ma il valore finale di una parte dell'integrale ho utilizzato un programma della famiglia ``getInt'', a seconda di dei parametri che mi interessava variare. Modificando a priori qualche parametro, come gli intervalli del rapporto $E/V$ o le energie delle onde prima di eseguire il lancio. Prima di lanciare l'esperimento vero e proprio lanciavo un ``single'' per poi analizzare i risultati dei lanci con l'interfaccia grafica in modo da capire se i risultati della simulazione sarebbero stati affidabili o meno.
 
 \subsection{Condizioni iniziali}
 La mia idea \`e di simulare l'evoluzione di un pacchetto di onde piane quindi nella forma
@@ -217,7 +225,7 @@ Quindi ho fatto una simulazione diminuendo il tempo massimo a $6$ in modo da non
   \centering
   \begin{subfigure}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{IMG/eChoosy1}
-    \caption{CI: gaussiana($\sigma=2$)}
+    \caption{CI: gaussiana($\sigma=1$)}
   \end{subfigure}
   ~
   \begin{subfigure}[b]{0.45\textwidth}
@@ -232,7 +240,7 @@ Osservando \autoref{fig:SceltaErrori} utilizzare come passi spaziali e temporali
 \begin{figure}[hbt]
   \centering
   \includegraphics[width=0.7\textwidth]{IMG/sceltaPassi}
-  \caption[Scelta Passi]{Gli errori dei passi che ritengo pi\`u convenienti}\label{fig:sceltaPassi}
+  \caption[Scelta Passi]{Gli errori dei passi che ritengo pi\`u convenienti, con $\sigma=1$ e $\sigma=2$}\label{fig:sceltaPassi}
 \end{figure}
 
 \subsection{Dispersione dei pacchetti d'onda}
@@ -361,7 +369,7 @@ bump = \lrt{x} = \lr\{.{\begin{array}{lr}
 	\end{array}}
 \end{equation}
 
-Il ''bump`` \`e una funzione di test quindi \`e definita differente da 0 solo in un intervallo aperto, ed ha la caratteristica di avere tutte le derivate continue, questo mi permetterebbe di ignorare completamente le condizioni al contorno quando la funzione si trova lontano dai bordi della simulazione.
+Il ``bump'' \`e una funzione di test quindi \`e definita differente da 0 solo in un intervallo aperto, ed ha la caratteristica di avere tutte le derivate continue, questo mi permetterebbe di ignorare completamente le condizioni al contorno quando la funzione si trova lontano dai bordi della simulazione.
 Inoltre moltiplico il risultato per $e$ per avere un pacchetto con il massimo alto $1$, vedi \autoref{fig:bump}.
 
 \begin{figure}[hbt]

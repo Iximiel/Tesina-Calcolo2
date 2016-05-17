@@ -8,7 +8,8 @@ Scrivo la pi\`u generica equazione risolvibile con questo metodo:
 \end{equation}
 
 Il coefficiente della derivata temporale \`e ignorato perch\'e \`e incluso negli altri coefficienti e deve essere diverso da 0, ovviamente anche $D_2$, il coefficiente della derivata seconda spaziale non deve essere mai uguale a zero!
-Inoltre preferisco lasciare $D_1$ e $D_2$ come costanti nel tempo e nello spazio, ma cambiare le costanti costa poco a livello di complessit\`a del calcolo, ma lascio per\`o la dipendenza temporale e spaziale a $V$ e $U$.
+
+Inoltre preferisco lasciare $D_1$ e $D_2$ come costanti nel tempo e nello spazio, aggiungere una dipendenza a queste costanti \`e facile, ma preferisco limitarmi a lasciare la dipendenza temporale e spaziale a $V$ e $U$.
 
 In seguito indicher\`o la il passo nello spazio a pedice con $_i$ e quello nel tempo in apice con $^j$.
 Discretizzo l'equazione, calcolando la derivata temporale in $j+1/2$ con passo $\Delta t/2$ e usando la definizione centrale, per quanto riguarda le derivate spaziali faccio la media tra quelle calcolate in $j$ e in $j+1$. I potenziali sono noti.
@@ -35,7 +36,7 @@ Per rendere pi\`u chiara spiegazione e risoluzione della matrice tridiagonale ri
   a_i^j F_{i-1}^{j+1} + d_i^j F^{j+1}_i + c_i^j F_{i+1}^{j+1} + e_i^j = 
   ak_i^j F_{i-1}^{j} + dk_i^j F^{j}_i + ck_i^j F_{i+1}^{j} + ek_i^j
 \end{equation}
-con:
+dove ho messo dipendenze spaziali e temporali anche dove non \`e necessario, con:
 \begin{equation}\label{eq:pararametri}
   \begin{array}{ll r}
     a_i^j = -1+\frac{D_1}{D_2}\frac{\Delta x}2			& ak_i^j =1-\frac{D_1}{D_2}\frac{\Delta x}2			& \text{parametri dei }(F^*_{i-1})\\
@@ -179,4 +180,4 @@ Per risolvere il sistema devo calcolare il vettore delle $\vec{P}$ per poi otten
 \begin{equation}
   F_{i}^{j+1} = p_{i}+h_i F_{i+1}^{j+1}
 \end{equation}
-A questo punto ho bisogno di conoscere come trattare le condizioni al contorno.
+Ora ho bisogno di conoscere come trattare le condizioni al contorno.
